@@ -21,3 +21,35 @@ We would like to contribute all the efforts to RISC-V community and AOSP project
 If you want to contribute, please read the contributing guide from the AOSP website.
 
 Feel free to open an issue for further questions/discussions!
+
+## Learning Materials
+
+### English
+
+
+**Porting Android to new Platforms**
+
+Amit Pundir
+
+https://www.slideshare.net/linaroorg/porting-android-tonewplatforms
+
+
+**Android-x86**
+
+https://www.android-x86.org/
+
+### Chinese Simplified
+
+**[COSCUP 2011] Porting android to brand-new CPU architecture**
+
+鄭孟璿 (Luse Cheng)
+
+https://www.youtube.com/watch?v=li6PqLn4Bl4
+
+**AOSP的构建系统和RISC-V移植初步 - 汪辰 - 20200805 - PLCT实验室**
+
+https://www.bilibili.com/video/BV1PA411Y7mz
+
+**闪电：AOSP移植RISC-V有多难 - 吴伟 - V8技术讨论会 - OSDT社区 - 20200607**
+
+https://www.bilibili.com/video/BV1wC4y1a7Za
