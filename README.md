@@ -9,6 +9,10 @@ If you are interested in runnning Android on RISC-V hardware, please join us!
 Currently we are in a very early stage, trying to cross compile AOSP codebase
 using the RISC-V official GNU toolchain.
 
+-2020-08-15 We have added the lunch menu for RISC-V, and loaded the menu success.
+After that, we added the RISC-V config files for build/make and build/soong,
+we are debugging RISC-V the config files in build/soong and build/blueprint.
+
 ## About Us
 
 The initial members of this project is from the [PLCT lab](https://github.com/isrc-cas/).
