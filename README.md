@@ -57,3 +57,7 @@ https://www.bilibili.com/video/BV1PA411Y7mz
 **闪电：AOSP移植RISC-V有多难 - 吴伟 - V8技术讨论会 - OSDT社区 - 20200607**
 
 https://www.bilibili.com/video/BV1wC4y1a7Za
+
+**AOSP for RISC-V 移植教程之 Android Runtime 介绍 - 汪辰 - 20200814 - PLCT实验室**
+
+https://www.bilibili.com/video/BV1wC4y1t7Xa
