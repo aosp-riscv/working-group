@@ -61,3 +61,7 @@ https://www.bilibili.com/video/BV1wC4y1a7Za
 **AOSP for RISC-V 移植教程之 Android Runtime 介绍 - 汪辰 - 20200814 - PLCT实验室**
 
 https://www.bilibili.com/video/BV1wC4y1t7Xa
+
+**AOSP for RISC-V 移植教程之 开始 ART 移植 - 汪辰 - 20200821 - PLCT实验室**
+
+https://www.bilibili.com/video/BV1JK411M7e5
