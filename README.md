@@ -11,7 +11,11 @@ using the RISC-V official GNU toolchain.
 
 - 2020-08-15 We have added the lunch menu for RISC-V, and loaded the menu success.
 After that, we added the RISC-V config files for build/make and build/soong,
-we are debugging RISC-V the config files in build/soong and build/blueprint.
+we are debugging RISC-V the config files in build/soong.
+
+- 20200901 We fixed the errors in build dir and prebuilts dir when we using the
+'mmm art/compiler' to generate the ninja files for compiler module. We are debugging
+the errors in the system dir and cts dir.
 
 ## About Us
 
