@@ -46,13 +46,15 @@ https://www.slideshare.net/linaroorg/porting-android-tonewplatforms
 
 https://www.android-x86.org/
 
-### Chinese Simplified
+### Traditional Chinese
 
 **[COSCUP 2011] Porting android to brand-new CPU architecture**
 
 鄭孟璿 (Luse Cheng)
 
 https://www.youtube.com/watch?v=li6PqLn4Bl4
+
+### Chinese Simplified
 
 **AOSP的构建系统和RISC-V移植初步 - 汪辰 - 20200805 - PLCT实验室**
 
