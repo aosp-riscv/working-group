@@ -1,0 +1,54 @@
+Here is a draft proposal for RISC-V AOSP Android Porting Plan.
+"Core Porting work" will focus on bringing up a minimum android rootfs with RISC-V Kernel image. It should be able to start console and native binary. And it will provide a solid build environment and runtime environment for further developing work.
+"Base Porting work" will focus on bringing up Android Java Runtime with APK support.
+"Extened Porting work" will focus on making up Android framework service into full function.
+
+1. Core Porting work items
+
+1.1 RISC-V AOSP Android GCC tool chain
+Upgrade the gcc toolchain with RISC-V Android GCC version.
+AOSP reference as https://android.googlesource.com/toolchain/gcc/
+$repo init -u https://android.googlesource.com/platform/manifest -b gcc
+$repo init -u persistent-https://android.git.corp.google.com/platform/manifest -b gcc
+aosp-gcc/toolchain/gcc$ ./build.py --toolchain aarch64-linux-android
+
+1.2 RISC-V AOSP Android NDK
+Follow the reference link to build RISC-V Android NDK. Reference link as https://android.googlesource.com/platform/ndk/+/master/docs/Building.md
+
+1.3 RISC-V AOSP CLANG
+Follow the refereince link to built RISC-V Android LLVM/CLANG.  Reference link as https://android.googlesource.com/toolchain/llvm_android/
+
+1.4 RISC-V Emulator Device Config
+Reference as below git
+* https://github.com/guoyinchen/riscv-aosp-mini-emulator-riscv64
+* https://github.com/guoyinchen/riscv-aosp-riscv64
+
+1.5 RISC-V Bionic porting
+1.5.1 libc syscall
+Reference as https://github.com/guoyinchen/riscv-aosp-bionic/tree/riscv_android-10.0.0
+1.5.2 libc vdso
+1.5.3 linker
+1.5.4 debuggerd
+1.5.5 libunwindstack
+1.5.6 update RISC-V Kernel header
+
+1.6 RISC-V Build/SOON config
+Reference as below:
+* https://github.com/guoyinchen/riscv-aosp-build/tree/riscv_android-10.0.0
+* https://github.com/guoyinchen/riscv-aosp-soong/tree/riscv_android-10.0.0
+1.7 RISC-V AOSP Kernel Porting
+Reference as https://android.googlesource.com/kernel/configs/
+
+2. Base Porting work items
+
+2.1 RISC-V ART porting
+
+3. Extended Porint work items
+
+3.1 RISC-V AOSP stagefright A/V codec 
+
+3.1 RISC-V AOSP Renderscript
+
+3.1 RISC-V AOSP boringssl
+
+3.1 RISC-V AOSP libpng/libjpg/libvpx
