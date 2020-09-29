@@ -19,6 +19,8 @@ the errors in the system dir and cts dir.
 
 - 2020-09-15 We launched task to porting AOSP kernel for RISC-V. After some research, we decided to base off the branch `android-5.4-stable` of AOSP common kernels and we are in working now.
 
+- 2020-10-01 Using the latest AOSP kernel and configuration, with GNU and LLVM/Clang tool-chain for RISC-V, successfully compile and boot the kernel on QEMU. The only problem is: after mounting the minimum rootfs, encounter the "Segmentation Fault" error. Still in debugging this issue. In addition, We began to study how to port the bionic library of AOSP to RISC-V. The current work is to port the AOSP building framework for bionic.
+
 ## About Us
 
 The initial members of this project is from the [PLCT lab](https://github.com/isrc-cas/).
@@ -40,21 +42,22 @@ Feel free to open an issue for further questions/discussions!
 
 ### Articles
 
-- [**AOSP 的版本管理，汪辰（ PLCT 实验室），20200911**](https://zhuanlan.zhihu.com/p/234390474)
-- [**AOSP 内核的版本管理，汪辰（ PLCT 实验室），20200915**](https://zhuanlan.zhihu.com/p/245131105)
-
+- [**Version Management for AOSP Platform，Wang Chen - PLCT lab，20200911 (Chinese Version)**](https://zhuanlan.zhihu.com/p/234390474)
+- [**Version Management for AOSP Kernel，Wang Chen - PLCT lab，20200915 (Chinese Version)**](https://zhuanlan.zhihu.com/p/245131105)
+- [**Running RISC-V 64 Linux on QEMU，Wang Chen - PLCT lab，20200923 (Chinese Version)**](https://zhuanlan.zhihu.com/p/258394849)
+- [**Compile Android Kenrel for RISC-V，Wang Chen - PLCT lab，20200929 (Chinese Version)**](https://zhuanlan.zhihu.com/p/260356339)
 
 ### Vedios
 
-- [**[COSCUP 2011] Porting android to brand-new CPU architecture, 鄭孟璿 (Luse Cheng)**](https://www.youtube.com/watch?v=li6PqLn4Bl4)
+- [**[COSCUP 2011] Porting android to brand-new CPU architecture, Luse Cheng (Traditional Chinese)**](https://www.youtube.com/watch?v=li6PqLn4Bl4)
 
-- [**闪电：AOSP 移植 RISC-V 有多难 - 吴伟 - V8 技术讨论会 - OSDT 社区 - 20200607**](https://www.bilibili.com/video/BV1wC4y1a7Za)
+- [**How difficult when do RISC-V porting for AOSP - Wu Wei - V8 technical symposium - OSDT community - 20200607 (Chinese Version)**](https://www.bilibili.com/video/BV1wC4y1a7Za)
 
-- [**AOSP 的构建系统和 RISC-V 移植初步 - 汪辰 - 20200805 - PLCT 实验室**](https://www.bilibili.com/video/BV1PA411Y7mz)
+- [**Introduction about Building framwork of AOSP and preliminary trying porting for RISC-V - Wang Chen - 20200805 - PLCT lab (Chinese Version)**](https://www.bilibili.com/video/BV1PA411Y7mz)
 
-- [**AOSP for RISC-V 移植教程之 Android Runtime 介绍 - 汪辰 - 20200814 - PLCT实 验室**](https://www.bilibili.com/video/BV1wC4y1t7Xa)
+- [**AOSP for RISC-V porting tutorial (1) - Introduction about Android Runtime - Wang Chen - 20200814 - PLCT lab (Chinese Version)**](https://www.bilibili.com/video/BV1wC4y1t7Xa)
 
-- [**AOSP for RISC-V 移植教程之 开始 ART 移植 - 汪辰 - 20200821 - PLCT 实验室**](https://www.bilibili.com/video/BV1JK411M7e5)
+- [**AOSP for RISC-V porting tutorial (2) - Starting porting ART - Wang Chen - 20200821 - PLCT lab (Chinese Version)**](https://www.bilibili.com/video/BV1JK411M7e5)
 
 ### Discussions
 
