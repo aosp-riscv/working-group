@@ -16,6 +16,8 @@
 
 - 2020-10-01 采用最新的 AOSP 内核及配置，尝试使用 RISC-V 的 GNU 工具链和 LLVM/Clang 工具链均可以成功编译并启动，但在挂载最小根文件系统后遇到 “Segmentation Fault” 错误，继续调试中。另外开始研究如何将 AOSP 的 bionic 库移植到 RISC-V 上，目前主要工作是在修改移植编译框架。
 
+- 2020-10-16 将 AOSP bionic 库的 build 框架简化为 make，初步的移植工作提交到 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支，目前该项目仓库依赖于两个子仓库 <https://github.com/aosp-riscv/platform_bionic> 和 <https://github.com/aosp-riscv/external_jemalloc_new> （由于改动还很 draft，所以目前对 aosp 相关的改动全部放在各自的 develop 分支上。另备注：目前的移植工作基于 AOSP 的 `android-10.0.0_r39` tag 版本）。下一步的工作是继续完善 make 项目并对 bionic 的代码进行移植改动，第一个目标是实现 `libc.a`。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
@@ -41,17 +43,14 @@
 - [**AOSP 内核的版本管理，汪辰（ PLCT 实验室），20200915**](https://zhuanlan.zhihu.com/p/245131105)
 - [**在 QEMU 上运行 RISC-V 64 位版本的 Linux，汪辰（ PLCT 实验室），20200923**](https://zhuanlan.zhihu.com/p/258394849)
 - [**编译一个 RISC-V 的 Android 内核，汪辰（ PLCT 实验室），20200929**](https://zhuanlan.zhihu.com/p/260356339)
+- [**制作一个针对 RISC-V 的 LLVM/Clang 编译器，汪辰（ PLCT 实验室），20201009**](https://zhuanlan.zhihu.com/p/263550372)
 
 ### 视频
 
 - [**[COSCUP 2011] Porting android to brand-new CPU architecture, 鄭孟璿 (Luse Cheng)**](https://www.youtube.com/watch?v=li6PqLn4Bl4)
-
 - [**闪电：AOSP 移植 RISC-V 有多难 - 吴伟 - V8 技术讨论会 - OSDT 社区 - 20200607**](https://www.bilibili.com/video/BV1wC4y1a7Za)
-
 - [**AOSP 的构建系统和 RISC-V 移植初步 - 汪辰 - 20200805 - PLCT 实验室**](https://www.bilibili.com/video/BV1PA411Y7mz)
-
 - [**AOSP for RISC-V 移植教程之 Android Runtime 介绍 - 汪辰 - 20200814 - PLCT 实验室**](https://www.bilibili.com/video/BV1wC4y1t7Xa)
-
 - [**AOSP for RISC-V 移植教程之 开始 ART 移植 - 汪辰 - 20200821 - PLCT 实验室**](https://www.bilibili.com/video/BV1JK411M7e5)
 
 ### 讨论
