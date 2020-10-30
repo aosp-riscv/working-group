@@ -18,6 +18,8 @@
 
 - 2020-10-16 将 AOSP bionic 库的 build 框架简化为 make，初步的移植工作提交到 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支，目前该项目仓库依赖于两个子仓库 <https://github.com/aosp-riscv/platform_bionic> 和 <https://github.com/aosp-riscv/external_jemalloc_new> （由于改动还很 draft，所以目前对 aosp 相关的改动全部放在各自的 develop 分支上。另备注：目前的移植工作基于 AOSP 的 `android-10.0.0_r39` tag 版本）。下一步的工作是继续完善 make 项目并对 bionic 的代码进行移植改动，第一个目标是实现 `libc.a`。
 
+- 2020-10-30 完善了 make 框架，支持编译生成 libc 静态库以及 `crtbegin.o` 和 `crtend.o`。目前可以实现静态编译的可执行程序从内核跳转进入 main 函数并确保 argv 和 envp 读取正确，其他 TLS 和 syscall 部分的移植还在进行中。具体改动请参考 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
