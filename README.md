@@ -23,6 +23,7 @@ the errors in the system dir and cts dir.
 
 - 2020-10-16 Simplify the build framework of the AOSP bionic library to make, and submit the preliminary porting work to the develop branch of <https://github.com/aosp-riscv/port_bionic>. Currently, the project repository depends on two sub-repositories <https://github.com/aosp-riscv/platform_bionic> and <https://github.com/aosp-riscv/external_jemalloc_new> (Because the changes are still draft, the current changes to aosp are all placed on their respective develop branches. Another note: the current porting work is based off `android-10.0.0_r39` tag version based on AOSP). The next step is to continue to improve the make project and make changes to the bionic code. The first goal is to implement `libc.a`.
 
+- 2020-10-30 The make framework has been improved to support the compilation and generation of libc static libraries, as well as `crtbegin.o` and `crtend.o`. Currently, the statically compiled executable program can jump from the kernel to the main function and ensure that argv and envp are read correctly. The porting of other TLS and syscall parts is still in progress. For specific changes, please refer to the develop branch of <https://github.com/aosp-riscv/port_bionic>.
 
 ## About Us
 
