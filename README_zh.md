@@ -20,6 +20,8 @@
 
 - 2020-10-30 完善了 make 框架，支持编译生成 libc 静态库以及 `crtbegin.o` 和 `crtend.o`。目前可以实现静态编译的可执行程序从内核跳转进入 main 函数并确保 argv 和 envp 读取正确，其他 TLS 和 syscall 部分的移植还在进行中。具体改动请参考 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支。
 
+- 2020-11-13 进一步完善 bionic 的 libc 静态库。目前采用 v10.0.1 的 llvm/clang 进行编译，然后用 gnu riscv 版本的 ld 基于 bionic 的 libc_static 、crtbegin_static 和 crtend.o 可以实现静态链接，并生成可执行程序。在此基础上移植编译了 AOSP 自带的 toybox 并制作了一个最小的 rootfs（shell 和 init 还是采用基于 glibc 编译的 busybox）。目前该 rootfs 可以在 qemu-system-riscv64 上启动运行。可以运行部分命令，但还有部分命令执行会报错。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其 submodule 仓库的 develop 分支的 commit comment。下一步将继续完善 bionic 的 libc，以及完善自制的最小根文件系统。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
