@@ -25,6 +25,8 @@ the errors in the system dir and cts dir.
 
 - 2020-10-30 The make framework has been improved to support the compilation and generation of libc static libraries, as well as `crtbegin.o` and `crtend.o`. Currently, the statically compiled executable program can jump from the kernel to the main function and ensure that argv and envp are read correctly. The porting of other TLS and syscall parts is still in progress. For specific changes, please refer to the develop branch of <https://github.com/aosp-riscv/port_bionic>.
 
+- 2020-11-13 Further improve the libc static library of bionic. Currently using v10.0.1 llvm/clang to compile, and then use the gnu riscv version of ld based on bionic's libc_static, crtbegin_static and crtend.o to achieve static linking and generate executable programs. On this basis, we transplanted and compiled the toybox that comes with AOSP and made a minimal rootfs (shell and init still use busybox compiled based on glibc). At present, the rootfs can be started and run on qemu-system-riscv64. You can run some commands, but some commands will report errors when executed. For specific changes, please refer to the commit comment of the develop branch of the bionic porting main repository <https://github.com/aosp-riscv/port_bionic> and the commit comment of the develop branch of its submodule repositories. The next step will continue to improve the libc of bionic and the self-made minimal root file system.
+
 ## About Us
 
 The initial members of this project is from the [PLCT lab](https://github.com/isrc-cas/).
