@@ -22,6 +22,8 @@
 
 - 2020-11-13 进一步完善 bionic 的 libc 静态库。目前采用 v10.0.1 的 llvm/clang 进行编译，然后用 gnu riscv 版本的 ld 基于 bionic 的 libc_static 、crtbegin_static 和 crtend.o 可以实现静态链接，并生成可执行程序。在此基础上移植编译了 AOSP 自带的 toybox 并制作了一个最小的 rootfs（shell 和 init 还是采用基于 glibc 编译的 busybox）。目前该 rootfs 可以在 qemu-system-riscv64 上启动运行。可以运行部分命令，但还有部分命令执行会报错。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其 submodule 仓库的 develop 分支的 commit comment。下一步将继续完善 bionic 的 libc，以及完善自制的最小根文件系统。
 
+- 2020-11-30 完成 shell 和 init 的移植，目前可以实现完全基于 bionic 的 libc 库，采用静态链接的方式生成一个最小的 android 根文件系统。该 rootfs 可以在 qemu-system-riscv64 上启动运行，并支持运行一些基本的操作命令。此外还改进了原先的 make 框架系统，为下一个阶段进一步支持动态链接做准备。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其相应的 submodule 仓库。更多的详细介绍可以参考另一篇知乎介绍文章：[《第一个 RISC-V 上的“Android 最小系统”》](https://zhuanlan.zhihu.com/p/302870095)。下一步的工作重点是增加动态链接支持，继续完善 bionic 功能并尝试移植 AOSP 的 Soong 构造系统，支持采用 AOSP 的 Soong 构造系统编译 RISC-V 版本的 bionic 库和相关应用。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
@@ -48,6 +50,9 @@
 - [**在 QEMU 上运行 RISC-V 64 位版本的 Linux，汪辰（ PLCT 实验室），20200923**](https://zhuanlan.zhihu.com/p/258394849)
 - [**编译一个 RISC-V 的 Android 内核，汪辰（ PLCT 实验室），20200929**](https://zhuanlan.zhihu.com/p/260356339)
 - [**制作一个针对 RISC-V 的 LLVM/Clang 编译器，汪辰（ PLCT 实验室），20201009**](https://zhuanlan.zhihu.com/p/263550372)
+- [**第一个 RISC-V 上的 “Android 最小系统”，汪辰（ PLCT 实验室），20201120**](https://zhuanlan.zhihu.com/p/302870095)
+- [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
+- [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
 
 ### 视频
 
