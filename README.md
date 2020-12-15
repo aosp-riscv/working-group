@@ -62,6 +62,7 @@ Feel free to open an issue for further questions/discussions!
 - [**First "Android minimal system" for RISC-V, Wang Chen - PLCT lab, 20201120 (Chinese Version)**](https://zhuanlan.zhihu.com/p/302870095)
 - [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
 - [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
+- [**AOSP-RISCV has a new mirror on Gitee, Wang Chen - PLCT lab, 20201215 (Chinese Version)**](https://zhuanlan.zhihu.com/p/337032693)
 
 ### Videos
 
