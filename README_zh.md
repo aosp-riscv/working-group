@@ -24,6 +24,11 @@
 
 - 2020-11-30 完成 shell 和 init 的移植，目前可以实现完全基于 bionic 的 libc 库，采用静态链接的方式生成一个最小的 android 根文件系统。该 rootfs 可以在 qemu-system-riscv64 上启动运行，并支持运行一些基本的操作命令。此外还改进了原先的 make 框架系统，为下一个阶段进一步支持动态链接做准备。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其相应的 submodule 仓库。更多的详细介绍可以参考另一篇知乎介绍文章：[《第一个 RISC-V 上的“Android 最小系统”》](https://zhuanlan.zhihu.com/p/302870095)。下一步的工作重点是增加动态链接支持，继续完善 bionic 功能并尝试移植 AOSP 的 Soong 构造系统，支持采用 AOSP 的 Soong 构造系统编译 RISC-V 版本的 bionic 库和相关应用。
 
+- 2020-12-15 
+    - 开始移植 bionic 的动态链接功能，目前完成了 `libc.so` 和 `linker` 的编译链接，但运行还有问题，还在调试中，欢迎熟悉动态链接器实现或者对此感兴趣的小伙伴一起来研究。此外还进一步改进优化了 make 框架。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其相应的 submodule 仓库。
+    - 目前移植工作涉及的 AOSP 子仓库已经达到 9 个，全部下载完有 537M。为了方便中国国内的小伙伴下载访问，我们在 Gitee 上为 <https://github.com/aosp-riscv> 建了一个 mirror 网站，具体地址是 <https://gitee.com/aosp-riscv/>。
+    - 下一步的工作重点依然是实现动态链接支持，目前感觉实现难度比静态链接要大。除此之外会继续完善 bionic 功能并尝试移植 AOSP 的 Soong 构造系统，支持采用 AOSP 的 Soong 构造系统编译 RISC-V 版本的 bionic 库和相关应用。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
