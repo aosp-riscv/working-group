@@ -26,7 +26,7 @@
 
 - 2020-12-15 
     - 开始移植 bionic 的动态链接功能，目前完成了 `libc.so` 和 `linker` 的编译链接，但运行还有问题，还在调试中，欢迎熟悉动态链接器实现或者对此感兴趣的小伙伴一起来研究。此外还进一步改进优化了 make 框架。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其相应的 submodule 仓库。
-    - 目前移植工作涉及的 AOSP 子仓库已经达到 9 个，全部下载完有 537M。为了方便中国国内的小伙伴下载访问，我们在 Gitee 上为 <https://github.com/aosp-riscv> 建了一个 mirror 网站，具体地址是 <https://gitee.com/aosp-riscv/>。
+    - 目前移植工作涉及的 AOSP 子仓库已经达到 9 个，全部下载完有 537M。为了方便中国国内的小伙伴下载访问，我们在 Gitee 上为 <https://github.com/aosp-riscv> 建了一个 mirror 网站，具体地址是 <https://gitee.com/aosp-riscv/>。具体访问操作说明请参考另外一篇知乎介绍文章 [《AOSP-RISCV 的开源仓库在 Gitee 上新建了镜像》](https://zhuanlan.zhihu.com/p/337032693)。
     - 下一步的工作重点依然是实现动态链接支持，目前感觉实现难度比静态链接要大。除此之外会继续完善 bionic 功能并尝试移植 AOSP 的 Soong 构造系统，支持采用 AOSP 的 Soong 构造系统编译 RISC-V 版本的 bionic 库和相关应用。
 
 ## 有关我们
@@ -58,6 +58,7 @@
 - [**第一个 RISC-V 上的 “Android 最小系统”，汪辰（ PLCT 实验室），20201120**](https://zhuanlan.zhihu.com/p/302870095)
 - [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
 - [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
+- [**AOSP-RISCV 的开源仓库在 Gitee 上新建了镜像，汪辰（ PLCT 实验室），20201215**](https://zhuanlan.zhihu.com/p/337032693)
 
 ### 视频
 
