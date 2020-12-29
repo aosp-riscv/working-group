@@ -33,6 +33,8 @@ the errors in the system dir and cts dir.
     - Started to port the dynamic link functionality for bionic. Currently, the compilation and linking of `libc.so` and `linker` have been completed, but still can not work well. We are still under debugging. Anybody familiar with the dynamic linker are welcomed to provide your suggestions. For specific changes, please refer to the `develop` branch of the bionic transplantation main repository, <https://github.com/aosp-riscv/port_bionic>, and its corresponding submodule repository.
     - The focus of further work is still to achieve dynamic link support, and the current implementation flaws are felt to be larger than static links. In addition, we will continue to improve the bionic function and try to transplant the Soong construction system of AOSP, and support the use of AOSP Soong construction system to compile the bionic library and related applications for RISC-V.
 
+- 2020-12-29 Completed the porting of dynamic linking feature for bionic, we can now support implicit dynamic link and explicit dynamic link with bionic. The make framework system is also improved. For specific changes, please refer to the `develop` branch of the bionic transplantation main repository, <https://github.com/aosp-riscv/port_bionic>. The next step is to port and modify AOSP's Soong construction system and use AOSP Soong construction system to compile the bionic library and related applications for RISC-V.
+
 ## About Us
 
 The initial members of this project are from the [PLCT lab](https://github.com/isrc-cas/).
