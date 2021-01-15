@@ -35,6 +35,8 @@ the errors in the system dir and cts dir.
 
 - 2020-12-29 Completed the porting of dynamic linking feature for bionic, we can now support implicit dynamic link and explicit dynamic link with bionic. The make framework system is also improved. For specific changes, please refer to the `develop` branch of the bionic transplantation main repository, <https://github.com/aosp-riscv/port_bionic>. The next step is to port and modify AOSP's Soong construction system and use AOSP Soong construction system to compile the bionic library and related applications for RISC-V.
 
+- 2021-01-15 Still in investigating how to add RVG64 support based on the Soong framework of AOSP. The main difficulty at present is: due to the AOSP compilation system is extremely large and complex, contains too much content required for engineering, and is intertwined and dependent on each other, so how to cleanly mask the modules that we don’t care about first and only compile those core content of the bionic library is the current focus and difficulty. There is not much clue yet, anyone is welcomed to provide help and suggestions.
+
 ## About Us
 
 The initial members of this project are from the [PLCT lab](https://github.com/isrc-cas/).
@@ -65,6 +67,8 @@ Feel free to open an issue for further questions/discussions!
 - [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
 - [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
 - [**AOSP-RISCV has a new mirror on Gitee, Wang Chen - PLCT lab, 20201215 (Chinese Version)**](https://zhuanlan.zhihu.com/p/337032693)
+- [**Summary of related knowledge behind AOSP build, Wang Chen - PLCT lab, 20201230**](https://zhuanlan.zhihu.com/p/340689022)
+- [**Details about AOSP Soong creation process, Wang Chen - PLCT lab, 20210108**](https://zhuanlan.zhihu.com/p/342817768)
 
 ### Videos
 
