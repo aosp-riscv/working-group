@@ -31,6 +31,8 @@
 
 - 2020-12-29 完成 bionic 的动态链接功能，目前可以基于 bionic 支持实现隐式动态链接和显式动态链接。此外还改进了原先的 make 框架系统。具体改动请参考 bionic 移植主仓库 <https://github.com/aosp-riscv/port_bionic> 的 develop 分支以及其相应的 submodule 仓库（国内用户也可以访问 Gitee 镜像 <https://gitee.com/aosp-riscv/>）。下一步的工作重点是移植修改 AOSP 的 Soong 构造系统，支持采用 AOSP 提供的 Soong 构造系统编译 RISC-V 版本的 bionic 库和相关应用。
 
+- 2021-01-15 仍然在研究如何基于 AOSP 的 Soong 框架加入 RVG64。目前的主要难点是由于 AOSP 的编译系统异常庞大和复杂，包含了太多工程化所需的内容，而且互相交织和依赖在一起，所以如何干净地先屏蔽掉我们不关心的模块，只编译 bionic 库的核心内容是目前的重点也是难点。目前还没有太多的头绪，如果有好心的小伙伴欢迎来提供帮助和建议。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
@@ -61,6 +63,8 @@
 - [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
 - [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
 - [**AOSP-RISCV 的开源仓库在 Gitee 上新建了镜像，汪辰（ PLCT 实验室），20201215**](https://zhuanlan.zhihu.com/p/337032693)
+- [**AOSP Build 背后涉及的相关知识汇总，汪辰（ PLCT 实验室），20201230**](https://zhuanlan.zhihu.com/p/340689022)
+- [**AOSP Soong 创建过程详解，汪辰（ PLCT 实验室），20210108**](https://zhuanlan.zhihu.com/p/342817768)
 
 ### 视频
 
