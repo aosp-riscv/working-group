@@ -5,23 +5,23 @@
 
 <!-- TOC -->
 
-- [参考](#参考)
-- [AOSP 的版本管理](#aosp-的版本管理)
+- [1. 参考](#1-参考)
+- [2. AOSP 的版本管理](#2-aosp-的版本管理)
 
 <!-- /TOC -->
 
-# 参考
+# 1. 参考
 
 - [Android version history](https://en.wikipedia.org/wiki/Android_version_history)
 - [Codenames, Tags, and Build Numbers](https://source.android.google.cn/setup/start/build-numbers)
 
-# AOSP 的版本管理
+# 2. AOSP 的版本管理
 
 AOSP （Android Open Source Project），也就是我们常说的 Android（安卓），从 2005 开始到现在已经十五个年头，整个代码仓库已经变成了一个巨兽。那么这么多年来， Google 是如何管理这个项目的呢，特别是对海量代码的版本管理又是怎样的呢，今天整理了一下，希望能够说说清楚。
 
 首先我们来看一张思维导图，后面的总结都将围绕这张图展开，大家看完后再回来回顾一下这张图，印象就更深了。
 
-![](./diagrams/20211027-platform-version/android-version.png)
+![](./diagrams/20200911-platform-version/android-version.png)
 
 Android 的开发版本每一个大版本我们称之为一个 **Platform**。围绕 Platform 的概念，Google 提出了以下三个和版本管理相关的概念：
 - 每个 **Platform** 有一个版本号 **Version**，这个 **Version** 的值是唯一的，我们就叫它 “版本号” 好了（后面直接用英文表达感觉更准确，其他关键字也是一样），可以作为关键字区分每个不同的 **Platform**。**Version** 的表达采用点分格式，完整的格式包括三段 `X.Y.Z`，但常常用不了那么多，所以经常简写为 `X` 或者 `X.Y`。 **Version** 的值是从 1.0 开始，依次递增，目前正式发布的已经达到 11。
@@ -30,13 +30,13 @@ Android 的开发版本每一个大版本我们称之为一个 **Platform**。�
 
 有关 **Platform**、**Codename**、**Vesion** 和 **API level** 之间概念的历史信息，可以参考官网的总结表格如下，大家结合上面的总结再自己看一下：
 
-![](./diagrams/20211027-platform-version/android-codename.png)
+![](./diagrams/20200911-platform-version/android-codename.png)
 
 (图片来源：https://source.android.google.cn/setup/start/build-numbers)
 
 维基百科上有一幅图也不错，摘录如下：
 
-![](./diagrams/20211027-platform-version/android-codename-wiki.png)
+![](./diagrams/20200911-platform-version/android-codename-wiki.png)
 
 (图片来源：https://en.wikipedia.org/wiki/Android_version_history)
 
@@ -59,7 +59,7 @@ Android 的开发版本每一个大版本我们称之为一个 **Platform**。�
 
 官网有关 **Build** 的总结表格如下，表格太长，我只是摘取了前面的部分条目：
 
-![](./diagrams/20211027-platform-version/android-build.png)
+![](./diagrams/20200911-platform-version/android-build.png)
 
 (图片来源：https://source.android.google.cn/setup/start/build-numbers)
 
