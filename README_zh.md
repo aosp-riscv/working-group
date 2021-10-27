@@ -35,6 +35,8 @@
 
 - 2021-01-xx 由于平头哥的 [开源工作 ](https://github.com/T-head-Semi/aosp-riscv)，我们于 2021 年初停止了 PLCT lab 的相关 AOSP 移植工作。所有原 <https://github.com/aosp-riscv> 和 <https://gitee.com/aosp-riscv> 下的代码仓库（除了 working-group）都备份到 [Gitee 的 aosp-riscv-bionic-porting 组织](https://gitee.com/aosp-riscv-bionic-porting) 下。
 
+- 2021-10-27 重启 PLCT lab 的 AOSP 移植工作，最新的目标是将 AOSP 12 移植到 RV64 上。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).

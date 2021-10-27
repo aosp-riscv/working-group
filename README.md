@@ -39,6 +39,8 @@ the errors in the system dir and cts dir.
 
 - 2021-01-xx Due to [open-source work](https://github.com/T-head-Semi/aosp-riscv) from T-Head(alibaba), we (PLCT lab) stopped the AOSP porting work in early 2021. All code repositories (except working-group) under the original <https://github.com/aosp-riscv> and <https://gitee.com/aosp-riscv> are backed up to [Gitee's aosp-riscv-bionic-porting](https://gitee.com/aosp-riscv-bionic-porting).
 
+- 2021-10-27 Restart the AOSP migration work of PLCT lab. The new goal is to migrate AOSP 12 to RV64.
+
 ## About Us
 
 The initial members of this project are from the [PLCT lab](https://github.com/isrc-cas/).
