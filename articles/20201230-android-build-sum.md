@@ -2,6 +2,15 @@
 
 文章标题：**AOSP Build 背后涉及的相关知识汇总**
 
+<!-- TOC -->
+
+- [1. AOSP 构造系统的演进](#1-aosp-构造系统的演进)
+- [2. 涉及相关技术简介](#2-涉及相关技术简介)
+    - [2.1. Ninja](#21-ninja)
+    - [2.2. Soong 和 Blueprint](#22-soong-和-blueprint)
+    - [2.3. Kati](#23-kati)
+
+<!-- /TOC -->
 
 # 1. AOSP 构造系统的演进
 
