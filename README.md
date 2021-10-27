@@ -37,6 +37,8 @@ the errors in the system dir and cts dir.
 
 - 2021-01-15 Still in investigating how to add RVG64 support based on the Soong framework of AOSP. The main difficulty at present is: due to the AOSP compilation system is extremely large and complex, contains too much content required for engineering, and is intertwined and dependent on each other, so how to cleanly mask the modules that we don’t care about first and only compile those core content of the bionic library is the current focus and difficulty. There is not much clue yet, anyone is welcomed to provide help and suggestions.
 
+- 2021-01-xx Due to [open-source work](https://github.com/T-head-Semi/aosp-riscv) from T-Head(alibaba), we (PLCT lab) stopped the AOSP porting work in early 2021. All code repositories (except working-group) under the original <https://github.com/aosp-riscv> and <https://gitee.com/aosp-riscv> are backed up to [Gitee's aosp-riscv-bionic-porting](https://gitee.com/aosp-riscv-bionic-porting).
+
 ## About Us
 
 The initial members of this project are from the [PLCT lab](https://github.com/isrc-cas/).

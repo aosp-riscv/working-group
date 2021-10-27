@@ -33,6 +33,8 @@
 
 - 2021-01-15 仍然在研究如何基于 AOSP 的 Soong 框架加入 RVG64。目前的主要难点是由于 AOSP 的编译系统异常庞大和复杂，包含了太多工程化所需的内容，而且互相交织和依赖在一起，所以如何干净地先屏蔽掉我们不关心的模块，只编译 bionic 库的核心内容是目前的重点也是难点。目前还没有太多的头绪，如果有好心的小伙伴欢迎来提供帮助和建议。
 
+- 2021-01-xx 由于平头哥的 [开源工作 ](https://github.com/T-head-Semi/aosp-riscv)，我们于 2021 年初停止了 PLCT lab 的相关 AOSP 移植工作。所有原 <https://github.com/aosp-riscv> 和 <https://gitee.com/aosp-riscv> 下的代码仓库（除了 working-group）都备份到 [Gitee 的 aosp-riscv-bionic-porting 组织](https://gitee.com/aosp-riscv-bionic-porting) 下。
+
 ## 有关我们
 
 项目初创人员来自 [PLCT lab](https://github.com/isrc-cas/).
