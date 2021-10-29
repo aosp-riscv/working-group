@@ -9,7 +9,11 @@ If you are interested in runnning Android on RISC-V hardware, please join us!
 Currently we are in a very early stage, trying to cross compile the AOSP codebase
 using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
 
-- 2021-10-27 Restart the AOSP migration work of PLCT lab. The new goal is to migrate AOSP 12 to RV64.
+- 2021-10-29 Restart the AOSP migration work of PLCT lab. The new goal is to migrate AOSP 12 to RV64.
+  - Setup group @ <https://github.com/aosp-riscv> (mirrored with <https://gitee.com/aosp-riscv>) with some initial repos.
+  - [PR Merged] added note on howto setup build env: <https://gitee.com/aosp-riscv/working-group/pulls/1>
+  - New tech article "Code analysis for envsetup" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211026-lunch.md>
+  - New tech article "Howto setup build environment" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211029-howto-setup-build-env.md>
 
 - 2021-01-xx Due to [open-source work](https://github.com/T-head-Semi/aosp-riscv) from T-Head(alibaba), we (PLCT lab) stopped the AOSP porting work in early 2021. All code repositories (except working-group) under the original <https://github.com/aosp-riscv> and <https://gitee.com/aosp-riscv> are backed up to [Gitee's aosp-riscv-bionic-porting](https://gitee.com/aosp-riscv-bionic-porting).
 
