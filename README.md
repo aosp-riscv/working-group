@@ -9,11 +9,57 @@ If you are interested in runnning Android on RISC-V hardware, please join us!
 Currently we are in a very early stage, trying to cross compile the AOSP codebase
 using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
 
+- 2021-11-15 For AOSP 12 ported to RV64, the implementation of `m --skip-ninja --skip-soong-tests` was successfully built. The relevant changes have been submitted to the repositories. The details are as follows (here, gitee is taken as an example, github has been mirrored):
+  - manifest repository：<https://gitee.com/aosp-riscv/platform_manifest>
+  - Newly added AOSP repositories:
+    - art/ : <https://gitee.com/aosp-riscv/platform_art>
+    - bionic/: <https://gitee.com/aosp-riscv/platform_bionic>
+    - build/make/: <https://gitee.com/aosp-riscv/platform_build>
+    - build/soong/: <https://gitee.com/aosp-riscv/platform_build_soong>
+    - external/crosvm/: <https://gitee.com/aosp-riscv/platform_external_crosvm>
+    - frameworks/av/: <https://gitee.com/aosp-riscv/platform_frameworks_av>
+    - packages/modules/NeuralNetworks/: <https://gitee.com/aosp-riscv/platform-packages-modules-NeuralNetworks>
+    - prebuilts/vndk/v28/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v28>
+    - prebuilts/vndk/v29/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v29>
+    - prebuilts/vndk/v30/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v30>
+    - system/apex/: <https://gitee.com/aosp-riscv/platform-system-apex>
+    - system/core/: <https://gitee.com/aosp-riscv/platform_system_core>
+    - system/iorap/: <https://gitee.com/aosp-riscv/platform-system-iorap>
+    - system/nvram/: <https://gitee.com/aosp-riscv/platform-system-nvram>
+  - In addition, some repositories are currently unable to be created on gitee/github because the overall volume or some files are too large and exceed the limitaiton required by gitee/github. Therefore, we currently use patching method to save the changes, and below are these repositories involved:
+    - cts/
+    - frameworks/base/
+    - packages/modules/ArtPrebuilt/
+    - packages/services/Car/
+    - prebuilts/clang/host/linux-x86/
+    - prebuilts/runtime/
+    The newly built patch repository is: <https://gitee.com/aosp-riscv/patches_aosp_riscv>
+  - The list of PRs submitted is as follows:
+    - <https://gitee.com/aosp-riscv/platform_art/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_build/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_external_crosvm/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_frameworks_av/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-modules-NeuralNetworks/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_system_core/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_system_core/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform-system-iorap/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-nvram/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-apex/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v28/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v29/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v30/pulls/1>
+    - <https://gitee.com/aosp-riscv/patches_aosp_riscv/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/6>
+  - Updated tech article [“Howto build aosp-riscv” ](./articles/20211029-howto-setup-build-env.md)
+  - Newed tech article ["Code analysis for soong_ui"](./articles/20211102-codeanalysis-soong_ui.md)
+
 - 2021-10-29 Restart the AOSP migration work of PLCT lab. The new goal is to migrate AOSP 12 to RV64.
   - Setup group @ <https://github.com/aosp-riscv> (mirrored with <https://gitee.com/aosp-riscv>) with some initial repos.
   - [PR Merged] added note on howto setup build env: <https://gitee.com/aosp-riscv/working-group/pulls/1>
-  - New tech article "Code analysis for envsetup" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211026-lunch.md>
-  - New tech article "Howto setup build environment" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211029-howto-setup-build-env.md>
+  - Newed tech article ["Code analysis for envsetup"](./articles/20211026-lunch.md)
+  - Newed tech article ["Howto setup build environment"](./articles/20211029-howto-setup-build-env.md)
 
 - 2021-01-xx Due to [open-source work](https://github.com/T-head-Semi/aosp-riscv) from T-Head(alibaba), we (PLCT lab) stopped the AOSP porting work in early 2021. All code repositories (except working-group) under the original <https://github.com/aosp-riscv> and <https://gitee.com/aosp-riscv> are backed up to [Gitee's aosp-riscv-bionic-porting](https://gitee.com/aosp-riscv-bionic-porting).
 
