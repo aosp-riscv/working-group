@@ -8,11 +8,57 @@
 
 本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
 
+- 2021-11-15 针对 AOSP 12 移植到 RV64 实现 `m --skip-ninja --skip-soong-tests` 下构建成功。相关修改已经提交到仓库上。具体如下(这里以 gitee 的为例，github 已经 mirror)：
+  - manifest 仓库：<https://gitee.com/aosp-riscv/platform_manifest>
+  - 涉及新增的 AOSP 仓库：
+    - art/ : <https://gitee.com/aosp-riscv/platform_art>
+    - bionic/: <https://gitee.com/aosp-riscv/platform_bionic>
+    - build/make/: <https://gitee.com/aosp-riscv/platform_build>
+    - build/soong/: <https://gitee.com/aosp-riscv/platform_build_soong>
+    - external/crosvm/: <https://gitee.com/aosp-riscv/platform_external_crosvm>
+    - frameworks/av/: <https://gitee.com/aosp-riscv/platform_frameworks_av>
+    - packages/modules/NeuralNetworks/: <https://gitee.com/aosp-riscv/platform-packages-modules-NeuralNetworks>
+    - prebuilts/vndk/v28/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v28>
+    - prebuilts/vndk/v29/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v29>
+    - prebuilts/vndk/v30/: <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v30>
+    - system/apex/: <https://gitee.com/aosp-riscv/platform-system-apex>
+    - system/core/: <https://gitee.com/aosp-riscv/platform_system_core>
+    - system/iorap/: <https://gitee.com/aosp-riscv/platform-system-iorap>
+    - system/nvram/: <https://gitee.com/aosp-riscv/platform-system-nvram>
+  - 另有部分仓库由于整体体积过大或者部分文件体积过大，超过 gitee/github 限制的，目前无法在 gitee/github 上新建仓库，所以目前采用补丁方式保存修改、目前这些涉及的仓库为：
+    - cts/
+    - frameworks/base/
+    - packages/modules/ArtPrebuilt/
+    - packages/services/Car/
+    - prebuilts/clang/host/linux-x86/
+    - prebuilts/runtime/
+    新建的补丁仓库为: <https://gitee.com/aosp-riscv/patches_aosp_riscv>
+  - 提交的 PR 列表如下:
+    - <https://gitee.com/aosp-riscv/platform_art/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_build/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_external_crosvm/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_frameworks_av/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-modules-NeuralNetworks/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_system_core/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_system_core/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform-system-iorap/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-nvram/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-apex/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v28/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v29/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-vndk-v30/pulls/1>
+    - <https://gitee.com/aosp-riscv/patches_aosp_riscv/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/6>
+  - 更新文档 [“如何编译 aosp-riscv” ](./articles/20211029-howto-setup-build-env.md)
+  - 新增文档 ["代码走读：对 soong_ui 的深入理解"](./articles/20211102-codeanalysis-soong_ui.md)
+
 - 2021-10-29 重启 PLCT lab 的 AOSP 移植工作，最新的目标是将 AOSP 12 移植到 RV64 上。
   - 创建 group @ <https://github.com/aosp-riscv> (mirrored with <https://gitee.com/aosp-riscv>) 以及部分仓库.
   - [PR Merged] added note on howto setup build env: <https://gitee.com/aosp-riscv/working-group/pulls/1>
-  - 新增文档 "Code analysis for envsetup" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211026-lunch.md>
-  - 新增文档 "Howto setup build environment" @ <https://github.com/aosp-riscv/working-group/blob/master/articles/20211029-howto-setup-build-env.md>
+  - 新增文档 ["Code analysis for envsetup"](./articles/20211026-lunch.md)
+  - 新增文档 ["Howto setup build environment"](./articles/20211029-howto-setup-build-env.md)
 
 - 2021-01-xx 由于平头哥的 [开源工作 ](https://github.com/T-head-Semi/aosp-riscv)，我们于 2021 年初停止了 PLCT lab 的相关 AOSP 移植工作。所有原 <https://github.com/aosp-riscv> 和 <https://gitee.com/aosp-riscv> 下的代码仓库（除了 working-group）都备份到 [Gitee 的 aosp-riscv-bionic-porting 组织](https://gitee.com/aosp-riscv-bionic-porting) 下。
 
