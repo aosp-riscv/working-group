@@ -24,7 +24,7 @@
     - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
     - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
     - <https://gitee.com/aosp-riscv/platform_bionic/pulls/2>
-    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls>
+    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls/1>
 
 - 2021-11-15 针对 AOSP 12 移植到 RV64 实现 `m --skip-ninja --skip-soong-tests` 下构建成功。相关修改已经提交到仓库上。具体如下(这里以 gitee 的为例，github 已经 mirror)：
   - manifest 仓库：<https://gitee.com/aosp-riscv/platform_manifest>
