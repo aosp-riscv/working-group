@@ -8,6 +8,24 @@
 
 本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
 
+- 2021-11-30 针对 AOSP 12 移植到 RV64 实现 `mmm bionic/libc/ --skip-soong-tests` 下构建成功 libc/libm/libdl。相关修改已经提交到仓库上。具体如下(部分 PR 在 gitee 上，所有代码同步推送至 github 和 gitee)：
+  - 工具链 for AOSP 更新：
+    - Rust for Android:
+      - compiler: add riscv64gc-linux-android target (Tier 3): <https://github.com/aosp-riscv/rust/commit/8397a76b895b586dcfc8637e98908f65df1af1f9>
+      - library: add riscv64gc-linux-android support: <https://github.com/aosp-riscv/rust/commit/2eacf985415ba38018de70845c0b150885ad4d57>
+      - Modified libc, added support for riscv64：<https://github.com/aosp-riscv/toolchain_rustc/pull/1>
+    - Clang/llvm for Android:
+      - add riscv __get_tls method: <https://github.com/aosp-riscv/toolchain_llvm-project/commit/2511f435f0c0c02f1a64d55b3b45c657dc84b050>
+      - Change some repos' fetch address and revision to support riscv64: <https://github.com/aosp-riscv/platform_manifest/commit/a3446a1580947ac5d5d29e99365fdf90b0edb3ef>
+  - manifest 仓库：PR: <https://gitee.com/aosp-riscv/platform_manifest/pulls/7>
+  - AOSP 仓库更新（PR）：
+    - <https://gitee.com/aosp-riscv/platform-external-scudo/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-unwinding/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls>
+
 - 2021-11-15 针对 AOSP 12 移植到 RV64 实现 `m --skip-ninja --skip-soong-tests` 下构建成功。相关修改已经提交到仓库上。具体如下(这里以 gitee 的为例，github 已经 mirror)：
   - manifest 仓库：<https://gitee.com/aosp-riscv/platform_manifest>
   - 涉及新增的 AOSP 仓库：

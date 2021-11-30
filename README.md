@@ -9,6 +9,24 @@ If you are interested in runnning Android on RISC-V hardware, please join us!
 Currently we are in a very early stage, trying to cross compile the AOSP codebase
 using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
 
+- 2021-11-30 For AOSP 12 ported to RV64, the implementation of `mmm bionic/libc/ --skip-soong-tests` was successfully built, we now have libc/libm/libdl. The relevant changes have been submitted to the repositories. The details are as follows (here, some PRs are created on gitee, all commits are pushed both on github & gitee):
+  - toolchain for AOSP：
+    - Rust for Android:
+      - compiler: add riscv64gc-linux-android target (Tier 3): <https://github.com/aosp-riscv/rust/commit/8397a76b895b586dcfc8637e98908f65df1af1f9>
+      - library: add riscv64gc-linux-android support: <https://github.com/aosp-riscv/rust/commit/2eacf985415ba38018de70845c0b150885ad4d57>
+      - Modified libc, added support for riscv64：<https://github.com/aosp-riscv/toolchain_rustc/pull/1>
+    - Clang/llvm for Android:
+      - add riscv __get_tls method: <https://github.com/aosp-riscv/toolchain_llvm-project/commit/2511f435f0c0c02f1a64d55b3b45c657dc84b050>
+      - Change some repos' fetch address and revision to support riscv64: <https://github.com/aosp-riscv/platform_manifest/commit/a3446a1580947ac5d5d29e99365fdf90b0edb3ef>
+  - manifest：PR: <https://gitee.com/aosp-riscv/platform_manifest/pulls/7>
+  - AOSP (PRs)：
+    - <https://gitee.com/aosp-riscv/platform-external-scudo/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-unwinding/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls>
+
 - 2021-11-15 For AOSP 12 ported to RV64, the implementation of `m --skip-ninja --skip-soong-tests` was successfully built. The relevant changes have been submitted to the repositories. The details are as follows (here, gitee is taken as an example, github has been mirrored):
   - manifest repository：<https://gitee.com/aosp-riscv/platform_manifest>
   - Newly added AOSP repositories:
