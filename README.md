@@ -25,7 +25,7 @@ using the RISC-V official GNU toolchain. The following is the project progress l
     - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
     - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
     - <https://gitee.com/aosp-riscv/platform_bionic/pulls/2>
-    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls>
+    - <https://gitee.com/aosp-riscv/platform-external-kernel-headers/pulls/1>
 
 - 2021-11-15 For AOSP 12 ported to RV64, the implementation of `m --skip-ninja --skip-soong-tests` was successfully built. The relevant changes have been submitted to the repositories. The details are as follows (here, gitee is taken as an example, github has been mirrored):
   - manifest repository：<https://gitee.com/aosp-riscv/platform_manifest>
