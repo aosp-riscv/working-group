@@ -1,12 +1,14 @@
 **如何编译 aosp-riscv**
+
+注：提供此文档为方便国内参与小伙伴。
+
 <!-- TOC -->
 
 - [1. 硬件环境](#1-硬件环境)
 - [2. 安装依赖软件](#2-安装依赖软件)
 - [3. 安装 repo](#3-安装-repo)
 - [4. 下载源码](#4-下载源码)
-- [5. 下载 patch 并打补丁](#5-下载-patch-并打补丁)
-- [6. 编译](#6-编译)
+- [5. 编译](#5-编译)
 
 <!-- /TOC -->
 
@@ -71,28 +73,17 @@ $ cd /home/u/aosp
 ```
 
 进入 AOSP 构建目录后执行以下命令下载 AOSP 的源码
+
+注：由于采用的是 Gitee 上的 aosp-riscv 开发仓库，以及采用国内清华源的 AOSP 镜像作为缺省 remote，将大大方便国内用户下载代码。
+
 ```
-$ repo init -u git@gitee.com:aosp-riscv/platform_manifest.git -b riscv64-android-12.0.0_dev
+$ repo init -u git@gitee.com:aosp-riscv/platform_manifest.git -b riscv64-android-12.0.0_dev_cn
 $ repo sync -j8
 ```
 
-# 5. 下载 patch 并打补丁
+# 5. 编译
 
-由于部分 AOSP 仓库整体体积过大或者部分文件体积过大，超过 gitee/github 限制的，目前无法在 gitee/github 上新建仓库，所以目前采用补丁方式保存修改，这些补丁单独存放在一个仓库 <https://gitee.com/aosp-riscv/patches_aosp_riscv> 中。
-
-**注意请将这个仓库下载在 AOSP 的构建目录（譬如这里是 `/home/u/aosp`）之外。**, 这里假设下载到 `/home/u` 下。
-
-执行如下命令下载额外的补丁并执行脚本文件应用补丁。
-
-```
-$ cd /home/u
-$ git clone git@gitee.com:aosp-riscv/patches_aosp_riscv.git
-$ cd patches_aosp_riscv/
-$ git checkout riscv64-android-12.0.0_dev
-$ ./apply_patches.sh /home/u/aosp
-```
-
-# 6. 编译
+注意：因为还在开发过程中，当前还不支持完整的编译 `m`。
 
 ```
 $ cd /home/u/aosp

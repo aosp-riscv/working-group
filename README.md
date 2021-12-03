@@ -4,6 +4,16 @@ This is the meta repo for the AOSP for RISC-V Project. General tasks and issues 
 
 If you are interested in runnning Android on RISC-V hardware, please join us!
 
+The code of AOSP-RISCV is open source, and everyone is welcome to contribute. All repositories are in duplicate on Github and Gitee, which are mirror backups of each other.
+
+- Github:<https://github.com/aosp-riscv>
+- Gitee: <https://gitee.com/aosp-riscv>
+
+You can choose a code repository for development according to your own preferences, and use similar development processes on both sides:
+
+- [Development Process based on Github](./docs/dev-github.md)
+- [Development Process based on Gitee(in Chinese)](./docs/zh/dev-gitee.md)
+
 ## Status
 
 Currently we are in a very early stage, trying to cross compile the AOSP codebase

@@ -2,7 +2,17 @@
 
 本仓库适用于为 AOSP for RISC-V 项目组归档除代码外的其他相关资料和讯息。
 
-如果您对在基于 RISC-V 架构的硬件上运行 Android，欢迎加入我们！
+如果您对在基于 RISC-V 架构的硬件上运行 Android 感兴趣，欢迎加入我们！
+
+AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github 和 Gitee 上一式两份，互为镜像备份。
+
+- Github 仓库地址：<https://github.com/aosp-riscv>
+- Gitee 仓库地址： <https://gitee.com/aosp-riscv>
+
+大家可以根据自己的喜好选择代码仓库进行开发，两边采用类似的开发流程：
+
+- [基于 Github 开发的流程说明](./docs/dev-github.md)
+- [基于 Gitee 开发的流程说明](./docs/zh/dev-gitee.md)
 
 ## 项目状态
 
