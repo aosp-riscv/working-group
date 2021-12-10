@@ -18,6 +18,35 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
 
+- 2021-12-10 已可以完整地成功编译 bionic，正在利用 Google 提供的 gtest 套件运行集成测试。
+  - Clang 工具链中增加 libFuzzer 支持 riscv
+    - <https://github.com/aosp-riscv/toolchain_llvm_android/pull/1>
+    - <https://github.com/aosp-riscv/toolchain_llvm-project/pull/1>
+    - <https://github.com/aosp-riscv/platform-prebuilts-clang-host-linux-x86/commit/5d06484b069ec0af9f0d278a3fcc2559bb6f37f4>
+  - 使能 soong tests，构建中无需输入 `--skip-soong-tests`
+    - <https://github.com/aosp-riscv/platform_build_soong/pull/1>
+    - <https://github.com/aosp-riscv/platform-build-bazel/pull/1>
+  - 针对一些大仓库，不再使用 patch 方式，仍然使用 git 进行管理:
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/10>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-runtime/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-services-Car/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-modules-ArtPrebuilt/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-frameworks-base/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-cts/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-clang-host-linux-x86/pulls/1>
+  - 构建成功 bionic，使用 "mmm bionic":
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/7>
+    - <https://gitee.com/aosp-riscv/platform-external-llvm/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/3>
+    - <https://gitee.com/aosp-riscv/platform-external-scudo/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-unwinding/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/8>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/9>
+  - 增加一个仓库存放测试相关的脚本: 
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/11>
+
 - 2021-11-30 针对 AOSP 12 移植到 RV64 实现 `mmm bionic/libc/ --skip-soong-tests` 下构建成功 libc/libm/libdl。相关修改已经提交到仓库上。具体如下(部分 PR 在 gitee 上，所有代码同步推送至 github 和 gitee)：
   - 工具链 for AOSP 更新：
     - Rust for Android:

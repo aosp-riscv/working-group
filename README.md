@@ -16,8 +16,36 @@ You can choose a code repository for development according to your own preferenc
 
 ## Status
 
-Currently we are in a very early stage, trying to cross compile the AOSP codebase
-using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
+Currently we are in a very early stage, trying to cross compile the AOSP codebase using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
+
+- 2021-12-10: Bionic has been successfully compiled, and integration tests are being run using the gtest suite provided by Google.
+  - Clang toolchain: added libFuzzer
+    - <https://github.com/aosp-riscv/toolchain_llvm_android/pull/1>
+    - <https://github.com/aosp-riscv/toolchain_llvm-project/pull/1>
+    - <https://github.com/aosp-riscv/platform-prebuilts-clang-host-linux-x86/commit/5d06484b069ec0af9f0d278a3fcc2559bb6f37f4>
+  - Enable soong tests during building:
+    - <https://github.com/aosp-riscv/platform_build_soong/pull/1>
+    - <https://github.com/aosp-riscv/platform-build-bazel/pull/1>
+  - Move some patches to git:
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/10>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-runtime/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-services-Car/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-packages-modules-ArtPrebuilt/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-frameworks-base/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-cts/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-prebuilts-clang-host-linux-x86/pulls/1>
+  - Pass build with "mmm bionic":
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/7>
+    - <https://gitee.com/aosp-riscv/platform-external-llvm/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform_bionic/pulls/3>
+    - <https://gitee.com/aosp-riscv/platform-external-scudo/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-unwinding/pulls/1>
+    - <https://gitee.com/aosp-riscv/platform-system-libbase/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/8>
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/9>
+  - Added test repo: 
+    - <https://gitee.com/aosp-riscv/platform_manifest/pulls/11>
 
 - 2021-11-30 For AOSP 12 ported to RV64, the implementation of `mmm bionic/libc/ --skip-soong-tests` was successfully built, we now have libc/libm/libdl. The relevant changes have been submitted to the repositories. The details are as follows (here, some PRs are created on gitee, all commits are pushed both on github & gitee):
   - toolchain for AOSP：
