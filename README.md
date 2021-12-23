@@ -18,6 +18,18 @@ You can choose a code repository for development according to your own preferenc
 
 Currently we are in a very early stage, trying to cross compile the AOSP codebase using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
 
+- 2021-12-23 Status update
+  - Build a minimal system, run AOSP's bionic-unit-test-static on QEMU, and solve the bugs found in the test.
+    - malloc.malloc_info: SIGABRT：<https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - part of stdio cases FAILED due to can not create tmpfiles: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - Fixed wrong mdev path issue: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - ifunc.*：Segmentation fault: <https://gitee.com/aosp-riscv/platform_bionic/pulls/4>; also raise PR to upstream: <https://github.com/riscv-android-src/platform-bionic/pull/1>
+    - added bionic-unit-tests-static log: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - Added doc on how-to setup test env: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+  - Participate in OSDTConf2021 and present a report about AOSP for RISC-V community open source progress
+    - report slides: <https://github.com/plctlab/PLCT-Open-Reports/blob/master/20211218-osdt2021-aosp-rv-wangchen.pdf>
+    - report vedio: <https://www.bilibili.com/video/BV1Sg411w7Le>
+
 - 2021-12-10: Bionic has been successfully compiled, and integration tests are being run using the gtest suite provided by Google.
   - Clang toolchain: added libFuzzer
     - <https://github.com/aosp-riscv/toolchain_llvm_android/pull/1>

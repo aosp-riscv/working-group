@@ -18,6 +18,18 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
 
+- 2021-12-23 状态更新
+  - 搭建了一个最小系统，在 QEMU 上运行 AOSP 的 bionic-unit-test-static，并解决测试中发现的 bugs。
+    - malloc.malloc_info: SIGABRT：<https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - part of stdio cases FAILED due to can not create tmpfiles: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - Fixed wrong mdev path issue: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - ifunc.*：Segmentation fault: <https://gitee.com/aosp-riscv/platform_bionic/pulls/4>; 该 bugfix 也提交上游 PR: <https://github.com/riscv-android-src/platform-bionic/pull/1>
+    - added bionic-unit-tests-static log: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+    - Added doc on how-to setup test env: <https://gitee.com/aosp-riscv/test-riscv/pulls/2>
+  - 参加 OSDTConf2021 并做 AOSP for RISC-V 社区开源进展报告
+    - 报告 slides: <https://github.com/plctlab/PLCT-Open-Reports/blob/master/20211218-osdt2021-aosp-rv-wangchen.pdf>
+    - 报告 vedio: <https://www.bilibili.com/video/BV1Sg411w7Le>
+
 - 2021-12-10 已可以完整地成功编译 bionic，正在利用 Google 提供的 gtest 套件运行集成测试。
   - Clang 工具链中增加 libFuzzer 支持 riscv
     - <https://github.com/aosp-riscv/toolchain_llvm_android/pull/1>
