@@ -14,6 +14,7 @@
 
 - [Android version history](https://en.wikipedia.org/wiki/Android_version_history)
 - [Codenames, Tags, and Build Numbers](https://source.android.google.cn/setup/start/build-numbers)
+- [What is API Level](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels)
 
 # 2. AOSP 的版本管理
 
@@ -23,18 +24,18 @@ AOSP （Android Open Source Project），也就是我们常说的 Android（安�
 
 ![](./diagrams/20200911-platform-version/android-version.png)
 
-Android 的开发版本每一个大版本我们称之为一个 **Platform**。围绕 Platform 的概念，Google 提出了以下三个和版本管理相关的概念：
-- 每个 **Platform** 有一个版本号 **Version**，这个 **Version** 的值是唯一的，我们就叫它 “版本号” 好了（后面直接用英文表达感觉更准确，其他关键字也是一样），可以作为关键字区分每个不同的 **Platform**。**Version** 的表达采用点分格式，完整的格式包括三段 `X.Y.Z`，但常常用不了那么多，所以经常简写为 `X` 或者 `X.Y`。 **Version** 的值是从 1.0 开始，依次递增，目前正式发布的已经达到 11。
-- 同时针对不同的 **Platform**， Google 为了方便人记忆，又会赋予一个独立的 **Codename**，这些 **Codename** 的灵感源自美味的点心，譬如Gingerbread/Honeycomb，就好比人的绰号。注意 **Codename** 和 **Version** 是一对多的概念，譬如同样叫 Oreo 对应的 **Version** 有 8.0.0 和 8.1.0。
-- 和 **Version** 对应的是 **API level**（有的 **Version** 还有对应的 **NDK release ID**，差不多是一个概念），所谓 API 就是每个 **Version** 的 Android Platform 的 framework 提供出来供上层的应用编程时调用的一套接口，所以 API 的版本（官方叫 level）是对应每一个 **Version** 都是唯一的。
+Android 的开发版本每一个大版本我们称之为一个 **Platform**。围绕 Platform 的概念，Google 提出了以下 **Version**、**Codename** 和 **API level** 三个和版本管理相关的概念：
+- **Version**: 每个 **Platform** 有一个版本号 **Version**，这个 **Version** 的值是唯一的，我们就叫它 “版本号” 好了（后面直接用英文表达感觉更准确，其他关键字也是一样），可以作为关键字区分每个不同的 **Platform**。**Version** 的表达采用点分格式，完整的格式包括三段 `X.Y.Z`，但常常用不了那么多，所以经常简写为 `X` 或者 `X.Y`。 **Version** 的值是从 1.0 开始，依次递增，目前正式发布的已经达到 11。
+- **Codename**: 同时针对不同的 **Platform**， Google 为了方便人记忆，又会赋予一个独立的 **Codename**，这些 **Codename** 的灵感源自美味的点心，譬如Gingerbread/Honeycomb，就好比人的绰号。注意 **Codename** 和 **Version** 是一对多的概念，譬如同样叫 Oreo 对应的 **Version** 有 8.0.0 和 8.1.0。
+- **API level**: 和 **Version** 对应的是 **API level**（有的 **Version** 还有对应的 **NDK release ID**，差不多是一个概念），所谓 API 就是每个 **Version** 的 Android Platform 的 framework 提供出来供上层的应用编程时调用的一套接口，所以 API 的版本（官方叫 level）是对应每一个 **Version** 都是唯一的。
 
-有关 **Platform**、**Codename**、**Vesion** 和 **API level** 之间概念的历史信息，可以参考官网的总结表格如下，大家结合上面的总结再自己看一下：
+有关 **Platform**、**Codename**、**Vesion** 和 **API level** 之间概念的历史信息，可以参考官网的总结表格如下 (由于图片较大，只截取了最新的一部分)，大家结合上面的总结再自己看一下：
 
 ![](./diagrams/20200911-platform-version/android-codename.png)
 
 (图片来源：https://source.android.google.cn/setup/start/build-numbers)
 
-维基百科上有一幅图也不错，摘录如下：
+维基百科上有一幅图也不错，摘录如下(由于图片较大，只截取了最新的一部分)：
 
 ![](./diagrams/20200911-platform-version/android-codename-wiki.png)
 
@@ -45,7 +46,7 @@ Android 的开发版本每一个大版本我们称之为一个 **Platform**。�
     - X.Y.Z 是上面介绍的 **Platform** 对应的 **Version**
     - N 是标识同一个 **Version** 下的二级小版本号，从 1 开始。
 
-    tag 的一个例子：`android-10.0.0_39`。
+    tag 的一个例子：`android-10.0.0_r39`。
 
 - **“构建（Build）”** 的概念。Android 开发团队针对某些 **tag** 标记的版本测试稳定后会发布比较正式的构建版本。针对这些构建版本会赋予一个唯一的 Build Number 进行标识。从 Android 8.0.0 (Oreo) 开始以后的版本中，每个 **Build** 的命名格式为 `PVBB.YYMMDD.bbb[.Cn]`，其中：
     - P 表示平台版本代号的第一个字母，例如 O 表示 Oreo。
