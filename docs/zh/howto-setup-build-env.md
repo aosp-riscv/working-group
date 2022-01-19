@@ -9,6 +9,7 @@
 - [3. 安装 repo](#3-安装-repo)
 - [4. 下载源码](#4-下载源码)
 - [5. 编译](#5-编译)
+- [6. 构建 Clang](#6-构建-clang)
 
 <!-- /TOC -->
 
@@ -85,9 +86,20 @@ $ repo sync -j8
 
 注意：因为还在开发过程中，当前还不支持完整的编译 `m`。
 
+下面是一个例子，编译 aosp 但不运行最终的 ninja 构建。
+
 ```
 $ cd /home/u/aosp
 $ source ./build/envsetup.sh
 $ lunch aosp_riscv64-eng
-$ m --skip-ninja --skip-soong-tests
+$ m --skip-ninja
+```
+
+# 6. 构建 Clang
+
+```
+$ mkdir llvm-toolchain && cd llvm-toolchain
+$ repo init -u git@github.com:aosp-riscv/platform_manifest.git -b riscv64-llvm-master
+$ repo sync -c
+$ python toolchain/llvm_android/build.py
 ```

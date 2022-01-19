@@ -7,6 +7,7 @@
 - [3. Install repo](#3-install-repo)
 - [4. Download source code](#4-download-source-code)
 - [5. Build](#5-build)
+- [6. Build Clang](#6-build-clang)
 
 <!-- /TOC -->
 
@@ -80,9 +81,20 @@ $ repo sync -j8
 
 Note: Because it is still in the development process, full compilation of `m` is not currently supported.
 
+Following is just sample on how to build without ninja.
+
 ```
 $ cd /home/u/aosp
 $ source ./build/envsetup.sh
 $ lunch aosp_riscv64-eng
-$ m --skip-ninja --skip-soong-tests
+$ m --skip-ninja
+```
+
+# 6. Build Clang
+
+```
+$ mkdir llvm-toolchain && cd llvm-toolchain
+$ repo init -u git@github.com:aosp-riscv/platform_manifest.git -b riscv64-llvm-master
+$ repo sync -c
+$ python toolchain/llvm_android/build.py
 ```
