@@ -18,6 +18,30 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
 
+- 2022-01-20 状态更新
+  - 运行 bionic 单元测试并解决发现的问题，提交的 PR 列表如下：
+    - [fix TLS issues](https://gitee.com/aosp-riscv/platform_bionic/pulls/5)
+    - [change TLS slot organization same as that for arm](https://gitee.com/aosp-riscv/platform_bionic/pulls/6)
+    - [fixed vfork](https://gitee.com/aosp-riscv/platform_bionic/pulls/7)
+    - [continue vfork](https://gitee.com/aosp-riscv/platform_bionic/pulls/8)
+    - [fixed memset infinite loop issue](https://gitee.com/aosp-riscv/platform_bionic/pulls/10)
+    - [some changes for test env](https://gitee.com/aosp-riscv/test-riscv/pulls/3)
+    - [run test with isolate mode](https://gitee.com/aosp-riscv/test-riscv/pulls/4)
+    - [enabled some blocking cases](https://gitee.com/aosp-riscv/test-riscv/pulls/5)
+    - [minor changes and ready for upstream](https://gitee.com/aosp-riscv/platform_bionic/pulls/9)
+    - [code format improvement](https://gitee.com/aosp-riscv/platform_bionic/pulls/11)
+    - [minor fix and ready for upstream](https://gitee.com/aosp-riscv/platform_build/pulls/2)
+    - [minor fix and ready for upstream](https://gitee.com/aosp-riscv/platform_build_soong/pulls/3)
+  - 文章和技术手册更新：
+    - [continue update android kernel related knowledge](https://gitee.com/aosp-riscv/working-group/pulls/10)
+    - [updated article: platform-version](https://gitee.com/aosp-riscv/working-group/pulls/11)
+    - [add how to build clang for aosp](https://gitee.com/aosp-riscv/working-group/pulls/12)
+  - RVI aosp 12 上游提交工作
+    - [RVI Android SIG 发布 AOSP 12 源码仓库, Jan/17/2022](https://lists.riscv.org/g/sig-android/message/32), 
+    - [removed old seccomp txt files](https://github.com/riscv-android-src/platform-bionic/pull/3)
+    - [bugfix: enable rela ifunc resolver for riscv64](https://github.com/riscv-android-src/platform-bionic/pull/4)
+    - [format code style](https://github.com/riscv-android-src/platform-bionic/pull/6)
+
 - 2021-12-23 状态更新
   - 搭建了一个最小系统，在 QEMU 上运行 AOSP 的 bionic-unit-test-static，并解决测试中发现的 bugs。
     - malloc.malloc_info: SIGABRT：<https://gitee.com/aosp-riscv/test-riscv/pulls/2>

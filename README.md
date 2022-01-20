@@ -18,6 +18,30 @@ You can choose a code repository for development according to your own preferenc
 
 Currently we are in a very early stage, trying to cross compile the AOSP codebase using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
 
+- 2022-01-20 Status update
+  - Bionic static unit test and bugfix:
+    - [fix TLS issues](https://gitee.com/aosp-riscv/platform_bionic/pulls/5)
+    - [change TLS slot organization same as that for arm](https://gitee.com/aosp-riscv/platform_bionic/pulls/6)
+    - [fixed vfork](https://gitee.com/aosp-riscv/platform_bionic/pulls/7)
+    - [continue vfork](https://gitee.com/aosp-riscv/platform_bionic/pulls/8)
+    - [fixed memset infinite loop issue](https://gitee.com/aosp-riscv/platform_bionic/pulls/10)
+    - [some changes for test env](https://gitee.com/aosp-riscv/test-riscv/pulls/3)
+    - [run test with isolate mode](https://gitee.com/aosp-riscv/test-riscv/pulls/4)
+    - [enabled some blocking cases](https://gitee.com/aosp-riscv/test-riscv/pulls/5)
+    - [minor changes and ready for upstream](https://gitee.com/aosp-riscv/platform_bionic/pulls/9)
+    - [code format improvement](https://gitee.com/aosp-riscv/platform_bionic/pulls/11)
+    - [minor fix and ready for upstream](https://gitee.com/aosp-riscv/platform_build/pulls/2)
+    - [minor fix and ready for upstream](https://gitee.com/aosp-riscv/platform_build_soong/pulls/3)
+  - Article/Document update:
+    - [continue update android kernel related knowledge](https://gitee.com/aosp-riscv/working-group/pulls/10)
+    - [updated article: platform-version](https://gitee.com/aosp-riscv/working-group/pulls/11)
+    - [add how to build clang for aosp](https://gitee.com/aosp-riscv/working-group/pulls/12)
+  - RVI aosp 12 upstream work:
+    - [RISC-V Android 12 Source code repo in github, Jan/17/2022](https://lists.riscv.org/g/sig-android/message/32), 
+    - [removed old seccomp txt files](https://github.com/riscv-android-src/platform-bionic/pull/3)
+    - [bugfix: enable rela ifunc resolver for riscv64](https://github.com/riscv-android-src/platform-bionic/pull/4)
+    - [format code style](https://github.com/riscv-android-src/platform-bionic/pull/6)
+
 - 2021-12-23 Status update
   - Build a minimal system, run AOSP's bionic-unit-test-static on QEMU, and solve the bugs found in the test.
     - malloc.malloc_info: SIGABRT：<https://gitee.com/aosp-riscv/test-riscv/pulls/2>
