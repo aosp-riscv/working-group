@@ -16,7 +16,25 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 ## 项目状态
 
-本项目还处于非常早期的状态，更多的工作在持续推进中。以下为项目进展日志（时间为倒序）。
+以下为项目进展日志（时间为倒序）。
+
+- 2022-02-17 状态更新
+
+  - Setup bionic dynamic-link unit test and bugfix:
+    - [support dynamic link tests](https://gitee.com/aosp-riscv/test-riscv/pulls/6)
+    - [updated doc about test](https://gitee.com/aosp-riscv/test-riscv/pulls/7)
+    - [added search path for libicu.so](https://gitee.com/aosp-riscv/test-riscv/pulls/8)
+    - [added 2.log for bionic dynamic link test](https://gitee.com/aosp-riscv/test-riscv/pulls/9)
+    - [added 4.log for bionic static test](https://gitee.com/aosp-riscv/test-riscv/pulls/10)
+  - Sync aosp-riscv from RVI upstream:
+    - [define REG_* for ucontext](https://gitee.com/aosp-riscv/platform_bionic/pulls/12)
+    - [asm header files](https://gitee.com/aosp-riscv/platform_bionic/pulls/13)
+    - [unify rv64 pre-processor definition](https://gitee.com/aosp-riscv/platform_bionic/pulls/14)
+  - Sync aosp-riscv to RVI upstream:
+    - [added stack overflow reserved bytes for rv64](https://github.com/riscv-android-src/platform-art/pull/2)
+    - [removed duplicated asm riscv header file](https://github.com/riscv-android-src/platform-bionic/pull/8)
+    - [unify rv64 preprocessor definition](https://github.com/riscv-android-src/platform-bionic/pull/13)
+    - [upgrade kernel uapi to 5.12](https://github.com/riscv-android-src/platform-bionic/pull/14) in reviewing
 
 - 2022-01-20 状态更新
   - 运行 bionic 单元测试并解决发现的问题，提交的 PR 列表如下：

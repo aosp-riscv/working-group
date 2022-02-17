@@ -16,7 +16,25 @@ You can choose a code repository for development according to your own preferenc
 
 ## Status
 
-Currently we are in a very early stage, trying to cross compile the AOSP codebase using the RISC-V official GNU toolchain. The following is the project progress log (time in reverse order).
+Following is the project progress log (time in reverse order).
+
+- 2022-02-17 Status update
+
+  - Setup bionic dynamic-link unit test and bugfix:
+    - [support dynamic link tests](https://gitee.com/aosp-riscv/test-riscv/pulls/6)
+    - [updated doc about test](https://gitee.com/aosp-riscv/test-riscv/pulls/7)
+    - [added search path for libicu.so](https://gitee.com/aosp-riscv/test-riscv/pulls/8)
+    - [added 2.log for bionic dynamic link test](https://gitee.com/aosp-riscv/test-riscv/pulls/9)
+    - [added 4.log for bionic static test](https://gitee.com/aosp-riscv/test-riscv/pulls/10)
+  - Sync aosp-riscv from RVI upstream:
+    - [define REG_* for ucontext](https://gitee.com/aosp-riscv/platform_bionic/pulls/12)
+    - [asm header files](https://gitee.com/aosp-riscv/platform_bionic/pulls/13)
+    - [unify rv64 pre-processor definition](https://gitee.com/aosp-riscv/platform_bionic/pulls/14)
+  - Sync aosp-riscv to RVI upstream:
+    - [added stack overflow reserved bytes for rv64](https://github.com/riscv-android-src/platform-art/pull/2)
+    - [removed duplicated asm riscv header file](https://github.com/riscv-android-src/platform-bionic/pull/8)
+    - [unify rv64 preprocessor definition](https://github.com/riscv-android-src/platform-bionic/pull/13)
+    - [upgrade kernel uapi to 5.12](https://github.com/riscv-android-src/platform-bionic/pull/14) in reviewing
 
 - 2022-01-20 Status update
   - Bionic static unit test and bugfix:
