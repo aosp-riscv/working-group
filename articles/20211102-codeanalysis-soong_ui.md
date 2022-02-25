@@ -2,6 +2,11 @@
 
 **代码走读：对 soong_ui 的深入理解**
 
+- 作者：汪辰
+- 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
+
+文章大纲
+
 <!-- TOC -->
 
 - [1. 构建系统对 soong_ui 的封装](#1-构建系统对-soong_ui-的封装)
@@ -19,9 +24,15 @@
 
 # 1. 构建系统对 soong_ui 的封装
 
-`soong_ui` 这个程序可以认为是 Google 在替代原先基于 make 的构建系统而引入的一个非常重要的程序，整个构建可以说就是由这个程序驱动完成的。但代码中我们很难看到直接调用 `soong_ui` 这个程序的地方，更多的我们看到的是形如在 `envsetup.sh` 脚本文件中诸如 `$T/build/soong/soong_ui.bash ...` 这样的调用，这个脚本正是对 `soong_ui` 程序的封装调用，以这个脚本函数为入口， Google 将原来的以 make 为核心的框架改造为以 Soong 为核心的构建框架。
+`soong_ui` 这个程序可以认为是 Google 在替代原先基于 make 的构建系统而引入的一个非常重
+要的程序，整个构建可以说就是由这个程序驱动完成的。但代码中我们很难看到直接调用 `soong_ui` 
+这个程序的地方，更多的我们看到的是形如在 `envsetup.sh` 脚本文件中诸如 
+`$T/build/soong/soong_ui.bash ...` 这样的调用，这个脚本正是对 `soong_ui` 程序的封装
+调用，以这个脚本函数为入口， Google 将原来的以 make 为核心的框架改造为以 Soong 为核心
+的构建框架。
 
-我们可以认为 Soong 的入口封装在 `build/soong/soong_ui.bash` 这个脚本中，下面我们来看看这个脚本的核心处理逻辑，主要包括以下三步：
+我们可以认为 Soong 的入口封装在 `build/soong/soong_ui.bash` 这个脚本中，下面我们来看
+看这个脚本的核心处理逻辑，主要包括以下三步：
 
 <pre>
 <b>// 第一步</b>
@@ -44,8 +55,14 @@ source ${TOP}/build/soong/scripts/microfactory.bash
 这个被导入的脚本主要做了以下几件事情：
 
 - 设置 GOROOT 环境变量，指向 prebuild 的 go 编译工具链
-- 定义 `getoutdir()` 和 `soong_build_go()` 这两个函数。`getoutdir()` 的作用很简单，就是用于 `Find the output directory`；`soong_build_go()` 实际上是一个对 `build_go()` 函数的调用封装。`soong_build_go()` 在第二步会用到。
-- 导入 `${TOP}/build/blueprint/microfactory/microfactory.bash` 这个脚本，这个脚本中定义了 `build_go()` 这个函数，这个函数的中会调用 go 的命令，根据调用的参数生成相应的程序，其中第一个参数用于指定生成的程序的名字，第二个参数用于指定源码的路径，还有第三个参数可以用于指定额外的编译参数。举个例子：`build_go soong_ui android/soong/cmd/soong_ui` 就是根据 AOSP 源码树目录 `soong/cmd/soong_ui` 的 package 生成一个可执行程序叫 `soong_ui`。
+- 定义 `getoutdir()` 和 `soong_build_go()` 这两个函数。`getoutdir()` 的作用很简单，
+  就是用于 `Find the output directory`；`soong_build_go()` 实际上是一个对 `build_go()` 
+  函数的调用封装。`soong_build_go()` 在第二步会用到。
+- 导入 `${TOP}/build/blueprint/microfactory/microfactory.bash` 这个脚本，这个脚本
+  中定义了 `build_go()` 这个函数，这个函数的中会调用 go 的命令，根据调用的参数生成相应
+  的程序，其中第一个参数用于指定生成的程序的名字，第二个参数用于指定源码的路径，还有第三
+  个参数可以用于指定额外的编译参数。举个例子：`build_go soong_ui android/soong/cmd/soong_ui` 
+  就是根据 AOSP 源码树目录 `soong/cmd/soong_ui` 的 package 生成一个可执行程序叫 `soong_ui`。
 
 ## 1.2. 第二步：构建
 
@@ -53,11 +70,18 @@ source ${TOP}/build/soong/scripts/microfactory.bash
 soong_build_go soong_ui android/soong/cmd/soong_ui
 ```
 
-其作用是调用 `soong_build_go` 函数。这个函数有两个参数，从第一步的分析可以知道，`soong_build_go` 实际上是一个对 `build_go()` 函数的调用封装，所以以上语句等价于 `build_go soong_ui android/soong/cmd/soong_ui`。第一参数 `soong_ui` 是指定了编译生成的可执行程序的名字， `soong_ui` 是一个用 go 语言写的程序，也是 Soong 的实际执行程序。在第二个参数告诉 `soong_build_go` 函数，`soong_ui` 程序的源码在哪里，这里制定了其源码路径  `android/soong/cmd/soong_ui`（实际对应的位置是 `build/soong/cmd/soong_ui`）
+其作用是调用 `soong_build_go` 函数。这个函数有两个参数，从第一步的分析可以知道，
+`soong_build_go` 实际上是一个对 `build_go()` 函数的调用封装，所以以上语句等价于 
+`build_go soong_ui android/soong/cmd/soong_ui`。第一参数 `soong_ui` 是指定了编译生
+成的可执行程序的名字， `soong_ui` 是一个用 go 语言写的程序，也是 Soong 的实际执行程序。
+在第二个参数告诉 `soong_build_go` 函数，`soong_ui` 程序的源码在哪里，这里制定了其源码
+路径  `android/soong/cmd/soong_ui`（实际对应的位置是 `build/soong/cmd/soong_ui`）
 
-综上所述，`build/soong/soong_ui.bash` 的第二步的效果就是帮助我们把 `soong_ui` 制作出来，制作好的 `soong_ui` 路径在 `out/soong_ui` 下。
+综上所述，`build/soong/soong_ui.bash` 的第二步的效果就是帮助我们把 `soong_ui` 制作出
+来，制作好的 `soong_ui` 路径在 `out/soong_ui` 下。
 
-p.s.: `soong_ui` 是 “soong native UI” 的缩写，这是一个运行在 host 上的可执行程序，即 Soong 的总入口。
+p.s.: `soong_ui` 是 “soong native UI” 的缩写，这是一个运行在 host 上的可执行程序，
+即 Soong 的总入口。
 
 ## 1.3. 第三步：执行
 
@@ -70,7 +94,9 @@ exec "$(getoutdir)/soong_ui" "$@"
 
 # 2. `soong_ui` 程序分析
 
-`soong_ui` 的主文件是 `build/soong/cmd/soong_ui/main.go` 这个文件可以认为只是 `soong_ui` 作为一个命令行程序的入口，但这个程序的内容绝对不止这一个文件。从其 `soong/cmd/soong_ui/Android.bp` 文件来看：
+`soong_ui` 的主文件是 `build/soong/cmd/soong_ui/main.go` 这个文件可以认为只是 `soong_ui` 
+作为一个命令行程序的入口，但这个程序的内容绝对不止这一个文件。从其 `soong/cmd/soong_ui/Android.bp` 
+文件来看：
 
 ```
 blueprint_go_binary {
@@ -90,9 +116,13 @@ blueprint_go_binary {
 编译这个 soong_ui 会涉及到以下几个依赖的 module：
 
 - `soong/ui/build`：soong_ui 的主逻辑
-- `soong/ui/logger`：Package logger implements a logging package designed for command line utilities.  It uses the standard 'log' package and function, but splits output between stderr and a rotating log file.
-- `soong/ui/terminal`：Package terminal provides a set of interfaces that can be used to interact with the terminal
-- `soong/ui/tracer`：This package implements a trace file writer, whose files can be opened in chrome://tracing.
+- `soong/ui/logger`：Package logger implements a logging package designed for 
+  command line utilities.  It uses the standard 'log' package and function, but 
+  splits output between stderr and a rotating log file.
+- `soong/ui/terminal`：Package terminal provides a set of interfaces that can be 
+  used to interact with the terminal
+- `soong/ui/tracer`：This package implements a trace file writer, whose files 
+  can be opened in chrome://tracing.
 
 
 ## 2.1. `soong_ui` 的 main 函数。
@@ -195,7 +225,8 @@ func main() {
 ./out/soong_ui --dumpvar-mode TARGET_PRODUCT
 ```
 
-`--make-mode` 参数告诉 soong_ui，是正儿八经要开始编译。也就是说 `soong_ui --make-mode` 可以替代原来的 make， 所以后面还可以带一些参数选项。这些参数可能都是为了兼容 make 的习惯。
+`--make-mode` 参数告诉 soong_ui，是正儿八经要开始编译。也就是说 `soong_ui --make-mode` 
+可以替代原来的 make， 所以后面还可以带一些参数选项。这些参数可能都是为了兼容 make 的习惯。
 
 ### 2.2.1. `soong_ui` 的 "--dumpvar-mode" 和 "--dumpvars-mode" 参数
 
@@ -223,15 +254,22 @@ human-readable config banner from the beginning of the build.
 
 ```
 
-这两个函数差不多，区别仅在于 dump 的 var 的个数多少。内部核心都是调用的 `build.DumpMakeVars()`, 具体的代码实现在 `./build/soong/ui/build/dumpvars.go`
+这两个函数差不多，区别仅在于 dump 的 var 的个数多少。内部核心都是调用的 `build.DumpMakeVars()`, 
+具体的代码实现在 `./build/soong/ui/build/dumpvars.go`
 
-而 `build.DumpMakeVars()` 内部最终封装的 `build.dumpMakeVars()`, 注意对于 "--make-mode" 内部如果要 BuildProductConfig 也会调用 `build.dumpMakeVars()` 这个函数。
+而 `build.DumpMakeVars()` 内部最终封装的 `build.dumpMakeVars()`, 注意对于 "--make-mode" 
+内部如果要 BuildProductConfig 也会调用 `build.dumpMakeVars()` 这个函数。
 
-`build.dumpMakeVars()` 这个函数就非常有趣了，看它的代码实际上是用命令行的方式去执行一个叫做 `build/make/core/config.mk` 的脚本。
+`build.dumpMakeVars()` 这个函数就非常有趣了，看它的代码实际上是用命令行的方式去执行一
+个叫做 `build/make/core/config.mk` 的脚本。
 
-这个脚本是从 Android 原先的 make 系统里遗留下来的，从该文件的最前面注释上来看，原先的 Android 的 build 系统中，top-level Makefile 会包含这个 config.mk 文件，这个文件根据 platform 的不同以及一些 configration 的不同设置了一些 standard variables，这些变量 `are not specific to what is being built`。
+这个脚本是从 Android 原先的 make 系统里遗留下来的，从该文件的最前面注释上来看，原先的 
+Android 的 build 系统中，top-level Makefile 会包含这个 config.mk 文件，这个文件根据 
+platform 的不同以及一些 configration 的不同设置了一些 standard variables，这些变量 
+`are not specific to what is being built`。
 
-这个 config.mk 会 include 大量的其他 mk 文件，这些文件存放在 BUILD_SYSTEM（`./build/make/common`) 和  BUILD_SYSTEM（`./build/make/core`） 下
+这个 config.mk 会 include 大量的其他 mk 文件，这些文件存放在 BUILD_SYSTEM（`./build/make/common`) 
+和  BUILD_SYSTEM（`./build/make/core`） 下
 
 注意在这个 config.mk 的最后 include 了这么两个文件
 ```
@@ -241,7 +279,9 @@ include $(BUILD_SYSTEM)/soong_config.mk
 endif
 ```
 
-其中 `soong_config.mk` 里将大量 Soong 需要的，但原先定义在 mk 文件中的变量打印输出到 `out/soong/soong.variables` 这个文件中，这是一个 json 格式的文件，这也是我们所谓的 dump Make Vars 的含义。dump 出来后我们就可以随时使用了。生成的 jason 语法格式为：
+其中 `soong_config.mk` 里将大量 Soong 需要的，但原先定义在 mk 文件中的变量打印输出到 
+`out/soong/soong.variables` 这个文件中，这是一个 json 格式的文件，这也是我们所谓的 
+dump Make Vars 的含义。dump 出来后我们就可以随时使用了。生成的 jason 语法格式为：
 
 ```
 $(call add_json_str,  BuildId,                           $(BUILD_ID))
@@ -260,11 +300,14 @@ $(call add_json_list, ProductResourceOverlays,           $(PRODUCT_PACKAGE_OVERL
 "ProductResourceOverlays": ["device/generic/goldfish/overlay"],
 ```
 
-这个地方对于理解 Android 中从 make 到 Soong 的转换非常重要，看上去 Android 的思路还是先保留了原先 Make 的一套核心的 setup 逻辑，然后导出为 soong variables 供新的 Soong 使用，完成了转换。
+这个地方对于理解 Android 中从 make 到 Soong 的转换非常重要，看上去 Android 的思路还是
+先保留了原先 Make 的一套核心的 setup 逻辑，然后导出为 soong variables 供新的 Soong 
+使用，完成了转换。
 
 ### 2.2.2. `soong_ui` 的 "--make-mode" 参数
 
-现在来看 `build.Build()` 这个核心函数, 源码在 `./soong/ui/build/build.go`, 略去所有辅助的步骤，只保留核心的步骤
+现在来看 `build.Build()` 这个核心函数, 源码在 `./soong/ui/build/build.go`, 略去所有
+辅助的步骤，只保留核心的步骤
 
 <pre>
 func Build(ctx Context, config Config, what int) {
@@ -306,7 +349,9 @@ func Build(ctx Context, config Config, what int) {
 }
 </pre>
 
-对 Build 这个核心函数的分析来看，其实最重要的是 `runSoong()`, 这个函数最终生成了 `./out/soong/build.ninja`, `runNinja()` 啥的都是以这个最终的 ninja 文件作为输入，在这个基础上执行编译构建的工作。
+对 Build 这个核心函数的分析来看，其实最重要的是 `runSoong()`, 这个函数最终生成了 
+`./out/soong/build.ninja`, `runNinja()` 啥的都是以这个最终的 ninja 文件作为输入，在
+这个基础上执行编译构建的工作。
 
 ## 2.3. `build.runSoong()`
 
