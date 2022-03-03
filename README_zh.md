@@ -18,6 +18,30 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 以下为项目进展日志（时间为倒序）。
 
+- 2022-03-03 状态更新
+
+  - Sync aosp-riscv to RVI upstream:
+    - [upgrade kernel uapi to 5.12](https://github.com/riscv-android-src/platform-bionic/pull/14)
+    - [clean-up some minor faults](https://github.com/riscv-android-src/platform-bionic/pull/15)
+    - [fix android unsafe frame pointer chase](https://github.com/riscv-android-src/platform-bionic/pull/16)
+    - [some cleanup and restore](https://github.com/riscv-android-src/platform-build-soong/pull/3)
+  - Sync aosp-riscv from RVI upstream:
+    - [sync with RVI upsteam: pr#14](https://gitee.com/aosp-riscv/platform_bionic/pulls/15)
+    - [sync from RVI upstream: linker_wrapper](https://gitee.com/aosp-riscv/platform_bionic/pulls/16)
+    - [removed FIXME](https://gitee.com/aosp-riscv/platform_bionic/pulls/17)
+    - [sync from RVI upstream, removed duplicated cflags](https://gitee.com/aosp-riscv/platform_build_soong/pulls/4)
+    - [fixed format issue](https://gitee.com/aosp-riscv/platform_build_soong/pulls/5)
+    - [RVI upstream sync, removed FIXME](https://gitee.com/aosp-riscv/platform_build_soong/pulls/6)
+  - aosp-riscv development and bugfix:
+    - [updated bionic unit test on host](https://gitee.com/aosp-riscv/test-riscv/pulls/11)
+    - [optimize the test scripts](https://gitee.com/aosp-riscv/test-riscv/pulls/12)
+    - [Enable create_minidebuginfo](https://github.com/aosp-riscv/platform_build_soong/pull/2)
+    - [Updated dependencies needed by create_minidebuginfo (Relocated)](https://github.com/aosp-riscv/platform_art/pull/2)
+    - [linux-x86/bin/create_minidebuginfo supports riscv64](https://gitee.com/aosp-riscv/platform-prebuilts-build-tools/pulls/1)
+  - Technical articles related:
+    - [status updated on Feb/17/2022](https://gitee.com/aosp-riscv/working-group/pulls/14)
+    - [added template for articles](https://gitee.com/aosp-riscv/working-group/pulls/15)
+
 - 2022-02-17 状态更新
 
   - Setup bionic dynamic-link unit test and bugfix:
