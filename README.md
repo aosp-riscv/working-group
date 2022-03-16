@@ -18,6 +18,26 @@ You can choose a code repository for development according to your own preferenc
 
 Following is the project progress log (time in reverse order).
 
+- 2022-03-16 Status update
+
+  - Sync aosp-riscv to RVI upstream:
+    - [squash and remove duplicated codes](https://github.com/riscv-android-src/platform-bionic/pull/17)
+    - [minor bugfixes in fenv](https://github.com/riscv-android-src/platform-bionic/pull/18)
+  - Sync aosp-riscv from RVI upstream:
+    - [riscv64: fix fenv handling](https://github.com/aosp-riscv/platform_bionic/pull/5)
+  - aosp-riscv development and bugfix:
+    - [libm/riscv64: minor bugfixes in fenv](https://github.com/aosp-riscv/platform_bionic/pull/7)
+    - [add argument check for fesetround()](https://gitee.com/aosp-riscv/platform_bionic/pulls/18)
+    - [fixed doc link issue](https://gitee.com/aosp-riscv/test-riscv/pulls/13)
+    - [fixed issue when run bionic host test](https://gitee.com/aosp-riscv/test-riscv/pulls/14)
+    - [PR for Feature "setup golang develop/debug env for soong"](https://gitee.com/aosp-riscv/working-group/pulls/17)
+    - [[RISCV] Pass -mno-relax to assembler when -fno-integrated-as specified](https://reviews.llvm.org/D120639)
+    - [[RISCV] Generate correct ELF EFlags when .ll file has target-abi attribute](https://reviews.llvm.org/D121183)
+  - Technical articles related:
+    - [20220226-case-prebuilt-elf-files.md](https://github.com/aosp-riscv/working-group/pull/38)
+    - [add doc to introduce how to add entry in lunch](https://gitee.com/aosp-riscv/working-group/pulls/20)
+    - [add code version for doc](https://gitee.com/aosp-riscv/working-group/pulls/19)
+
 - 2022-03-03 Status update
 
   - Sync aosp-riscv to RVI upstream:
@@ -79,7 +99,7 @@ Following is the project progress log (time in reverse order).
     - [updated article: platform-version](https://gitee.com/aosp-riscv/working-group/pulls/11)
     - [add how to build clang for aosp](https://gitee.com/aosp-riscv/working-group/pulls/12)
   - RVI aosp 12 upstream work:
-    - [RISC-V Android 12 Source code repo in github, Jan/17/2022](https://lists.riscv.org/g/sig-android/message/32), 
+    - [RISC-V Android 12 Source code repo in github, Jan/17/2022](https://lists.riscv.org/g/sig-android/message/32),
     - [removed old seccomp txt files](https://github.com/riscv-android-src/platform-bionic/pull/3)
     - [bugfix: enable rela ifunc resolver for riscv64](https://github.com/riscv-android-src/platform-bionic/pull/4)
     - [format code style](https://github.com/riscv-android-src/platform-bionic/pull/6)
@@ -122,7 +142,7 @@ Following is the project progress log (time in reverse order).
     - <https://gitee.com/aosp-riscv/platform_build_soong/pulls/2>
     - <https://gitee.com/aosp-riscv/platform_manifest/pulls/8>
     - <https://gitee.com/aosp-riscv/platform_manifest/pulls/9>
-  - Added test repo: 
+  - Added test repo:
     - <https://gitee.com/aosp-riscv/platform_manifest/pulls/11>
 
 - 2021-11-30 For AOSP 12 ported to RV64, the implementation of `mmm bionic/libc/ --skip-soong-tests` was successfully built, we now have libc/libm/libdl. The relevant changes have been submitted to the repositories. The details are as follows (here, some PRs are created on gitee, all commits are pushed both on github & gitee):
