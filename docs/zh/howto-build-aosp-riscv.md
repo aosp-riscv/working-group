@@ -37,16 +37,16 @@ $ sudo apt install git-core gnupg flex bison build-essential zip curl zlib1g-dev
 
 # 3. 安装 repo
 
-```
-$ mkdir ~/bin
-$ export PATH=~/bin:$PATH
-$ export REPO=$(mktemp /tmp/repo.XXXXXXXXX)
-$ curl -o ${REPO} https://storage.googleapis.com/git-repo-downloads/repo
-$ gpg --keyserver keyserver.ubuntu.com --recv-key 8BB9AD793E8E6153AF0F9A4416530D5E920F5C65
-$ curl -s https://storage.googleapis.com/git-repo-downloads/repo.asc | gpg --verify - ${REPO} && install -m 755 ${REPO} ~/bin/repo
-```
+下载（参考 [清华大学开源软件镜像站 Git Repo 镜像使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/)）
 
-其中 export 的 PATH 以后可以写入 `~/.bashrc` 文件中去，避免以后每次定义。
+```
+$ curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+$ chmod +x repo
+```
+为了方便可以将其拷贝到你的 PATH 里。
+
+repo 运行过程中会尝试访问官方的 git 源更新自己，如果想使用 tuna 的镜像源进行更新，可以
+将如下内容复制到你的 `~/.bashrc` 里并重启终端生效。
 
 安装好后可以运行 `repo version` 检查效果，出现类似以下输出说明安装成功。repo 版本需要 2.15 以上。
 
@@ -62,8 +62,6 @@ OS Linux 4.15.0-144-generic (#148-Ubuntu SMP Sat May 8 02:33:43 UTC 2021)
 CPU x86_64 (x86_64)
 Bug reports: https://bugs.chromium.org/p/gerrit/issues/entry?template=Repo+tool+issue
 ```
-
-如果你的机器是在中国大陆内还需要定义并导出一个环境变量：`export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'`，否则在后面执行 repo init 的时候会默认去 google 的网站下载 repo 的第二阶段，但由于网络原因会导致连接不上，所以改成国内的 git-repo 镜像地址。其中 export 的 PATH 以后可以写入 `~/.bashrc` 文件中去，避免以后每次定义。
 
 # 4. 下载源码
 
