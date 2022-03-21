@@ -9,14 +9,16 @@
 
 <!-- TOC -->
 
-- [如何增加一个普通的产品定义](#如何增加一个普通的产品定义)
-- [如何增加一个 GSI 的产品定义](#如何增加一个-gsi-的产品定义)
+- [1. 如何增加一个普通的产品定义](#1-如何增加一个普通的产品定义)
+- [2. 如何增加一个 GSI 的产品定义](#2-如何增加一个-gsi-的产品定义)
+- [3. lunch 过程中 Android Build System 是如何识别产品的](#3-lunch-过程中-android-build-system-是如何识别产品的)
+- [4. 总结：](#4-总结)
 
 <!-- /TOC -->
 
-注：本文内容基于 AOSP 12 (tag: android-12.0.0_r3)
+注：本文内容基于 AOSP 12 (tag: `android-12.0.0_r3`)
 
-# 如何增加一个普通的产品定义
+# 1. 如何增加一个普通的产品定义
 
 本章节是对以下参考文章的内容整理。
 - [Adding a New Device](https://source.android.google.cn/setup/develop/new-device)
@@ -34,7 +36,7 @@
 
    include device/google/sunfish/device-common.mk
 
-   ......
+   # 省略 ......
    ```
 
    这个文件又会 include 其他的 mk 文件，譬如 `device-common.mk`, 继续看看
@@ -45,7 +47,7 @@
 
    include device/google/sunfish/device.mk
 
-   .....
+   # 省略 ......
    ```
    感觉都是对硬件的一些配置和定义
 
@@ -78,7 +80,7 @@
   $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
   $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_system.mk)
 
-  ......
+  # 省略 ......
 
   PRODUCT_MANUFACTURER := Google
   PRODUCT_BRAND := Android
@@ -87,10 +89,10 @@
   PRODUCT_MODEL := AOSP on sunfish
   ```
 
-- 第(4) 步：创建一个板级配置文件 BoardConfig.mk 例如：`device/google/sunfish/sunfish/BoardConfig.mk`，这个文件中定义了更多 board 级别的编译构建变量定义。
+- 第(4) 步：创建一个板级配置文件 `BoardConfig.mk` 例如：`device/google/sunfish/sunfish/BoardConfig.mk`，这个文件中定义了更多 board 级别的编译构建变量定义。
 
   ```makefile
-  ......
+  # 省略 ......
   include device/google/sunfish/BoardConfig-common.mk
   ```
 
@@ -99,7 +101,7 @@
 - 第 (5) 步：上面这些准备工作做好后，我们需要在运行 lunch 命令时在下拉菜单列表中出现和我们的产品项对应的 entry item。具体防范就是创建一个 AndroidProducts.mk 文件。譬如 `device/google/sunfish/AndroidProducts.mk`。这是个入口文件，定义了我们在 lunch 的菜单列表中显示的项目名称以及前面第（3）步定义的 product 文件的位置。
 
   我们可以看看这个 `device/google/sunfish/AndroidProducts.mk` 文件：
-  ```
+  ```makefile
   PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/aosp_sunfish.mk \
     $(LOCAL_DIR)/aosp_sunfish_hwasan.mk \
@@ -111,15 +113,15 @@
   `COMMON_LUNCH_CHOICES` 中的字符串项会出现在 lunch 命令的项目列表中。
   
 基于以上文件，AOSP 就可以根据我们在 lunch 过程中选择的 product-variant 找到 product 的相关配置文件。步骤大致如下：
-- step 1：假设我们选择了 `aosp_sunfish-userdebug` 这一项，则 build 系统会根据 `-` 分离出前半部分的 `aosp_sunfish`。
-- step 2：然后再到 `PRODUCT_MAKEFILES` 中去匹配，找到对应的 product 的 mk 文件，也就是我们在第（3）步中创建的 `device/google/sunfish/aosp_sunfish.mk`。
+- step 1：假设我们选择了 `aosp_sunfish-userdebug` 这一项，则 build 系统会根据 `-` 分离两个部分，前半部分是 `TARGET_PRODUCT`，即这里的 `aosp_sunfish`, 后半部分是 `TARGET_BUILD_VARIANT`, 即这里的 `userdebug`。有关 build variant 的定义，可参见 <https://source.android.google.cn/docs/setup/develop/new-device#build-variants>。
+- step 2：然后再到 `PRODUCT_MAKEFILES` 中去匹配，根据 `TARGET_PRODUCT` 找到对应的 product 的 mk 文件，也就是我们在第（3）步中创建的 `device/google/sunfish/aosp_sunfish.mk`。
 - step 3：找到 `device/google/sunfish/aosp_sunfish.mk` 后，在根据该文件中定义的 `PRODUCT_DEVICE` 的值就可以继续定位到 sunfish 目录，以及该目录下 product 对应的 board 级配置文件，譬如 `device-sunfish.mk` 和 `BoardConfig.mk`。
 
 形象如下图所示，帮助理解整个过程。
 
 ![](./diagrams/20220315-howto-add-lunch-entry/normal-product.png)
 
-# 如何增加一个 GSI 的产品定义
+# 2. 如何增加一个 GSI 的产品定义
 
 device 目录下的那些产品对应的是具体的一个厂家的设备，Google 还提供了一些官方的 Generic System Images，有关 GSI 可以参考 [Generic System Images](https://source.android.google.cn/setup/build/gsi)。
 
@@ -194,3 +196,31 @@ OUT_DIR=out
 
 ![](./diagrams/20220315-howto-add-lunch-entry/gsi-product.png)
 
+
+# 3. lunch 过程中 Android Build System 是如何识别产品的
+
+我们导入 build/envsetup.sh 后，就可以调用 lunch 命令。该命令的执行逻辑如下：
+
+- print_lunch_menu，这个函数内部会触发 `out/soong_ui --dumpvar-mode COMMON_LUNCH_CHOICES`，打印输出我们看到的 product entry list
+- 我们选择 product 后，lunch 继续 build_build_var_cache，此时获取我们选择的 product 的配置信息
+
+更详细的处理可以参考另外两篇笔记
+- [《envsetup.sh 中的 lunch 函数分析》][1]
+- [《代码走读：对 soong_ui 的深入理解》][2]
+
+# 4. 总结：
+
+AOSP 中的产品定义文件是一些名为 `AndroidProducts.mk` 的文件，这些文件中关键是定义两个变量:
+
+- `PRODUCT_MAKEFILES`: 定义真正的产品文件的路径，每个文件的命名必须符合 `$TARGET_PRODUCT.mk`
+- `COMMON_LUNCH_CHOICES`: 定义可以出现在 lunch 菜单项中的条目，每个条目的命名格式是 `$TARGET_PRODUCT-$TARGET_BUILD_VARIANTS`
+
+
+这些文件分两大类，存放在两个地方：
+
+- 一类是 GSI 产品，由 Google 统一维护，统一存放在 `build/target/product/AndroidProducts.mk` 中。
+- 一类是普通产品，由各个 vendor 维护，存放在 `device` 目录下，一般会按照 vendor 分目录分别存放。
+
+
+[1]: ./20211026-lunch.mode
+[2]: ./20211102-codeanalysis-soong_ui.md
