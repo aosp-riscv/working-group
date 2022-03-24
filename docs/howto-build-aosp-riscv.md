@@ -107,3 +107,4 @@ $ mkdir rust-toolchain && cd rust-toolchain
 $ repo init -u git@github.com:riscv-android-src/manifest.git -b riscv64-android12-rust-toolchain-dev
 $ repo sync -c
 $ python toolchain-android_rust/build.py
+```
