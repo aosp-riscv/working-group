@@ -7,7 +7,7 @@
 - [3. Install repo](#3-install-repo)
 - [4. Download source code](#4-download-source-code)
 - [5. Build](#5-build)
-- [6. Build Clang/llvm toolchain](#6-build-clang/llvm-toolchain)
+- [6. Build Clang/llvm toolchain](#6-build-clang-llvm-toolchain)
 - [7. Build Rust toolchain](#7-build-rust-toolchain)
 
 <!-- /TOC -->
@@ -91,7 +91,7 @@ $ lunch aosp_riscv64-eng
 $ m --skip-ninja
 ```
 
-# 6. Build Clang/llvm toolchain
+# 6. Build Clang llvm toolchain
 
 ```
 $ mkdir llvm-toolchain && cd llvm-toolchain
