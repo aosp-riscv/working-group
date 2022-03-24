@@ -9,7 +9,8 @@
 - [3. 安装 repo](#3-安装-repo)
 - [4. 下载源码](#4-下载源码)
 - [5. 编译](#5-编译)
-- [6. 构建 Clang](#6-构建-clang)
+- [6. 构建 Clang llvm 工具链](#6-构建-clang-llvm-工具链)
+- [7. 构建 Rust 工具链](#7-构建-rust-工具链)
 
 <!-- /TOC -->
 
@@ -93,11 +94,20 @@ $ lunch aosp_riscv64-eng
 $ m --skip-ninja
 ```
 
-# 6. 构建 Clang
+# 6. 构建 Clang llvm 工具链
 
 ```
 $ mkdir llvm-toolchain && cd llvm-toolchain
 $ repo init -u git@github.com:aosp-riscv/platform_manifest.git -b riscv64-llvm-master
 $ repo sync -c
 $ python toolchain/llvm_android/build.py
+```
+
+# 7. 构建 Rust 工具链
+
+```
+$ mkdir rust-toolchain && cd rust-toolchain
+$ repo init -u git@github.com:riscv-android-src/manifest.git -b riscv64-android12-rust-toolchain-dev
+$ repo sync -c
+$ python toolchain-android_rust/build.py
 ```
