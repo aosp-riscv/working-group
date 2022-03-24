@@ -7,7 +7,8 @@
 - [3. Install repo](#3-install-repo)
 - [4. Download source code](#4-download-source-code)
 - [5. Build](#5-build)
-- [6. Build Clang](#6-build-clang)
+- [6. Build Clang/llvm toolchain](#6-build-clang/llvm-toolchain)
+- [7. Build Rust toolchain](#7-build-rust-toolchain)
 
 <!-- /TOC -->
 
@@ -90,7 +91,7 @@ $ lunch aosp_riscv64-eng
 $ m --skip-ninja
 ```
 
-# 6. Build Clang
+# 6. Build Clang/llvm toolchain
 
 ```
 $ mkdir llvm-toolchain && cd llvm-toolchain
@@ -98,3 +99,11 @@ $ repo init -u git@github.com:aosp-riscv/platform_manifest.git -b riscv64-llvm-m
 $ repo sync -c
 $ python toolchain/llvm_android/build.py
 ```
+
+# 7. Build Rust toolchain
+
+```
+$ mkdir rust-toolchain && cd rust-toolchain
+$ repo init -u git@github.com:riscv-android-src/manifest.git -b riscv64-android12-rust-toolchain-dev
+$ repo sync -c
+$ python toolchain-android_rust/build.py
