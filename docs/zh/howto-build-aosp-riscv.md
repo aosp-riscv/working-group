@@ -9,7 +9,7 @@
 - [3. 安装 repo](#3-安装-repo)
 - [4. 下载源码](#4-下载源码)
 - [5. 编译](#5-编译)
-- [6. 构建 Clang llvm 工具链](#6-构建-clang-llvm-工具链)
+- [6. 构建 Clang/llvm 工具链](#6-构建-clang-llvm-工具链)
 - [7. 构建 Rust 工具链](#7-构建-rust-工具链)
 
 <!-- /TOC -->
@@ -94,7 +94,7 @@ $ lunch aosp_riscv64-eng
 $ m --skip-ninja
 ```
 
-# 6. 构建 Clang llvm 工具链
+# 6. 构建 Clang/llvm 工具链
 
 ```
 $ mkdir llvm-toolchain && cd llvm-toolchain
