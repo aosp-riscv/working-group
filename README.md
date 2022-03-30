@@ -18,6 +18,23 @@ You can choose a code repository for development according to your own preferenc
 
 Following is the project progress log (time in reverse order).
 
+- 2022-03-30 Status update 
+
+  - Sync aosp-riscv to RVI upstream:
+    - [improve vfork](https://github.com/riscv-android-src/platform-bionic/pull/19)
+  - Sync aosp-riscv from RVI upstream:
+    - N/A
+  - aosp-riscv development and bugfix:
+    - [New TARGET_PRODUCT sdk_phone_riscv64 with 64bit Support Only](https://gitee.com/aosp-riscv/platform_build/pulls/3)
+    - [changed device/generic/goldfish to aosp-riscv](https://gitee.com/aosp-riscv/platform_manifest/pulls/13)
+    - [pass build with m --skip-ninja for sdk_phone_riscv64-eng](https://gitee.com/aosp-riscv/device-generic-goldfish/pulls/1)
+    - [sudo is not required for make_rootfs.sh](https://gitee.com/aosp-riscv/test-riscv/pulls/15)
+    - [added prebuilt gdb](https://gitee.com/aosp-riscv/test-riscv/pulls/16)
+    - [use gdb built for 18.04](https://gitee.com/aosp-riscv/test-riscv/pulls/17)
+  - Technical articles related:
+    - [added doc to introduce howto build emu](https://gitee.com/aosp-riscv/working-group/pulls/22)
+    - [Add rust toolchain build instructions](https://gitee.com/aosp-riscv/working-group/pulls/23)
+
 - 2022-03-16 Status update
 
   - Sync aosp-riscv to RVI upstream:

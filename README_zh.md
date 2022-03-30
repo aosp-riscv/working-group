@@ -18,6 +18,9 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 以下为项目进展日志（时间为倒序）。
 
+- 2022-03-30 状态更新
+  不再维护中文版，请统一访问 [英文版](./README.md)
+
 - 2022-03-16 状态更新
 
   - Sync aosp-riscv to RVI upstream:
