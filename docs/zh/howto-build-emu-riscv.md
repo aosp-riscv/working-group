@@ -9,8 +9,8 @@
 - [3. 安装 repo](#3-安装-repo)
 - [4. 下载源码](#4-下载源码)
 - [5. 构建](#5-构建)
-	- [5.1. 增量构建](#51-增量构建)
-	- [5.2. 使用 “ccache” 加速构建](#52-使用-ccache-加速构建)
+    - [5.1. 增量构建](#51-增量构建)
+    - [5.2. 使用 “ccache” 加速构建](#52-使用-ccache-加速构建)
 - [6. 使用生成的 AOSP 系统映像进行测试](#6-使用生成的-aosp-系统映像进行测试)
 
 <!-- /TOC -->
@@ -121,6 +121,8 @@ $ lunch sdk_phone_arm64-eng
 $ make -j8
 ```
 
+`$AOSP` 是你 aosp 源码树的路径。
+
 推荐选择的产品类型有 'sdk_phone_arm64-eng' 或者 'sdk_phone_x86_64-eng'。
 
 利用我们自己构建的模拟器启动 AOSP 系统镜像的方法如下：
@@ -133,8 +135,21 @@ $ objs/emulator
 ```
 
 注意：
+- 以上启动 emulator 的命令行必须和 lunch 命令在一个终端会话中，否则会报错。
 - 如果您想在没有图形界面的的模式（headless mode）下启动模拟器，您可以添加 `-no-window` 选项。
 - 如果您看到错误：“pulseaudio: Failed to initialize PA contextaudio: Could not
   init 'pa' audio driver”，您可以添加 `-no-audio` 选项。
 - 如果您看到错误：“PCI bus not available for hda”，您可以添加 `-qemu -machine virt`。
 - 如果您想在 headless mode 下查看内核日志，可以添加 `-show-kernel` 选项。
+
+综上所述，假设我们已经编译生成了 `sdk_phone_arm64-eng` 的 aosp image 和 emulator，现
+在我们想用自己编译的 emulator 运行测试一下这个 aosp image，，并且采用文本模式，不启动
+图形界面，可以输入如下命令：
+```
+$ cd $AOSP/
+$ . build/envsetup.sh
+$ lunch sdk_phone_arm64-eng
+$ cd /home/u/emu-master-dev/external/qemu
+$ export ANDROID_BUILD_TOP=$AOSP
+$ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
+```

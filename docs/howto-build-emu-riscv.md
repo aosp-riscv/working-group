@@ -7,8 +7,8 @@
 - [3. Install repo](#3-install-repo)
 - [4. Download source code](#4-download-source-code)
 - [5. Build](#5-build)
-	- [5.1. Incremental builds](#51-incremental-builds)
-	- [5.2. Speeding up builds with ‘ccache’](#52-speeding-up-builds-with-ccache)
+    - [5.1. Incremental builds](#51-incremental-builds)
+    - [5.2. Speeding up builds with ‘ccache’](#52-speeding-up-builds-with-ccache)
 - [6. Test with the generated AOSP system image](#6-test-with-the-generated-aosp-system-image)
 
 <!-- /TOC -->
@@ -124,6 +124,8 @@ $ lunch sdk_phone_arm64-eng
 $ make -j8
 ```
 
+`$AOSP` is the path to your aosp source tree.
+
 Recommended build products are 'sdk_phone_arm64-eng ' or 'sdk_phone_x86_64-eng'.
 
 To boot the generated system image:
@@ -136,9 +138,24 @@ $ objs/emulator
 ```
 
 Note:
+- The above command lines to start the emulator must be in the same terminal
+  session as the lunch command, otherwise an error will be reported.
 - If you want to launch emulator without GUI(headless mode), you can add 
   `-no-window` option.
 - If you see error: "pulseaudio: Failed to initialize PA contextaudio: Could not
   init `pa' audio driver", you can add `-no-audio` option.
 - If you see error: "PCI bus not available for hda", you can add `-qemu -machine virt`.
 - If you want to see kernel log in headless mode, you can add `-show-kernel` option.
+
+To sum up, assuming that we have compiled and generated the aosp image of
+`sdk_phone_arm64-eng`and emulator. When we want to run and test this aosp image
+with our own compiled emulator, and use text mode (no GUI), you can enter the
+following commands:
+```
+$ cd $AOSP/
+$ . build/envsetup.sh
+$ lunch sdk_phone_arm64-eng
+$ cd /home/u/emu-master-dev/external/qemu
+$ export ANDROID_BUILD_TOP=$AOSP
+$ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
+```
