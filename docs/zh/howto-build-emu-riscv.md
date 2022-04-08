@@ -69,16 +69,16 @@ Bug reports: https://bugs.chromium.org/p/gerrit/issues/entry?template=Repo+tool+
 
 # 4. 下载源码
 
-创建一个模拟器源码构建目录，这里假设是`/home/u/emu-master-dev`，然后进入该目录。
+创建一个模拟器源码构建目录，这里假设是`/home/u/emu-dev`，然后进入该目录。
 
 ```
-$ mkdir -p /home/u/emu-master-dev && cd /home/u/emu-master-dev
+$ mkdir -p /home/u/emu-dev && cd /home/u/emu-dev
 ```
 
 进入构建目录后，执行以下命令下载源代码。
 
 ```
-$ repo init -u git@github.com:aosp-riscv/platform_manifest -b riscv64-emu-master-dev
+$ repo init -u git@gitee.com:aosp-riscv/platform_manifest -b riscv64-emu-31.2.1.0-dev-cn
 $ repo sync -j8
 ```
 
@@ -128,7 +128,7 @@ $ make -j8
 利用我们自己构建的模拟器启动 AOSP 系统镜像的方法如下：
 
 ```
-$ cd /home/u/emu-master-dev/external/qemu 
+$ cd /home/u/emu-dev/external/qemu
 $ ./android/rebuild.sh 
 $ export ANDROID_BUILD_TOP=/path/to/aosp
 $ objs/emulator
@@ -149,7 +149,7 @@ $ objs/emulator
 $ cd $AOSP/
 $ . build/envsetup.sh
 $ lunch sdk_phone_arm64-eng
-$ cd /home/u/emu-master-dev/external/qemu
+$ cd /home/u/emu-dev/external/qemu
 $ export ANDROID_BUILD_TOP=$AOSP
 $ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
 ```

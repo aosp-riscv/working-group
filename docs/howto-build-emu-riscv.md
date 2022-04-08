@@ -68,17 +68,17 @@ Bug reports: https://bugs.chromium.org/p/gerrit/issues/entry?template=Repo+tool+
 
 # 4. Download source code
 
-Create an emulator source code build directory, here assume it is `/home/u/emu-master-dev`, and then enter the directory.
+Create an emulator source code build directory, here assume it is `/home/u/emu-dev`, and then enter the directory.
 
 ```
-$ mkdir -p /home/u/emu-master-dev && cd /home/u/emu-master-dev
+$ mkdir -p /home/u/emu-dev && cd /home/u/emu-dev
 ```
 
 After entering the build directory, execute the following command to download 
 the source code.
 
 ```
-$ repo init -u git@github.com:aosp-riscv/platform_manifest -b riscv64-emu-master-dev
+$ repo init -u git@github.com:aosp-riscv/platform_manifest -b riscv64-emu-31.2.1.0-dev
 $ repo sync -j8
 ```
 
@@ -131,7 +131,7 @@ Recommended build products are 'sdk_phone_arm64-eng ' or 'sdk_phone_x86_64-eng'.
 To boot the generated system image:
 
 ```
-$ cd /home/u/emu-master-dev/external/qemu 
+$ cd /home/u/emu-dev/external/qemu
 $ ./android/rebuild.sh 
 $ export ANDROID_BUILD_TOP=/path/to/aosp
 $ objs/emulator
@@ -155,7 +155,7 @@ following commands:
 $ cd $AOSP/
 $ . build/envsetup.sh
 $ lunch sdk_phone_arm64-eng
-$ cd /home/u/emu-master-dev/external/qemu
+$ cd /home/u/emu-dev/external/qemu
 $ export ANDROID_BUILD_TOP=$AOSP
 $ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
 ```
