@@ -84,7 +84,7 @@ main -> emulator_parseCommonCommandLineOptions -> createAVD
 
 为方便每次启动 gdb 调试都要输入太多的命令，我们把所有操作都写到 gdbinit 文件中去
 
-假设 `$AOSP` 是 `/aosp/wangchen/aosp12`
+假设 `$AOSP` 是 `/home/u/aosp12`
 ```
 $ cat ./gdbinit
 set env ANDROID_BUILD_TOP=/home/u/aosp12
