@@ -1,3 +1,5 @@
+![](./diagrams/android-riscv.png)
+
 文章标题：**如何为 AOSP 的 lunch 新增一个菜单项**
 
 - 作者：汪辰
