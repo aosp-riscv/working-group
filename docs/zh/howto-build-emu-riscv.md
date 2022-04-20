@@ -153,3 +153,11 @@ $ cd /home/u/emu-dev/external/qemu
 $ export ANDROID_BUILD_TOP=$AOSP
 $ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
 ```
+
+**补充**：如果嫌麻烦想避免在 AOSP 和 Emulator 两个项目之间切换以及不想执行避免 lunch，我们也可以自己定义 `ANDROID_PRODUCT_OUT`，这个环境变量用于指定 `target-specific out directory where disk images will be looked for`。具体操作，以上面的例子为例，可以用以下命令替换上面的命令输入：
+```
+$ cd /home/u/emu-dev/external/qemu
+$ export ANDROID_BUILD_TOP=$AOSP
+$ export ANDROID_PRODUCT_OUT=$AOSP/out/target/product/emulator_arm64
+$ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
+```

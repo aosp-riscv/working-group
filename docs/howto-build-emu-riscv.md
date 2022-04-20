@@ -51,7 +51,9 @@ export PATH=$PATH:$HOME/bin
 
 Do not forget to add this to your `.bashrc` file.
 
-After the installation is complete, you can run `repo version` to check the effect. An output similar to the following shows that the installation is successful. The repo version needs to be 2.15 or higher.
+After the installation is complete, you can run `repo version` to check the effect. 
+An output similar to the following shows that the installation is successful. 
+The repo version needs to be 2.15 or higher.
 
 ```
 $ repo version
@@ -68,7 +70,8 @@ Bug reports: https://bugs.chromium.org/p/gerrit/issues/entry?template=Repo+tool+
 
 # 4. Download source code
 
-Create an emulator source code build directory, here assume it is `/home/u/emu-dev`, and then enter the directory.
+Create an emulator source code build directory, here assume it is `/home/u/emu-dev`, 
+and then enter the directory.
 
 ```
 $ mkdir -p /home/u/emu-dev && cd /home/u/emu-dev
@@ -159,3 +162,15 @@ $ cd /home/u/emu-dev/external/qemu
 $ export ANDROID_BUILD_TOP=$AOSP
 $ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
 ```
+
+**Supplement**: If you want to avoid switching between AOSP and Emulator projects 
+and don't want to execute `lunch`, we can also define environment variable 
+`ANDROID_PRODUCT_OUT`  to specify `target-specific out directory where disk 
+images will be looked for`. For specific operations, take the above example as 
+an example, you can replace the above command input with the following command:
+````
+$ cd /home/u/emu-dev/external/qemu
+$ export ANDROID_BUILD_TOP=$AOSP
+$ export ANDROID_PRODUCT_OUT=$AOSP/out/target/product/emulator_arm64
+$ objs/emulator -no-window -show-kernel -no-audio -qemu -machine virt
+````
