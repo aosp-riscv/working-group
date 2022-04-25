@@ -13,12 +13,12 @@
 - [2. NDK 发布包的构建](#2-ndk-发布包的构建)
 - [3. NDK 发布包构建系统浅析](#3-ndk-发布包构建系统浅析)
 - [4. NDK 发布包的构建](#4-ndk-发布包的构建)
-	- [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
-		- [4.1.1. clang](#411-clang)
-		- [4.1.2. sysroot](#412-sysroot)
-	- [4.2. C++ STL 的构建](#42-c-stl-的构建)
-		- [4.2.1. libc++](#421-libc)
-		- [4.2.2. system](#422-system)
+    - [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
+        - [4.1.1. clang](#411-clang)
+        - [4.1.2. sysroot](#412-sysroot)
+    - [4.2. C++ STL 的构建](#42-c-stl-的构建)
+        - [4.2.1. libc++](#421-libc)
+        - [4.2.2. system 运行时库](#422-system-运行时库)
 
 <!-- /TOC -->
 
@@ -63,7 +63,7 @@ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b 
 ./ndk/checkbuild.py
 ```
 
-构建完成后，在 `./out` 目录下就会生成多个目录，其中 `./out/android-ndk-r23b` 下就是我们做出来的 ndk package，虽然仔细看会发现 `./out/android-ndk-r23b` 只是一个符号链接，它实际指向了 `./out/linux/android-ndk-r23b`。其他目录可以认为都是构建过程中间生成的临时目录。
+构建完成后，在 `./out` 目录下就会生成多个目录，其中 `./out/android-ndk-r23b` 下就是我们做出来的 ndk package （和 **图一** 是一样的），虽然仔细看会发现 `./out/android-ndk-r23b` 只是一个符号链接，它实际指向了 `./out/linux/android-ndk-r23b`。其他目录可以认为都是构建过程中间生成的临时目录。
 
 可以查看帮助获取常用选项：
 ```
@@ -99,7 +99,7 @@ module 的名字可以看代码中 `class LibAndroidSupport` 的属性 `name`。
 
 module 和 module 之间存在依赖关系，具体可以看 module 对应的类的 deps 属性定义。
 
-简单总结了一下一些主要 module 之间的依赖关系，途中箭头从依赖方指向被依赖方。绿色的 module 表示既有编译动作也有安装动作。白色 module 则只有安装动作。 
+简单总结了一下一些主要 module 之间的依赖关系，图中箭头从依赖方指向被依赖方。绿色的 module 表示既有编译动作也有安装动作。白色 module 则只有安装动作。 
 
 ![](./diagrams/20220402-understand-how-ndk-built/modules-relationship.png)
 **[图二] NDK module 依赖关系**
@@ -121,7 +121,7 @@ llvm 工具链做好后会安装在 `./out/linux/android-ndk-r23b/toolchains/llv
 
 ### 4.1.1. clang
 
-clang 就是 android 里目前替代了 gcc 用来编译 c/c++ 的编译器。这部分是 llvm 工具链的核心部分，从 **图二** 上我们也可以看出很多其他 module 会依赖于它，主要是这些 module 的编译会用到我们安装好后的 clang。所以 clang 也是第一个需要执行的 module。其安装过程相对比较简单，就是将预构建（prebuilt）的 clang 从 `prebuilts/clang/host/linux-x86/clang-r416183c1` 拷贝到 `NDK_TOOLCHAIN_LLVM`，需要值得注意的是，对 clang 的安装还有一个附加的动作，就是用 `prebuilts/clang/host/linux-x86/clang-r416183c1/runtimes_ndk_cxx` 这个目录下的内容覆盖下的 clang rt 库替换 `${NDK_TOOLCHAIN_LLVM}/lib64/clang/12.0.8/lib/linux`。这个原因是因为在基于 NDK 采用 clang 编译 c/c++ 源码时采用的那些 libclang_rt 库和用 clang 构建 aosp 系统（google 的文档也称其为 platform）所用的 libclang_rt 库不是一套。具体原因还要再看看。
+clang 就是 android 里目前替代了 gcc 用来编译 c/c++ 的编译器。这部分是 llvm 工具链的核心部分，从 **图二** 上我们也可以看出很多其他 module 会依赖于它，主要是这些 module 的编译会用到我们安装好后的 clang。所以 clang 也是第一个需要执行的 module。其安装过程相对比较简单，就是将预构建（prebuilt）的 clang 从 `prebuilts/clang/host/linux-x86/clang-r416183c1` 拷贝到 `NDK_TOOLCHAIN_LLVM`，需要值得注意的是，对 clang 的安装还有一个附加的动作，就是用 `prebuilts/clang/host/linux-x86/clang-r416183c1/runtimes_ndk_cxx` 这个目录下的内容覆盖替换 `${NDK_TOOLCHAIN_LLVM}/lib64/clang/12.0.8/lib/linux` 下的 clang rt 库。这个原因是因为在基于 NDK 采用 clang 编译 c/c++ 源码时采用的那些 libclang_rt 库和用 clang 构建 aosp 系统（google 的文档也称其为 platform）所用的 libclang_rt 库不是一套。具体原因还要再看看。
 
 ### 4.1.2. sysroot
 
@@ -135,13 +135,15 @@ sysroot 指 clang 工具链中用于交叉编译时的逻辑系统目录，最�
 整个 sysroot 由两部分组成，一个是库的头文件部分，安装在 `${NDK_TOOLCHAIN_LLVM}/sysroot/usr/include`，走的是 **图三** 中上半部分的流程。另一个是库的二进制部分，安装在 `${NDK_TOOLCHAIN_LLVM}/sysroot/usr/lib`，其安装走的是 **图三** 的下半部分的流程。
 
 sysroot 的头文件部分的安装分两个阶段，第一个阶段由 "sysroot" module 负责完成，它会首先
-将 `./prebuilts/ndk/platform/sysroot` 的内容完整地复制到 `./out/linux/sysroot/install/sysroot` 这个中间路径下。同时会根据实际的版本信息自动生成一个 `./out/linux/sysroot/install/sysroot/usr/include/android/ndk-version.h` 文件。第二个阶段由 "base-toolchain" module 负责完成，将 `./out/linux/sysroot/install/sysroot` 进一步拷贝到 `${NDK_TOOLCHAIN_LLVM}/sysroot` 下，同时还会生成 `${NDK_TOOLCHAIN_LLVM}/sysroot/usr/local/include`。
+将 `./prebuilts/ndk/platform/sysroot` 的内容完整地复制到 `./out/linux/sysroot/install/sysroot` 这个临时安装路径下。同时会根据实际的版本信息自动生成一个 `./out/linux/sysroot/install/sysroot/usr/include/android/ndk-version.h` 文件。第二个阶段由 "base-toolchain" module 负责完成，将 `./out/linux/sysroot/install/sysroot` 进一步拷贝到 `${NDK_TOOLCHAIN_LLVM}/sysroot` 下，同时还会生成 `${NDK_TOOLCHAIN_LLVM}/sysroot/usr/local/include`。
 
-注意在这个流程中三个目录从左到右，都是和 `${NDK_TOOLCHAIN_LLVM}/sysroot` 的目录安排一致的。**图三** 中都用六边形表示。在此过程中，虽然也会在最终的 `${NDK_TOOLCHAIN_LLVM}/sysroot` 下生成二进制部分的内容（从 prebuilt 那里带过来的），但是不用担心，因为在实际的执行过程中，对应 "base-toolchain" module 的操作，**图三** 中下半部分的执行是在上半部分之后，所以的 sysroot 的头文件部分的安装中带来的二进制内容会被覆盖掉。 
+注意在 sysroot 头文件部分的安装流程中：
+- 三个目录从左到右，都是和 `${NDK_TOOLCHAIN_LLVM}/sysroot` 的目录布局安排是一致的。**图三** 中都用六边形表示。
+- 在 **图三** 中上半部分的流程，会在最终的 `${NDK_TOOLCHAIN_LLVM}/sysroot` 下将 prebuilt 里的二进制部分也拷贝过来。但是不用担心，因为在实际的执行过程中，**图三** 中下半部分的执行是在上半部分之后，所以这部分多拷贝过来的二进制内容在下半部流程中会在对应 "base-toolchain" module 的操作中被覆盖掉。
 
 下面我们来看看 sysroot 的二进制部分的构建和安装。sysroot 的二进制部分最终会被安装到 `${NDK_TOOLCHAIN_LLVM}/sysroot/usr/lib` 下，为方便起见，我们把整个路径记为 `NDK_PLATFORMS`。之所以叫 PLATFORMS, 感觉 ndk 里习惯把 sysroot的二进制部分叫这个。
 
-`NDK_PLATFORMS` 目录的组织安排分两级：第一级 ARCH（分四个：`arm-linux-androideabi`/`aarch64-linux-android`/`i686-linux-android`/`x86_64-linux-android`），第二级再按照 API 分（注意 32 位的 arm 和 i686 是从 16 到 31，而 64 位的 aarch64 和 x86_64 是从 21 到 31），这种分级的思路体现的思想就是可以看出来针对某种体系架构 android 系统是从哪个 API 开始支持的。
+`NDK_PLATFORMS` 目录的组织安排分两级：第一级 ARCH（分四个：`arm-linux-androideabi`/`aarch64-linux-android`/`i686-linux-android`/`x86_64-linux-android`），第二级再按照 API 分（注意 32 位的 arm 和 i686 是从 16 到 31，而 64 位的 aarch64 和 x86_64 是从 21 到 31），这种分级的思路体现的思想就是 32 位的 arm 和 i686 系统上 Android 的 Platform API 最小支持 16，而 64 位的 aarch64 和 x86_64 系统上最小支持的 Platform API 从 21 开始。
 
 ```
 out/android-ndk-r23b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
@@ -221,7 +223,7 @@ out/linux/platforms/install/platforms
 
 - 第一部分是 c runtime object files：譬如 `crtbegin_so.o`/`crtend_so.o` 这些 `.o` 文件。这些目标文件是现场制作的（区分于 prebuilt）。源文件来自 `./bionic` 仓库。制作需要使用 ndk 自己安装在 `NDK_TOOLCHAIN_LLVM` 下的 clang，注意在制作诸如 `crtbegin_dynamic.o` 过程中会使用 ndk 自己的 `./ndk/sources/crt/crtbrand.S`，而没有用 `./bionic` 仓库中的 `crtbrand.S`。这些 `.o` 文件的编译由 "platforms" module 负责完成，编好后放在 `./out/platforms` 下。注意 `./out/platforms` 这个目录的安排和 `NDK_PLATFORMS_IMMEDIATE` 类似。
   
-  "platforms" module 在完成以上编译工作后会将这些 obj 文件安装到 `NDK_PLATFORMS_IMMEDIATE` 下。
+  "platforms" module 在完成以上编译工作后会将这些 obj 文件从 `./out/platforms` 拷贝（安装）到 `NDK_PLATFORMS_IMMEDIATE` 下。
 
 - 第二部分为动态库，指的是 **图三** 中的那些 `.so` 文件。"platform" module 负责将它们从 `./prebuilts/ndk/platform/platforms/` 下直接拷贝到 `NDK_PLATFORMS_IMMEDIATE`。具体代码可以参考 `./ndk/ndk/checkbuild.py` 中 `class Platforms` 的 `install()` 部分注释带有 `Copy shared libraries from prebuilts/ndk/platform/platforms.`。
  
@@ -233,27 +235,34 @@ out/linux/platforms/install/platforms
   
 有关 libc++ 的介绍可以阅读 Android 官网介绍：<https://developer.android.com/ndk/guides/cpp-support>
 
-NDK C++ 运行时支持两种库
+NDK C++ 运行时支持两种库：
 
-- LLVM 的 libc++ 是 C++ 标准库，自 Lollipop 以来 Android 操作系统便一直使用该库，并且从 NDK r18 开始成为 NDK 中唯一可用的 STL， 本文后面简称 libc++。
-- system 运行时指的是 `libstdc++.so`。请勿将该库与 GNU 的 `libstdc++` 混淆。Android 系统中的 libstdc++ 只实现了 new 和 delete。Android 利用 LLVM 的 libc++ 来提供完整的 C++ 标准库功能。
+- libc++：libc++ 是 LLVM 的 C++ 标准库，自 Lollipop 以来 Android 操作系统便一直使用该库，并且从 NDK r18 开始成为 NDK 中唯一可用的 STL， 本文后面简称 libc++。
+- system 运行时库：指的是 `libstdc++.so`。请勿将该库与 GNU 的 `libstdc++` 混淆。Android 系统中的 libstdc++ 只实现了 new 和 delete。Android 利用 LLVM 的 libc++ 来提供完整的 C++ 标准库功能。
+
+下面我们来分别看一下这两个库在 ndk 中是如何制作的和安装的。
 
 ### 4.2.1. libc++
 
 和 libc++ 有关的工作分三部分：
 
-- 第一部分是基本的 libc++ 库的编译和安装。都由 "libc++" 这个 module 完成。第一个阶段是编译，编译时需要依赖 "clang" module 和 "ndk-build"/"ndk-build-shortcut" module，原因就是需要利用它们做编译链接。还依赖于 "libandroid_support" module，这是因为 是因为构建 libc++ 时会编译生成 `libandroid_support.a`，这需要用到 "libandroid_support" module 安装到 `./out/linux/android-ndk-r23b/sources/android/support` 目录下的一些源文件。源码位于 `./toolchain/llvm-project/libcxx`。编译生成的内容在 `./out/libcxx`。
+- 第一部分是 libc++ 库的二进制部分的编译和安装。这部分工作由 "libc++" 这个 module 完成。第一个阶段是编译，编译生成的内容在 `./out/libcxx`，而且会针对 aosp 支持的所有 ARCH（arm64-v8a/armeabi-v7a/x86/x86_64）分别构建 `libc++_shared.so`。编译时需要依赖 "clang" module 和 "ndk-build"/"ndk-build-shortcut" module，原因就是需要利用这些工具程序做编译链接。此外 "libc++" module 还依赖于 "libandroid_support" module，这是因为构建 `libc++_shared.so` 时会依赖于 `libandroid_support.a`，目前只对 16 位的 x86 和 armeabi-v7a 会存在这个依赖，因此在构建 `libc++_shared.so` 之前我们需要用 "libandroid_support" module 先将一些 android support 相关的源码安装到 `./out/linux/android-ndk-r23b/sources/android/support` 下去，而这些源码的源是位于 `./toolchain/llvm-project/libcxx` 下。
 
   编译完成后就可以安装了，安装内容也是分两部分，一部分是 libc++ 的相关头文件，这部分内容从 `./toolchain/llvm-project/libcxx/include/` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/llvm-libc++/include`。还有一部分就是二进制的库文件，从第一阶段编译输出的地方，也就是 `./out/libcxx/libs` 下拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/llvm-libc++/libs/` 就好了。
 
-- 和 libc++ 有关的第二部分工作，参考代码 `./ndk/ndk/checkbuild.py` 中 Libcxxabi 这个 class 完成。其工作就是简单的复制，从 `./toolchain/llvm-project/libcxxabi` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/llvm-libc++abi`
+- 和 libc++ 有关的第二部分工作是 libc++ 的 abi 部分的源码，参考代码 `./ndk/ndk/checkbuild.py` 中 Libcxxabi 这个 class 完成。其工作就是简单的复制，从 `./toolchain/llvm-project/libcxxabi` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/llvm-libc++abi`，这些代码会被 ndk 的用户在构建应用时使用。
 
 - 第三部分工作和 toolchain 有关，我们还需要将做好的 C++ STL （包括 libc++ 和 libc++abi）安装到 clang 工具链的 sysroot 下去。这部分工作参考代码 `./ndk/ndk/checkbuild.py` 中 Toolchain 这个 class，也就是 "toolchain" 这个 module。所以这个 module 会依赖于 "libc++"/"libc++abi"/"platforms" 这些 module 的完成。"toolchain" 这个 module 的名字让人迷惑，但阅读代码的注释，解释了 ""toolchain"" 和 "base-toolchain" 之间的关系：
   > BaseToolchain installs the core of the toolchain. This module installs the STL to that toolchain.
 
-### 4.2.2. system
+### 4.2.2. system 运行时库
 
-这部分没什么好说的，对应代码是 `./ndk/ndk/checkbuild.py` 中 SystemStl 这个 class。其工作就是简单的复制，从 `./ndk/sources/cxx-stl/system` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/system`
+这部分内容同样分二进制部分和头文件部分。
+
+二进制内容即 "libstdc++.so" 随 "platform" module 的工作会被安装到 sysroot 的 lib 下去。
+
+而头文件部分，对应的安装代码是 `./ndk/ndk/checkbuild.py` 中 SystemStl 这个 class。其工作就是简单的复制，从 `./ndk/sources/cxx-stl/system` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/system`。我们看一下 `./ndk/sources/cxx-stl/system` 下的内容，发现主要的就是 include 目录下这些 STL 封装的头文件。
+
 
 
 
