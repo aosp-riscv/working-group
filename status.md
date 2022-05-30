@@ -1,5 +1,29 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-05-30 Status update
+
+  - RVI upstream:
+    - redo prebuilt ndk for 12: https://github.com/riscv-android-src/platform-prebuilts-ndk/pull/2
+    - fixed some typo issues: https://github.com/riscv-android-src/platform-bionic/pull/20
+    - fixed issue for setjmp: https://github.com/riscv-android-src/platform-bionic/pull/21
+    - using 0x0001(c.addi) as padding bytes: https://github.com/riscv-android-src/platform-bionic/pull/23
+    - remove TLS_SLOT_SELF for riscv: https://github.com/riscv-android-src/platform-bionic/pull/24
+    - passed setjmp_DeathTest.setjmp_cookie_checksum: https://github.com/riscv-android-src/platform-bionic/pull/25
+    - fixed TLS issues and pass unit tests: https://github.com/riscv-android-src/platform-bionic/pull/26
+  - aosp-riscv development and bugfix:
+    - PR for Disable dex2oat: https://gitee.com/aosp-riscv/platform_build/pulls/5 review 中
+    - completed sync mem* from RVI upstream：https://gitee.com/aosp-riscv/platform_bionic/pulls/22
+    - fix setjmp issue： https://gitee.com/aosp-riscv/platform_bionic/pulls/21
+    - sync from rvi upstream：https://gitee.com/aosp-riscv/platform_bionic/pulls/19
+    - added log after fixed setjmp issue：https://gitee.com/aosp-riscv/test-riscv/pulls/18
+    - enable those disabled cases: https://gitee.com/aosp-riscv/test-riscv/pulls/19
+    - workaround sanitize issue: https://gitee.com/aosp-riscv/platform_build_soong/pulls/7
+    - sync tls from rvi: https://gitee.com/aosp-riscv/platform_bionic/pulls/24
+    - fixed setjmp checksum issue: https://gitee.com/aosp-riscv/platform_bionic/pulls/23
+  - Articles:
+    - PR for the analysis of RenderScript in Android 12 RISCV64 porting: https://gitee.com/aosp-riscv/working-group/pulls/34
+    - add article about setjmp：https://gitee.com/aosp-riscv/working-group/pulls/35
+
 - 2022-04-28 Status update
   
   - RVI upstream:
