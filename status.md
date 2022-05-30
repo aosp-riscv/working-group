@@ -11,7 +11,7 @@ Project(aosp-riscv) progress log (time in reverse order).
     - passed setjmp_DeathTest.setjmp_cookie_checksum: https://github.com/riscv-android-src/platform-bionic/pull/25
     - fixed TLS issues and pass unit tests: https://github.com/riscv-android-src/platform-bionic/pull/26
   - aosp-riscv development and bugfix:
-    - PR for Disable dex2oat: https://gitee.com/aosp-riscv/platform_build/pulls/5 review 中
+    - PR for Disable dex2oat: https://gitee.com/aosp-riscv/platform_build/pulls/5
     - completed sync mem* from RVI upstream：https://gitee.com/aosp-riscv/platform_bionic/pulls/22
     - fix setjmp issue： https://gitee.com/aosp-riscv/platform_bionic/pulls/21
     - sync from rvi upstream：https://gitee.com/aosp-riscv/platform_bionic/pulls/19
