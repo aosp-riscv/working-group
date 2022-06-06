@@ -1,4 +1,4 @@
-![](./diagrams/android.png)
+![](./diagrams/risc-v.png)
 
 文章标题：**制作一个针对 RISC-V 的 LLVM/Clang 编译器**
 
