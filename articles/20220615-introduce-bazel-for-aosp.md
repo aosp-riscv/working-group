@@ -34,7 +34,7 @@
 # 2. 历史回顾
 
 ![](./diagrams/20220615-introduce-bazel-for-aosp/timeline.png)
-图（1）Timeline
+**图（1）Timeline**
 
 上面这张图主要讲述了 Bazel 和 AOSP 的发展时间线。这里解读一下，基本上对 Bazel 和 AOSP 的构建相关的历史可以有一个大致的了解。
 
@@ -88,7 +88,7 @@ $ ./bazel-5.2.0-installer-linux-x86_64.sh --user
 
 例子的代码可以直接从 github 下载：
 ```console
-# git clone https://github.com/bazelbuild/examples
+$ git clone https://github.com/bazelbuild/examples
 ```
 示例项目位于 `examples/cpp-tutorial/stage3` 目录中，其结构如下所示:
 
@@ -119,7 +119,7 @@ examples
        │   └── hello-time.h
        └── WORKSPACE
 ```
-图（2）Sample
+**图（2）Sample**
 
 具体构建的步骤大家可以自己去看在线文档的介绍，很详尽了，这里我结合上面这个例子总结了一下 Bazel 开发环境里的一些基本概念：
 
@@ -151,7 +151,7 @@ examples
   ```
   就会生成 `libhello-greet.a` 和 `libhello-greet.so`
 
-- **Dependency**: 各个 target 之间存在依赖关系，这是在所有构建系统中都存在的概念，同样在 Bazel 中也缺少不了。譬如在 stage3 这个例子中，target `//main:hello-world` 就依赖于 target `//main:hello-greet`，背后的含义就是我们要构建最终的可执行程序 hello-world，则首先要构建成功 `hello-greet` 这个规则的 obj 文件，这种依赖关系在 BUILD 文件中体现为 deps 这个 attribute 的描述。
+- **Dependency**: 各个 target 之间存在依赖关系，这是在所有构建系统中都存在的概念，同样在 Bazel 中也缺少不了。譬如在 stage3 这个例子中，target `//main:hello-world` 就依赖于 target `//main:hello-greet`，背后的含义就是我们要构建最终的可执行程序 hello-world，则首先要构建成功 `hello-greet` 这个规则的 obj 文件，这种依赖关系在 BUILD 文件中体现为 `deps` 这个 attribute 的描述。
   ```python
   cc_binary(
       name = "hello-world",
@@ -174,7 +174,7 @@ examples
 我们先看一下没有加入 Bazel 支持之前 AOSP 项目的构建系统组成和构建的大致过程。如下图所示：
 
 ![](./diagrams/20220615-introduce-bazel-for-aosp/aosp-build-before.png)
-图（3）Before
+**图（3）Before**
 
 这张图上内容分成三部分，其中灰色的模块是 AOSP 构建系统的组成部分，我们可以发现包含了 Kati，Soong 和 ninja 好几个东东，还是比较复杂的。黄色的可以认为是整个构建过程中各个构建组件的输出和输入：
 
@@ -189,7 +189,7 @@ examples
 在 [【参考 1】][3] 中 Google 希望的第三代基于 Bazel 的 AOSP 构建系统完成后整个构建过程是变成如下情况，见下图所示：
 
 ![](./diagrams/20220615-introduce-bazel-for-aosp/aosp-build-after.png)
-图（4）After
+**图（4）After**
 
 也就是说上一节中涉及的 “产品配置信息” 的定义信息（见图中左边下部标注为 “product config” ）和涉及 “模块构建动作（action）”（见图中左边上部标注为 “code” ）统一采用 BUILD 文件进行描述和定义。由 Bazel 统一处理后，并由 Bazel 负责驱动实现上一节中的第三部分 “实际构建动作的执行”（ninjia 也不再需要了）。整个构建过程全部统一由 Bazel 完成。
 
@@ -210,7 +210,7 @@ Google 的计划是逐步完成这个过程的替换，就像当初从 Kati 到 
 大致的替换方案如下图所示，我根据我的而理解解释一下，如果有什么不对的地方请大家不吝指出。其中注意下图中增加啊的绿色部分就是为实现 Bazel 替换引入的新组件。
 
 ![](./diagrams/20220615-introduce-bazel-for-aosp/aosp-build-now.png)
-图（5）Now
+**图（5）Now**
 
 - 在对 “产品配置信息” 的处理上，Google 会引入两个新的工具 `convert` 和 `product_config`。`convert` 负责将含有产品配置信息处理的 `.mk` 文件转换为以 Starlark 语法描述的替代文件，在图上标识为后缀为 `.bzl` 的 文件，我理解就是对应 **图（4）** 中标识为（product config）的 BUILD 文件。而 `product_config` 则负责将 `.bzl` 文件进一步转化为 Config vars。我猜想分成两步的方式可能是为了在演变成最终的 **图 （4）** 后，`.bzl` 文件可以作为包含 product config 信息的 BUILD 文件保留下来。
 
@@ -225,7 +225,7 @@ Google 的计划是逐步完成这个过程的替换，就像当初从 Kati 到 
 仍然是基于 [【参考 1】][3], 注意视频时间标注为 2021 年 4 月 2 日 。所以不能说是最新的，而是截至本文完成前一年的状态，我看了一下大致和我们移植 AOSP 12 的 [aosp-riscv][7] 采用的 tag：`android-12.0.0_r3` 差不多的时间。
 
 ![](./diagrams/20220615-introduce-bazel-for-aosp/milestones.png)
-图（6）Milestone
+**图（6）Milestone**
 
 从当时的进展来看，只能说 “任重而道远” 啊！
 
