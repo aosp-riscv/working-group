@@ -207,9 +207,20 @@ Linux 内核 5.4。
 # 5. TBD
 补充 内核生命周期部分，
 https://source.android.com/devices/architecture/kernel/android-common
+与linux所维护的内核相类似，一个完整的android内核的周期经历了“开发-稳定-冻结”三个阶段。
+1.开发阶段  在开发阶段时，谷歌官方可接受来自社区、爱好者等的代码贡献。android内核一般也
+跟随linux内核发布的进度，例如，当linux5.10发布时，android12-5.10也会被发布。
+2.稳定阶段  当新版本的内核被发布后，其便进入了稳定阶段。在这个阶段中，尽管可以接受某些针
+对产商的特殊功能与bug修复的改动，但是其必须遵守内核接口的规范。
+3.冻结阶段 当将要推送给aosp之前，内核将会进入冻结阶段。由于android内核需要对外提供内核
+模块接口，因此，维护接口的稳定性至关重要。在冻结阶段中，需要保证KMI的稳定性。
+尽管谷歌可以接受 bug 的修复以及功能更新，但针对对现有 KMI作出巨大改变的操作将不会被允许。因此，
+这一阶段将保持KMI的稳定，除非有巨大的安全问题，任何对KMI进行大规模更新的操作都将会被禁止。
 
 > When entering the frozen phase, the branch is git-tagged with the KMI version 
 > string containing the KMI generation number. For example, when android11-5.4 
 > was frozen, it was tagged with the KMI version string 5.4-android11-0 where 
 > the trailing 0 is the KMI generation number.
+
+
 
