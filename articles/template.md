@@ -32,8 +32,7 @@
 
   额外要求：
   - 正文中英文字符和中文字符之间建议加空格，譬如：“`中文 English 中文  English`”
-  - 一行不要太长，80 个英文字符左右就主动换行吧。
-
+  
 - **有关贴图**：
 
   例子：`![](./diagrams/20200911-platform-version/android-version.png)`
