@@ -25,7 +25,7 @@
 
 **[图一] RenderScript 框架总览**
 
-(图片来源：https://source.android.com/devices/architecture/vndk/renderscript?hl=zh-cn)
+(图片来源：https://source.android.com/devices/architecture/vndk/renderscript?hl=zh-cn ，在原图上有修改)
 
 RenderScript 框架的全面讲解请参见链接 <https://source.android.com/devices/architecture/vndk/renderscript?hl=zh-cn>。本文关心如下部分：
 - “从 Android 12 开始，RenderScript API 已被弃用。它们将继续正常运行，但 AOSP 预计设备和组件制造商会逐渐停止提供硬件加速支持。为充分利用 GPU 加速功能，AOSP 建议停止使用 RenderScript“。
