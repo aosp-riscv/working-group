@@ -110,11 +110,18 @@ $ cmake -G Ninja \
 -DCMAKE_INSTALL_PREFIX=../../install \
 -DLLVM_TARGETS_TO_BUILD="RISCV" \
 -DLLVM_ENABLE_PROJECTS="clang" \
+-DLLVM_USE_LINKER=gold \
 -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-linux-gnu" \
 ../llvm
 ```
 
-简单解释一下以上命令的效果就是: 采用 Ninja 方式编译 LLVM，这需要你在 Ubuntu 里提前采用 apt install ninja；编译 Release 版本（我们这里只是使用 llvm 工具链，不涉及开发，所以采用 Release 方式可以缩短编译时间和减少对硬盘的消耗，生成的可执行程序执行速度也快）；编译完成后如果要安装将安装在和 llvm-project 源码树平级的 install 子目录下，确保不会污染 llvm-project 源码目录；只编译 RISCV 的 target；修改默认的 triple 组合为 riscv64-unknown-linux-gnu（避免在后面编译时再通过 `--target` 指定）；除了 llvm 外还会生成 clang。
+简单解释一下以上命令的效果就是: 
+- 采用 Ninja 方式编译 LLVM，这需要你在 Ubuntu 里提前采用 apt install ninja；
+- 编译 Release 版本（我们这里只是使用 llvm 工具链，不涉及开发，所以采用 Release 方式可以缩短编译时间和减少对硬盘的消耗，生成的可执行程序执行速度也快）；
+- 编译完成后如果要安装将安装在和 llvm-project 源码树平级的 install 子目录下，确保不会污染 llvm-project 源码目录；
+- 只编译 RISCV 的 target；
+- 链接时使用 gold 而不是默认的 gnu-ld，加快链接速度，需要你在 Ubuntu 里提前采用 apt install binutils；
+- 修改默认的 triple 组合为 `riscv64-unknown-linux-gnu`（避免在后面编译时再通过 `--target` 指定）；除了 llvm 外还会生成 clang。
 
 ## 3.3. 执行编译和安装
 ```
@@ -159,7 +166,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-受限于 LLVM 自身的链接器和 C 库的不完善，clang 目前需要借用 GNU 的链接器和 C 库来生成 RISC-V 的可执行程序（如果是本地 X86 则不用这么麻烦）。
+受限于 LLVM 自身的 C 库不完善以及 lld 链接器尚未实现 linker relaxation，所以我们目前在使用 clang 时仍然需要借用 GNU 的 C 库和链接器来生成 RISC-V 的可执行程序（如果是本地 X86 则不用这么麻烦）。
 
 运行 clang 编译程序，通过 `--sysroot` 选项来指定 gnu 工具链的 sysroot，通过 `--gcc-toolchain` 来指定 gcc 工具链的位置。
 
