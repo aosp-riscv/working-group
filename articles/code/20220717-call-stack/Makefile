@@ -8,6 +8,9 @@ callstack: clean
 callstack-param: clean
 	${CROSS_COMPILE}gcc -g -c param.c
 
+callstack-o0-omit-fp: clean
+	${CROSS_COMPILE}gcc -g -c callstack.c -fomit-frame-pointer
+
 callstack-o1: clean
 	${CROSS_COMPILE}gcc -g -c callstack.c -O1
 

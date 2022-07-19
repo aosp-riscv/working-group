@@ -52,18 +52,22 @@
 一开始 SP 指向 Call Stack 的 BOTTOM 位置：
 
 ![](./diagrams/20220717-call-stack/call-stack-0.png)
+【图一】 初始状态
 
 当 “函数 A” 被调用时，程序在 call stack 中 push “函数 A” 的 stack frame，同时 SP 的值被更新，指向当前 Call Stack 的 TOP。当然这个 stack frame 中的内容如果存在多项的话，并不是一次性 push 的，而是需要多次 push，具体会有哪些内容，这个我们在下一节讨论。
 
 ![](./diagrams/20220717-call-stack/call-stack-1.png)
+【图二】 “函数 A” 被调用
 
 当 “函数 A” 调用 “函数 B” 时，程序在 call stack 中 push “函数 B” 的 stack frame，同时 SP 的值被更新，指向当前 Call Stack 的 TOP。
 
 ![](./diagrams/20220717-call-stack/call-stack-2.png)
+【图三】 “函数 B” 被调用
 
 当 “函数 B” 调用 “函数 C” 时，程序在 call stack 中 push “函数 C” 的 stack frame，同时 SP 的值被更新，继续指向当前 Call Stack 的 TOP。
 
 ![](./diagrams/20220717-call-stack/call-stack-3.png)
+【图四】 “函数 C” 被调用
 
 当函数调用逐级返回时，会逆向发生 Call Stack 的 pop 操作。在 call stack 中创建子程序的 stack frame 有时称为 "winding"；相反，删除该内容叫做 "unwinding"。wind 英文有 “缠绕” 的意思，而函数调用 Call stack 中 push 过程类似于我们绕绳子的绕的过程，而 pop 过程则对应松开绕的绳子（原路返回），记住这个就比较好理解为啥叫 winding 或者 unwinding 了。
 
@@ -113,7 +117,10 @@ void foo(void)
 }
 ```
 
-我们简单编译一下 `riscv64-unknown-linux-gnu-gcc -g -c callstack.c`，然后用 objdump 看一下反汇编的结果：
+我们采用最常见的方式编译一下 `riscv64-unknown-linux-gnu-gcc -g -c callstack.c`，注意我们在编译 `callstack.c` 时，没有带任何优化选项，所以编译器默认为 `-O0`，这等同于默认启用了 `-fno-omit-frame-pointer` 选项，编译器会把某个特定的寄存器当 frame pointer，用来保存当前函数 stack frame 的 BOTTOM（起始地址），前面说过，在 RISC-V 中，这个寄存器是 x8，其 ABI name 是 s0 或者 fp。同时编译器在对高级语言进行汇编处理时，针对 callee 函数的 prologue 阶段生成的指令中会插入指令，将 caller 对应的 fp 中的值保存到 callee 的 stack frame 中同时将 fp 更新为指向 caller 的 sp。
+
+我们用 objdump 仔细看一下反汇编的结果，特别关注一下函数的 prologue 和 epilogue 部分生成的指令：
+
 ```cpp
 extern int bar(int a, int b);
 
@@ -148,6 +155,7 @@ void foo(void)
 我们可以对照下图来理解一下这段汇编实现的效果。
 
 ![](./diagrams/20220717-call-stack/call-stack.png)
+【图五】 RISC-V 的函数
 
 从 line 0 ~ line 6，是 `foo()` 函数的 prologue 处理，
 - `0: addi    sp,sp,-32`：将 SP 从左边的位置向下移到右边的 SP 位置，可以认为就是为 `foo()` 函数预留了 32 个字节的 stack frame 空间。该指令执行完后，SP 指向 stack frame 的 TOP。
@@ -159,12 +167,7 @@ void foo(void)
 
 从 line 2a ~ line 32 是 `foo()` 函数的 epilogue 处理，这里我就不赘述了。
 
-
-**注意：以下优化代码的例子放在本文可能是不合适的，后面可能会放到有关栈回溯的文章中去。**
-
-上面我们在编译 `callstack.c` 时，没有带任何优化选项，默认为 `-O0`，但是如果使用优化选项，gcc 会做如下优化 ：
-
-`-O1` 的结果如下，我们发现 fp 被优化掉了。
+需要注意的是: fp 是否需要其实并不是必须的，不定义 fp 并不会影响程序的执行，我们可以在上面的编译命令中加上 `-fomit-frame-pointer`, 编译器就不会生成 fp 相关的指令了。执行 `riscv64-unknown-linux-gnu-gcc -g -c callstack.c -fomit-frame-pointer` 后 objdump 如下，大家可以比较一下：
 
 ```cpp
 0000000000000000 <foo>:
@@ -172,122 +175,29 @@ extern int bar(int a, int b);
 
 void foo(void)
 {
-   0:   1141                    addi    sp,sp,-16
-   2:   e406                    sd      ra,8(sp)
+   0:   1101                    addi    sp,sp,-32
+   2:   ec06                    sd      ra,24(sp)
     int a = 1;
+   4:   4785                    li      a5,1
+   6:   c63e                    sw      a5,12(sp)
     int b = 2;
+   8:   4789                    li      a5,2
+   a:   c43e                    sw      a5,8(sp)
     bar(a, b);
-   4:   4589                    li      a1,2
-   6:   4505                    li      a0,1
-   8:   00000097                auipc   ra,0x0
-   c:   000080e7                jalr    ra # 8 <foo+0x8>
-
-0000000000000010 <.LVL1>:
+   c:   4722                    lw      a4,8(sp)
+   e:   47b2                    lw      a5,12(sp)
+  10:   85ba                    mv      a1,a4
+  12:   853e                    mv      a0,a5
+  14:   00000097                auipc   ra,0x0
+  18:   000080e7                jalr    ra # 14 <foo+0x14>
 }
-  10:   60a2                    ld      ra,8(sp)
-  12:   0141                    addi    sp,sp,16
-  14:   8082                    ret
+  1c:   0001                    nop
+  1e:   60e2                    ld      ra,24(sp)
+  20:   6105                    addi    sp,sp,32
+  22:   8082                    ret
 ```
 
-如果在 `-O1` 情况下希望在 call stack 中保留 frame pointer，可以加上 `-fno-omit-frame-pointer` 告诉编译器不要把 frame pointer 优化掉
-
-`-O2 -fno-omit-frame-pointer` 的结果如下:
-
-```cpp
-0000000000000000 <foo>:
-extern int bar(int a, int b);
-
-void foo(void)
-{
-   0:   1141                    addi    sp,sp,-16
-   2:   e406                    sd      ra,8(sp)
-   4:   e022                    sd      s0,0(sp)
-   6:   0800                    addi    s0,sp,16
-    int a = 1;
-    int b = 2;
-    bar(a, b);
-   8:   4589                    li      a1,2
-   a:   4505                    li      a0,1
-   c:   00000097                auipc   ra,0x0
-  10:   000080e7                jalr    ra # c <foo+0xc>
-
-0000000000000014 <.LVL1>:
-}
-  14:   60a2                    ld      ra,8(sp)
-  16:   6402                    ld      s0,0(sp)
-  18:   0141                    addi    sp,sp,16
-  1a:   8082                    ret
-```
-
-`-O2` 的结果如下，我们发现不仅 fp 被优化掉了，ra 都被优化掉了，这主要时因为我们这里的例子代码是 “尾调用”，所以可以这么优化，而且 `jalr` + `ret` 的组合被优化成了一条 `jr`。
-
-```cpp
-0000000000000000 <foo>:
-
-void foo(void)
-{
-    int a = 1;
-    int b = 2;
-    bar(a, b);
-   0:   4589                    li      a1,2
-   2:   4505                    li      a0,1
-   4:   00000317                auipc   t1,0x0
-   8:   00030067                jr      t1 # 4 <foo+0x4>
-```
-
-但注意在 `-O2` 的情况下，光加上 `-fno-omit-frame-pointer` 还不足以实现正常的栈回溯，见下面的反汇编结果，line 6 在调用 `bar()` 函数之前过早地恢复了 fp，这对栈回溯是有影响的。
-
-```cpp
-0000000000000000 <foo>:
-extern int bar(int a, int b);
-
-void foo(void)
-{
-   0:   1141                    addi    sp,sp,-16
-   2:   e422                    sd      s0,8(sp)
-   4:   0800                    addi    s0,sp,16
-    int a = 1;
-    int b = 2;
-    bar(a, b);
-}
-   6:   6422                    ld      s0,8(sp)
-    bar(a, b);
-   8:   4589                    li      a1,2
-   a:   4505                    li      a0,1
-}
-   c:   0141                    addi    sp,sp,16
-    bar(a, b);
-   e:   00000317                auipc   t1,0x0
-  12:   00030067                jr      t1 # e <foo+0xe>
-```
-
-所以如果考虑到尾调用的情况，还要加上 `-fno-optimize-sibling-calls` 选项，该选项让编译器不要优化尾部调用。`-O2 -fno-omit-frame-pointer -fno-optimize-sibling-calls` 的结果如下，这样就没有问题了。
-
-```cpp
-0000000000000000 <foo>:
-extern int bar(int a, int b);
-
-void foo(void)
-{
-   0:   1141                    addi    sp,sp,-16
-   2:   e022                    sd      s0,0(sp)
-   4:   e406                    sd      ra,8(sp)
-   6:   0800                    addi    s0,sp,16
-    int a = 1;
-    int b = 2;
-    bar(a, b);
-   8:   4589                    li      a1,2
-   a:   4505                    li      a0,1
-   c:   00000097                auipc   ra,0x0
-  10:   000080e7                jalr    ra # c <foo+0xc>
-
-0000000000000014 <.LVL1>:
-}
-  14:   60a2                    ld      ra,8(sp)
-  16:   6402                    ld      s0,0(sp)
-  18:   0141                    addi    sp,sp,16
-  1a:   8082                    ret
-```
+有同学问，那为啥我们要专门浪费一个寄存器来存放 fp 呢，还增加了 prologue 和 epilogue 的指令处理。这个原因涉及到 “Stack Unwinding” 的处理问题，我会专门另外写一篇笔记来总结。
 
 另外利用 call stack 传参的例子可以见 [param.c][3]，我这里就不解释了。
 
