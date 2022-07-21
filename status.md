@@ -1,5 +1,36 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-06-30 Statue update
+
+- RVI upstream:
+  - roll-back temp changes: https://github.com/riscv-android-src/platform-bionic/pull/27
+  - redefine ucontext: https://github.com/riscv-android-src/platform-bionic/pull/28
+  - fixed benchmark for link reloc: https://github.com/riscv-android-src/platform-bionic/pull/29
+  - Fix unistd.exec_argv0_null for new kernels.: https://github.com/riscv-android-src/platform-bionic/pull/32
+  - use clang integrated as: https://github.com/riscv-android-src/platform-build-soong/pull/4
+  - add no-relax: https://github.com/riscv-android-src/platform-build-soong/pull/5
+  - updated android 12 download steps: https://github.com/riscv-android-src/riscv-android/pull/4
+- aosp-riscv development and bugfix:
+  - added build of run-as: https://gitee.com/aosp-riscv/test-riscv/pulls/22
+  - update env and add 8.log: https://gitee.com/aosp-riscv/test-riscv/pulls/21
+  - added 9.log: https://gitee.com/aosp-riscv/test-riscv/pulls/23
+  - Investigate round issue for math lib：
+    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5BV63
+    - Raised LLVM/compiler-rt PR: https://reviews.llvm.org/D128240 ，waiting for review.
+  - Signal Stack unwinding failure：
+    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5D6NY, in investigating
+  - "-nan" sprintf error
+    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4
+    - submit a GNU toolchain issue: https://github.com/riscv-collab/riscv-gnu-toolchain/issues/1092, waiting for feedback
+  - ifunc crash
+    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5DNIJ, found rootcasue, in resloving
+  - exec_argv0_null failed
+    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5EGDI, resolved.
+- Articles:
+  - Bazel for AOSP: https://zhuanlan.zhihu.com/p/529147848 (in chinese)
+  - GNU IFUNC (RISC-V): https://zhuanlan.zhihu.com/p/532312568 (in chinese)
+  - IFUNC in BIONIC: https://zhuanlan.zhihu.com/p/532885045 (in chinese)
+
 - 2022-05-30 Status update
 
   - RVI upstream:
