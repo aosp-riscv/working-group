@@ -116,7 +116,7 @@ int main()
 一句话总结：有很多。但常见的方法有两种，内容比较多，我打算另辟两篇文章如下单独总结。
 
 - [基于 Frame Pointer 的栈回溯][6]
-- 基于 Call Frame Information 的栈回溯
+- [基于 Call Frame Information 的栈回溯][7]
 
 除此之外，还有一些基于以上方法的改良定制版本，以及基于 ARCH 自身自己发明的方法，我这里就不一一赘述了，感兴趣可以阅读 [【参考 2】][2]。
 
@@ -127,3 +127,4 @@ int main()
 [4]: https://www.geeksforgeeks.org/stack-unwinding-in-c/
 [5]: https://itanium-cxx-abi.github.io/cxx-abi/abi-eh.html
 [6]: ./20220719-stackuw-fp.md
+[7]: ./20220721-stackuw-cfi.md
