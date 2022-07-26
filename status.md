@@ -1,35 +1,61 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-07-30 Statue update
+
+  - RVI upstream: The synchronization work between aosp-riscv (<https://github.com/aosp-riscv>) and RVI upstream (<https://github.com/riscv-android-src>) is almost complete. We will not add new features to aosp-riscv, and the development work later will move to RVI upstream (https://github.com/riscv-android-src).
+    - updated qemu for riscv: https://github.com/riscv-android-src/platform-prebuilts-android-emulator/pull/2
+    - updated android 12 guide: https://github.com/riscv-android-src/riscv-android/pull/5
+    - Updated the android12.md for cts: https://github.com/riscv-android-src/riscv-android/pull/6
+    - rollback commented code: https://github.com/riscv-android-src/platform-bionic/pull/34
+    - revert the changes: https://github.com/riscv-android-src/platform-frameworks-av/pull/1
+    - remove build options for aosp 10: https://github.com/riscv-android-src/platform-build-soong/pull/6
+    - remove.sdk_rv: https://github.com/riscv-android-src/platform-build/pull/4
+    - revert.mainline_system_x86: https://github.com/riscv-android-src/platform-build/pull/5
+    - remove.sdk_phone_riscv64: https://github.com/riscv-android-src/platform-build/pull/6
+    - add -mno-relax when building libc++: https://github.com/riscv-android-src/toolchain-llvm_android/pull/3
+  - bionic unit test ( on emulator) status update:
+    - Round issue for math lib: https://gitee.com/aosp-riscv/working-group/issues/I5BV63, opened LLVM/compiler-rt PR: https://reviews.llvm.org/D128240, rework after review and waiting for reviewer accept.
+    - Signal Stack unwinding failure: https://gitee.com/aosp-riscv/working-group/issues/I5D6NY, it is found that the build manifest of llvm-project does not pick the latest bionic and ndk, submitted an issue for discussion: https://github.com/riscv-android-src/toolchain-llvm-project/issues/5
+    - "-nan" sprintf error: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4, submitted a GNU toolchain issue: https://github.com/riscv-collab/riscv-gnu-toolchain/issues/1092, waiting for feedback
+  - Articles:
+    - RenderScript poriting analysis for AOSP RISC-V: https://gitee.com/aosp-riscv/working-group/blob/master/articles/20220509-renderscipt-adaptation-analysis-in-android12-riscv64-porting.md (in chinese)
+    - Setup CTS env:  https://gitee.com/aosp-riscv/working-group/blob/master/articles/20220705-build-the-cts.md
+    - Call Stack (RISC-V): https://zhuanlan.zhihu.com/p/542845861
+    - Stack Unwinding - Overview: https://zhuanlan.zhihu.com/p/543823849
+    - Stack Unwinding with Frame Pointer: https://zhuanlan.zhihu.com/p/543825539
+    - Stack Unwinding with CFI: https://zhuanlan.zhihu.com/p/546207071
+    - GCC cross toolchain for building RISC-V from source: https://zhuanlan.zhihu.com/p/544827596
+
 - 2022-06-30 Statue update
 
-- RVI upstream:
-  - roll-back temp changes: https://github.com/riscv-android-src/platform-bionic/pull/27
-  - redefine ucontext: https://github.com/riscv-android-src/platform-bionic/pull/28
-  - fixed benchmark for link reloc: https://github.com/riscv-android-src/platform-bionic/pull/29
-  - Fix unistd.exec_argv0_null for new kernels.: https://github.com/riscv-android-src/platform-bionic/pull/32
-  - use clang integrated as: https://github.com/riscv-android-src/platform-build-soong/pull/4
-  - add no-relax: https://github.com/riscv-android-src/platform-build-soong/pull/5
-  - updated android 12 download steps: https://github.com/riscv-android-src/riscv-android/pull/4
-- aosp-riscv development and bugfix:
-  - added build of run-as: https://gitee.com/aosp-riscv/test-riscv/pulls/22
-  - update env and add 8.log: https://gitee.com/aosp-riscv/test-riscv/pulls/21
-  - added 9.log: https://gitee.com/aosp-riscv/test-riscv/pulls/23
-  - Investigate round issue for math lib：
-    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5BV63
-    - Raised LLVM/compiler-rt PR: https://reviews.llvm.org/D128240 ，waiting for review.
-  - Signal Stack unwinding failure：
-    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5D6NY, in investigating
-  - "-nan" sprintf error
-    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4
-    - submit a GNU toolchain issue: https://github.com/riscv-collab/riscv-gnu-toolchain/issues/1092, waiting for feedback
-  - ifunc crash
-    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5DNIJ, found rootcasue, in resloving
-  - exec_argv0_null failed
-    - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5EGDI, resolved.
-- Articles:
-  - Bazel for AOSP: https://zhuanlan.zhihu.com/p/529147848 (in chinese)
-  - GNU IFUNC (RISC-V): https://zhuanlan.zhihu.com/p/532312568 (in chinese)
-  - IFUNC in BIONIC: https://zhuanlan.zhihu.com/p/532885045 (in chinese)
+  - RVI upstream:
+    - roll-back temp changes: https://github.com/riscv-android-src/platform-bionic/pull/27
+    - redefine ucontext: https://github.com/riscv-android-src/platform-bionic/pull/28
+    - fixed benchmark for link reloc: https://github.com/riscv-android-src/platform-bionic/pull/29
+    - Fix unistd.exec_argv0_null for new kernels.: https://github.com/riscv-android-src/platform-bionic/pull/32
+    - use clang integrated as: https://github.com/riscv-android-src/platform-build-soong/pull/4
+    - add no-relax: https://github.com/riscv-android-src/platform-build-soong/pull/5
+    - updated android 12 download steps: https://github.com/riscv-android-src/riscv-android/pull/4
+  - aosp-riscv development and bugfix:
+    - added build of run-as: https://gitee.com/aosp-riscv/test-riscv/pulls/22
+    - update env and add 8.log: https://gitee.com/aosp-riscv/test-riscv/pulls/21
+    - added 9.log: https://gitee.com/aosp-riscv/test-riscv/pulls/23
+    - Investigate round issue for math lib：
+      - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5BV63
+      - Raised LLVM/compiler-rt PR: https://reviews.llvm.org/D128240 ，waiting for review.
+    - Signal Stack unwinding failure：
+      - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5D6NY, in investigating
+    - "-nan" sprintf error
+      - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4
+      - submit a GNU toolchain issue: https://github.com/riscv-collab/riscv-gnu-toolchain/issues/1092, waiting for feedback
+    - ifunc crash
+      - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5DNIJ, found rootcasue, in resloving
+    - exec_argv0_null failed
+      - Root-Analysis: https://gitee.com/aosp-riscv/working-group/issues/I5EGDI, resolved.
+  - Articles:
+    - Bazel for AOSP: https://zhuanlan.zhihu.com/p/529147848 (in chinese)
+    - GNU IFUNC (RISC-V): https://zhuanlan.zhihu.com/p/532312568 (in chinese)
+    - IFUNC in BIONIC: https://zhuanlan.zhihu.com/p/532885045 (in chinese)
 
 - 2022-05-30 Status update
 
