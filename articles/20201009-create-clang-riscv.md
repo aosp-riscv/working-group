@@ -170,10 +170,10 @@ int main(int argc, char *argv[])
 
 运行 clang 编译程序，通过 `--sysroot` 选项来指定 gnu 工具链的 sysroot，通过 `--gcc-toolchain` 来指定 gcc 工具链的位置。
 
-这里假设使用在 [在 QEMU 上运行 RISC-V 64 位版本的 Linux](https://zhuanlan.zhihu.com/p/258394849) 一文中制作的 GNU GCC。同时假设我们还是利用上文中的环境来测试，由于我们当时制作的文件系统很简单，不包含任何 c 库，所以我们采用静态链接的方式生成可执行程序。
+这里假设使用在 [《制作交叉工具链 riscv-gnu-toolchain》](./20220721-riscv-gcc.md) 一文中制作的 GNU GCC。为方便测试，我们采用静态链接的方式生成可执行程序。
 
 ```
-$ clang --gcc-toolchain=/opt/riscv64 --sysroot=/opt/riscv64/sysroot/ -static test.c
+$ clang --gcc-toolchain=$WS/install --sysroot=$WS/install/sysroot/ -static test.c
 ```
 
 简单检查一下生成的可执行文件格式是否正确：
