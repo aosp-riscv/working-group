@@ -2,6 +2,8 @@
 
 This is the meta repo for the AOSP for RISC-V Project. General tasks and issues here.
 
+This project is initiated by [PLCT lab](https://github.com/plctlab), the purpose is to port Android to RISC-V platform. At this stage, it has been merged with [RISC-V Android Source](https://github.com/riscv-android-src) under [RISC-V International](https://riscv.org/).
+
 If you are interested in runnning Android on RISC-V hardware, please join us!
 
 The code of AOSP-RISCV is open source, and everyone is welcome to contribute. All repositories are in duplicate on Github and Gitee, which are mirror backups of each other.
