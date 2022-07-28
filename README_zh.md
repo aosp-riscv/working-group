@@ -2,7 +2,7 @@
 
 本仓库适用于为 AOSP for RISC-V 项目组归档除代码外的其他相关资料和讯息。
 
-本项目由 [PLCT lab](https://github.com/plctlab) 发起，目的为将 Android 移植到 RISC-V 平台上。现阶段已经与 [RISC-V International](https://riscv.org/) 旗下的 [RISC-V Android Source](https://github.com/riscv-android-src）合并。
+本项目由 [PLCT lab](https://github.com/plctlab) 发起，目的为将 Android 移植到 RISC-V 平台上。现阶段已经与 [RISC-V International](https://riscv.org/) 旗下的 [RISC-V Android Source](https://github.com/riscv-android-src) 合并。
 
 如果您对在基于 RISC-V 架构的硬件上运行 Android 感兴趣，欢迎加入我们！
 
