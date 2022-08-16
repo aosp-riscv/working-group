@@ -390,7 +390,7 @@ foo_2:
 
 具体例子参考 [示例代码][13] 的 `backtrace.c`
 
-其中 `backtrace()`, `backtrace_symbols()` 都是库函数，先获取到地址，然后解析出对应的 symbol。编译命令如下，注意 `-rdynamic` 是必须的，否则无法得到符号表的名字。
+其中 `backtrace()`, `backtrace_symbols()` 都是库函数，`backtrace()` 可以获取 call stack 中各级函数对应的 stack frame 所对应的 RA，`backtrace_symbols()` 则可以根据获取的 RA 信息解析出对应的 symbol 信息，包括文件和函数名。编译命令如下，`-fomit-frame-pointer` 确保程序不生成 FP，`-fasynchronous-unwind-tables` 保证生成 CFI 信息，注意 `-rdynamic` 是必须的，否则无法得到符号表的名字。
 
 ```
 $ riscv64-unknown-linux-gnu-gcc test.c foos.c backtrace.c -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out
@@ -399,23 +399,44 @@ $ riscv64-unknown-linux-gnu-gcc test.c foos.c backtrace.c -fomit-frame-pointer -
 用 qemu 尝试运行一下, 因为我们是动态链接，所以执行 qemu 时加一下 `-L` 选项，指定动态链接器所在的 sysroot 路径：
 ```
 qemu-riscv64 -L $YOUR_SYSROOT a.out
-0x10a7a:a.out(unwind_by_backtrace+0x78) [0x10a7a]
-0x109ca:a.out(foo_3+0x8) [0x109ca]
-0x109da:a.out(foo_2+0x8) [0x109da]
-0x109ea:a.out(foo_1+0x8) [0x109ea]
-0x109fa:a.out(foo_0+0x8) [0x109fa]
-0x109b8:a.out(main+0x8) [0x109b8]
-0x400085a70c:/lib/libc.so.6(__libc_start_main+0x86) [0x400085a70c]
-0x1093c:a.out(_start+0x2c) [0x1093c]
+a.out(unwind_by_backtrace+0x14) [0x10a16]
+a.out(foo_3+0x8) [0x109ca]
+a.out(foo_2+0x8) [0x109da]
+a.out(foo_1+0x8) [0x109ea]
+a.out(foo_0+0x8) [0x109fa]
+a.out(main+0x8) [0x109b8]
+/lib/libc.so.6(__libc_start_main+0x86) [0x400085a70c]
+a.out(_start+0x2c) [0x1093c]
 ```
 
-这个回溯链中任何一个函数如果缺失了 CFI 信息都会导致栈回溯不完整。假设我们故意删除 `foo_2()` 的 CFI 信息，执行后的效果如下：
+简单分析一下 `backtrace()` 是如何获取各级函数对应的 stack frame 所对应的 RA 的。参考下图为例子运行到调用 `backtrace()` 时的 call stack 状态。
+
+![](./diagrams/20220721-stackuw-cfi/backtrace.png)
+
+【图 1】 例子运行到调用 `backtrace()` 时的 call stack 和 CFI 的对应关系
+
+由于我们拥有 CFI 信息，所以 `backtrace()` 可以根据当前现场的 SP 逐步回溯，步骤如下：
+
+- `backtrace()` 函数本身有 CFI 信息，所以我们在 `backtrace()` 中可以根据其 CFI 信息在其 stack frame 中得到上一级函数，也就是 `unwind_by_backtrace()` 的 RA 和 SP。 RA 的值 从 【图 1】 中的反汇编结果可以知道就是 0x10a16（红色 1），SP 的值就是 `backtrace()` 对应 FDE 的 CFA。此时可以打印出第一行 `a.out(unwind_by_backtrace+0x14) [0x10a16]`
+
+- 我们根据 0x10a16 找到 `unwind_by_backtrace()` 函数对应的 FDE 信息以及对应指令地址的 CFA 和 ra 计算规则（红色 2）
+
+- 根据 SP 和计算规则找到 CFA 和 stack frame 中保存的上一级函数 `foo_3` 的返回地址值，这里是 0x109ca （红色 3）。此时可以打印出第二行 `a.out(foo_3+0x8) [0x109ca]` 
+
+- 后面就是依次类推，（绿色 1 -> 绿色 2 -> 绿色 3）
+  
+  此时可以打印出第三行 `a.out(foo_2+0x8) [0x109da]`
+
+- ...... 后面的推导过程暂不赘述。
+
+
+注意这个回溯链中任何一个函数如果缺失了 CFI 信息都会导致栈回溯不完整。假设我们故意删除 `foo_2()` 的 CFI 信息，执行后的效果如下：
 
 ```
 qemu-riscv64 -L $YOUR_SYSROOT a.out
-0x10a7a:a.out(unwind_by_backtrace+0x78) [0x10a7a]
-0x109ca:a.out(foo_3+0x8) [0x109ca]
-0x109da:a.out(foo_2+0x8) [0x109da]
+a.out(unwind_by_backtrace+0x14) [0x10a16]
+a.out(foo_3+0x8) [0x109ca]
+a.out(foo_2+0x8) [0x109da]
 ```
 
 有关支持 stack unwind 的函数的总结，可以考虑另起一篇，这篇总结已经足够长了。

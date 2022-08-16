@@ -9,13 +9,13 @@ SRCS_NOCFI = test.c foos_no_cfi.S backtrace.c
 
 .PHONY : test-cfi
 test-cfi: clean
-	${CROSS_COMPILE}gcc ${SRCS} -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out
+	${CROSS_COMPILE}gcc ${SRCS} -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out -Wall
 	${CROSS_COMPILE}gcc -S foos.c -fomit-frame-pointer -fasynchronous-unwind-tables
 	${CROSS_COMPILE}gcc -c foos.c -fomit-frame-pointer -fasynchronous-unwind-tables
 
 .PHONY : test-nocfi
 test-nocfi: clean
-	${CROSS_COMPILE}gcc ${SRCS_NOCFI} -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out
+	${CROSS_COMPILE}gcc ${SRCS_NOCFI} -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out -Wall
 	${CROSS_COMPILE}gcc -c foos_no_cfi.S -fomit-frame-pointer -fasynchronous-unwind-tables
 
 .PHONY : run
