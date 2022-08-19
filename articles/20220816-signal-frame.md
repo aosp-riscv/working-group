@@ -18,15 +18,13 @@
 <!-- /TOC -->
 
 
-# 1. 参考
-
-本文主要参考了如下内容：
-
-- 【参考 1】[linux 内核信号机制需要解决的两个关键问题][3]
-
 信号作为一种进程间通信的方式，在 Linux 中被广泛使用。这篇技术总结不打算对 Linux 内核中信号的具体实现细节全面介绍，而是聚焦于内核调用信号处理函数过程中栈帧的处理，目的是为了更好地理解信号处理函数调用过程中如何进行栈回溯（Stack Unwinding）。在涉及到 ARCH 相关的内容时，本笔记以 RISC-V 为主，必要时也会涉及一点其他 ARCH，譬如 X86_64 或者 AARCH64。
 
 至于什么是 “Stack” 以及什么是 “Stack Unwinding”，请阅读我的另外两篇总结 [《Call Stack (RISC-V)》][1] 和 [《Stack Unwinding - Overview》][2]。
+
+# 1. 参考
+
+- 【参考 1】[linux 内核信号机制需要解决的两个关键问题][3]
 
 # 2. 信号的基本概念
 
@@ -309,7 +307,7 @@ struct rt_sigframe {
 
 【图 4】信号处理过程中的 `trap_out_1`
 
-signal handler 函数执行的最后调用 ret 指令，因为 SP 已经指向 `__vdso_rt_sigreturn` 函数，而这个函数自然就是为了完成系统再次返回内核态作准备。我们来看一下 [`__vdso_rt_sigreturn` 这个函数](https://elixir.bootlin.com/linux/v5.19/source/arch/riscv/kernel/vdso/rt_sigreturn.S#L10)。摘抄如下：
+signal handler 的 prologue 会将 Hart 中的 RA 等保存到自己的栈中，signal handler 函数执行的最后会 restore RA 然后调用 ret 指令，因为 RA 指向 `__vdso_rt_sigreturn` 函数，而这个函数自然就是为了完成系统再次返回内核态作准备。我们来看一下 [`__vdso_rt_sigreturn` 这个函数](https://elixir.bootlin.com/linux/v5.19/source/arch/riscv/kernel/vdso/rt_sigreturn.S#L10)。摘抄如下：
 
 ```asm
 ENTRY(__vdso_rt_sigreturn)
