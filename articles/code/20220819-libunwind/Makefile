@@ -35,5 +35,5 @@ debug:
 
 .PHONY : clean
 clean:
-	rm -rf *o *.s a.out
+	rm -rf *.o *.s a.out
 
