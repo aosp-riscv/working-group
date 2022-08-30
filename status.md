@@ -1,6 +1,21 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
-- 2022-07-30 Statue update
+- 2022-08-30 Status update 
+
+  - RVI upstream:
+    - skip ptrace testing cases: https://github.com/riscv-android-src/platform-bionic/pull/35
+    - Backport commits to support fe_getround and fe_raise_inexact in builtins: https://github.com/riscv-android-src/toolchain-llvm-project/pull/6 
+  - bionic unit test ( on emulator) status update：
+    - Round issue for math lib: resolved with https://github.com/riscv-android-src/toolchain-llvm-project/pull/6
+    - Signal Stack unwinding issue：https://gitee.com/aosp-riscv/working-group/issues/I5D6NY, rootcaused and found it is due to current LLVM/libunwind has not support signal frame unwinding. Reported to RVI upstream and T-head has worked out a patch, waiting for the new release and verify it.
+    - "-nan" sprintf issue: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4: will not priority it now, plan to report to Google and have a look what will they comment on this.
+    - sys_ptrace: https://gitee.com/aosp-riscv/working-group/issues/I5NL9M, resolved with https://github.com/riscv-android-src/platform-bionic/pull/35
+  - Articles update:
+    - Signal Frame introduction: https://zhuanlan.zhihu.com/p/555659009
+    - Libraries about Stack unwinding: https://zhuanlan.zhihu.com/p/556211455
+    - Notes about ptrace: https://zhuanlan.zhihu.com/p/559140687
+
+- 2022-07-30 Status update
 
   - RVI upstream: The synchronization work between aosp-riscv (<https://github.com/aosp-riscv>) and RVI upstream (<https://github.com/riscv-android-src>) is almost complete. We will not add new features to aosp-riscv, and the development work later will move to RVI upstream (https://github.com/riscv-android-src).
     - updated qemu for riscv: https://github.com/riscv-android-src/platform-prebuilts-android-emulator/pull/2
@@ -26,7 +41,7 @@ Project(aosp-riscv) progress log (time in reverse order).
     - Stack Unwinding with CFI: https://zhuanlan.zhihu.com/p/546207071
     - GCC cross toolchain for building RISC-V from source: https://zhuanlan.zhihu.com/p/544827596
 
-- 2022-06-30 Statue update
+- 2022-06-30 Status update
 
   - RVI upstream:
     - roll-back temp changes: https://github.com/riscv-android-src/platform-bionic/pull/27
