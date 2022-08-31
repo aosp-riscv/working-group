@@ -11,6 +11,7 @@ Project(aosp-riscv) progress log (time in reverse order).
     - "-nan" sprintf issue: https://gitee.com/aosp-riscv/working-group/issues/I5CKA4: will not priority it now, plan to report to Google and have a look what will they comment on this.
     - sys_ptrace: https://gitee.com/aosp-riscv/working-group/issues/I5NL9M, resolved with https://github.com/riscv-android-src/platform-bionic/pull/35
   - Articles update:
+    - Participated in the 2nd RISC-V China Summit and made a joint report with RVI Android SIG chairman - Maohan, sildes at: https://github.com/aosp-riscv/working-group/blob/master/docs/slides/202208-rvsc2022-rvi-aosp-report.pdf
     - Signal Frame introduction: https://zhuanlan.zhihu.com/p/555659009
     - Libraries about Stack unwinding: https://zhuanlan.zhihu.com/p/556211455
     - Notes about ptrace: https://zhuanlan.zhihu.com/p/559140687
