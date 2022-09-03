@@ -42,17 +42,7 @@ Feel free to open an issue for further questions/discussions!
 
 ### Articles
 
-- [**Version Management for AOSP Platform, Wang Chen - PLCT lab, 20200911 (Chinese Version)**](https://zhuanlan.zhihu.com/p/234390474)
-- [**Version Management for AOSP Kernel, Wang Chen - PLCT lab, 20200915 (Chinese Version)**](https://zhuanlan.zhihu.com/p/245131105)
-- [**Running RISC-V 64 Linux on QEMU, Wang Chen - PLCT lab, 20200923 (Chinese Version)**](https://zhuanlan.zhihu.com/p/258394849)
-- [**Compile Android Kenrel for RISC-V, Wang Chen - PLCT lab, 20200929 (Chinese Version)**](https://zhuanlan.zhihu.com/p/260356339)
-- [**Make a LLVM/Clang compiler for RISC-V, Wang Chen - PLCT lab, 20201009 (Chinese Version)**](https://zhuanlan.zhihu.com/p/263550372)
-- [**First "Android minimal system" for RISC-V, Wang Chen - PLCT lab, 20201120 (Chinese Version)**](https://zhuanlan.zhihu.com/p/302870095)
-- [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
-- [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
-- [**AOSP-RISCV has a new mirror on Gitee, Wang Chen - PLCT lab, 20201215 (Chinese Version)**](https://zhuanlan.zhihu.com/p/337032693)
-- [**Summary of related knowledge behind AOSP build, Wang Chen - PLCT lab, 20201230**](https://zhuanlan.zhihu.com/p/340689022)
-- [**Details about AOSP Soong creation process, Wang Chen - PLCT lab, 20210108**](https://zhuanlan.zhihu.com/p/342817768)
+Move to [Article Category Index Page](./articles/index.md)
 
 ### Videos
 

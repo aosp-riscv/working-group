@@ -41,17 +41,7 @@ AOSP-RISCV 的代码开源，欢迎大家参与贡献。所有仓库在 Github �
 
 ### 文章
 
-- [**AOSP 的版本管理，汪辰（ PLCT 实验室），20200911**](https://zhuanlan.zhihu.com/p/234390474)
-- [**AOSP 内核的版本管理，汪辰（ PLCT 实验室），20200915**](https://zhuanlan.zhihu.com/p/245131105)
-- [**在 QEMU 上运行 RISC-V 64 位版本的 Linux，汪辰（ PLCT 实验室），20200923**](https://zhuanlan.zhihu.com/p/258394849)
-- [**编译一个 RISC-V 的 Android 内核，汪辰（ PLCT 实验室），20200929**](https://zhuanlan.zhihu.com/p/260356339)
-- [**制作一个针对 RISC-V 的 LLVM/Clang 编译器，汪辰（ PLCT 实验室），20201009**](https://zhuanlan.zhihu.com/p/263550372)
-- [**第一个 RISC-V 上的 “Android 最小系统”，汪辰（ PLCT 实验室），20201120**](https://zhuanlan.zhihu.com/p/302870095)
-- [**Create a minimal Android system for RISC-V, Wang Chen - PLCT lab, 20201124**](https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html)
-- [**RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127**](https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/)
-- [**AOSP-RISCV 的开源仓库在 Gitee 上新建了镜像，汪辰（ PLCT 实验室），20201215**](https://zhuanlan.zhihu.com/p/337032693)
-- [**AOSP Build 背后涉及的相关知识汇总，汪辰（ PLCT 实验室），20201230**](https://zhuanlan.zhihu.com/p/340689022)
-- [**AOSP Soong 创建过程详解，汪辰（ PLCT 实验室），20210108**](https://zhuanlan.zhihu.com/p/342817768)
+移步 [文章分类索引页面](./articles/index.md)
 
 ### 视频
 
