@@ -22,6 +22,7 @@
 - [Bazel 和 AOSP 介绍][18]
 - [BIONIC 中对 IFUNC 的支持][20]
 - [搭建 CTS 环境][21]
+- [Andorid Build System 研究心得][33]
 
 ## 编程语言与编译技术
 
@@ -80,3 +81,4 @@
 [30]: https://zhuanlan.zhihu.com/p/258394849
 [31]: https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html
 [32]: https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/
+[33]: ./20220905-aosp-build-system.md
