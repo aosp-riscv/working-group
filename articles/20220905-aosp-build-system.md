@@ -49,10 +49,10 @@ Build System 作为一个框架，它为使用者提供了如下的功能：
 - 执行构建，也就是当我们输入 make 时发生了什么。入口是 `core/main.mk`, 这个 makefile 文件会依次导入如下内容（注，这里仅列出重要的，不重要的内容太多，就不一一列举了）
   - 导入 `core/config.mk`，导入过程中会对用户选择的 product 的基本信息，如果是 lunch 方式则会读取环境变量中的 product 的参数值，对其进行检查和过滤，并生成最终的 make 内部的 build 变量。
     
-    **值得一提的是，导入 config.mk 过程中还会导入 product 和 board 的配置信息，这个过程中会将用户客制化的产品级别信息导入进来。** 这涉及 `core/product_config.mk` 和 `core/board_config.mk`
+    **值得一提的是，导入 config.mk 过程中还会导入 product 和 board 的配置信息，这个过程中会将用户客制化的产品级别信息导入进来。** ，见上面客制化工作的产品级别的内容。这涉及 `core/product_config.mk` 和 `core/board_config.mk`
     
   - 导入辅助函数，主要是对应 【图 1】 中的 `core/definitions.mk`
-  - 导入系统的模块文件。这个 【图 1】中没有列出，这个过程比较费时。
+  - **导入系统的模块定义文件**。即导入 module 的 `Android.mk` 文件。见上面客制化工作的模块级别的构建规则的内容。这个 【图 1】中没有列出，这个过程比较费时。运行 make 时会看到提示 `Inclduing xxx.mk`。
   - 导入大量的构建规则，这个指的是 `core/Makefile`
   - 定义了大量的伪规则，这个基本上定义在 `core/main.mk` 的后半部分。
 
@@ -69,15 +69,48 @@ Build System 作为一个框架，它为使用者提供了如下的功能：
 
 仅仅是按照我自己的理解总结一下，仅供参考。以 AOSP 12 (tag: android-12.0.0_r3) 为参考代码基线。
 
-我目前理解一个完整的构建和原来的差异不大，因为引入 Soong 后，只是把部分 module 的 Android.mk 替换为了 Android.bp。系统 image 的制作部分还是基于 Makefile 的，当然和最最初的区别是不是直接将 Makefile 传入 make 执行，而是交给 Kati 转化成 ninja 文件，building action 的最终动作是由 ninja 来驱动完成的。
+我目前理解一个完整的构建和原来的差异不大，因为引入 Soong 后，只是把部分 module 的 `Android.mk` 替换为了 `Android.bp`。系统 image 的制作部分还是基于 Makefile 的，当然和最最初的区别是不是直接将 Makefile 传入 make 执行，而是交给 Kati 转化成 ninja 文件，building action 的最终动作是由 ninja 来驱动完成的。
 
 所以还是结合 【图 1】 来看 AOSP 引入 Soong 后的变化：
 
 - Product Descriotions 和 Board Description 部分没有什么变化
-- Module Build Rules 这块，大部分 module 的 Android.mk 被转化成了 Android.bp
-- Build System 部分，引入了 soong_ui, 这个 soong_ui 封装了一个新的构建过程，可以参考 `soong/ui/build/build.go` 这个文件中的 `Build` 函数，其核心执行顺序如下（不完整，抽取了核心步骤）：
-  - runSoong：这是 Soong 新引入的步骤，会扫描所有的 Android.bp 转化为 ninjia 文件，为了和原有的 build system 融合，同时还会生成一个 `$(SOONG_ANDROID_MK)` 文件，譬如：`out/soong/Android-sdk_phone64_riscv64.mk`。这是一个很大的文件，打开看一下会发现这是一个符合 Android.mk 格式的形式的文件，但不是只针对一个 module，而是包含了所有解析过的 bp 文件中针对所有的 module 的符合 Android.mk 的定义，可以认为是那些采用 Android.bp 文件的 module 所对应的多个 Android.mk 文件的一个集合。
-  - runKatiBuild，这个函数封装了 Kati 处理，传入的是原来 make 的入口 `core/main.mk`，此时我们再看一下`core/main.mk`， 会发现这个 makefile 文件中针对 Soong 是有相关改动的，特别是是针对导入 module 的步骤，除了导入那些还没有采用 Android.bp 的 module 所对应的 Android.mk 外，还会导入一个特殊的 `$(SOONG_ANDROID_MK)` 文件，见上一步 runSoong 中的骚操作。所以说这里导入 module 时依然是一个全集，只是部分已经迁移到 soong 了，所以采用 `$(SOONG_ANDROID_MK)` 文件过渡了一下。
+- Module Build Rules 这块，大部分 module 的 `Android.mk` 被转化成了 `Android.bp`
+- Build System 部分，引入了 `soong_ui`, 这个 `soong_ui` 封装了一个新的构建过程，可以参考 `soong/ui/build/build.go` 这个文件中的 `Build` 函数，其核心执行顺序如下（不完整，抽取了核心步骤）：
+  
+  - runSoong：这是 Soong 新引入的步骤，会扫描所有的 `Android.bp` 转化为 ninjia 文件，为了和原有的 build system 融合，同时还会生成一个 `$(SOONG_ANDROID_MK)` 文件，譬如：`out/soong/Android-sdk_phone64_riscv64.mk`。这是一个很大的文件，打开看一下会发现这是一个符合 Android.mk 格式的形式的文件，但不是只针对一个 module，而是包含了所有解析过的 bp 文件中针对所有的 module 的符合 `Android.mk` 的定义，可以认为是那些采用 `Android.bp` 文件的 module 所对应的多个 `Android.mk` 文件的一个集合。摘录部分内容如下：
+  
+    ```
+    LOCAL_MODULE_MAKEFILE := $(lastword $(MAKEFILE_LIST))
+    
+    include $(CLEAR_VARS)
+    LOCAL_PATH := system/sepolicy
+    LOCAL_MODULE := 26.0.compat.cil
+    LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
+    LOCAL_LICENSE_CONDITIONS := notice unencumbered
+    LOCAL_NOTICE_FILE := system/sepolicy/NOTICE
+    LOCAL_LICENSE_PACKAGE_NAME := system_sepolicy_license
+    LOCAL_MODULE_CLASS := ETC
+    LOCAL_PREBUILT_MODULE_FILE := out/soong/.intermediates/system/sepolicy/26.0.compat.cil/android_common/gen/26.0.compat.cil
+    LOCAL_FULL_INIT_RC := 
+    LOCAL_MODULE_PATH := out/target/product/emulator_riscv64/system/etc/selinux/mapping
+    LOCAL_INSTALLED_MODULE_STEM := 26.0.compat.cil
+    include $(BUILD_PREBUILT)
+    
+    include $(CLEAR_VARS)
+    LOCAL_PATH := system/sepolicy
+    LOCAL_MODULE := 26.0.ignore.cil
+    LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
+    LOCAL_LICENSE_CONDITIONS := notice unencumbered
+    LOCAL_NOTICE_FILE := system/sepolicy/NOTICE
+    LOCAL_LICENSE_PACKAGE_NAME := system_sepolicy_license
+    LOCAL_MODULE_CLASS := ETC
+    LOCAL_PREBUILT_MODULE_FILE := out/soong/.intermediates/system/sepolicy/26.0.ignore.cil/android_common/gen/26.0.ignore.cil
+    LOCAL_FULL_INIT_RC := 
+    LOCAL_MODULE_PATH := out/target/product/emulator_riscv64/system/etc/selinux/mapping
+    include $(BUILD_PREBUILT)
+    ```
+  
+  - runKatiBuild，这个函数封装了 Kati 处理，传入的是原来 make 的入口 `core/main.mk`，此时我们再看一下`core/main.mk`， 会发现这个 makefile 文件中针对 Soong 是有相关改动的，特别是是针对导入 module 的步骤，除了导入那些还没有采用 `Android.bp` 的 module 所对应的 `Android.mk` 外，还会导入一个特殊的 `$(SOONG_ANDROID_MK)` 文件，见上一步 runSoong 中的骚操作。所以说这里导入 module 时依然是一个全集，只是部分已经迁移到 soong 了，所以采用 `$(SOONG_ANDROID_MK)` 文件过渡了一下。
   - createCombinedBuildNinjaFile：合并 soong 和 kati 的 ninja 文件
   - runNinjaForBuild：执行 ninja
 
