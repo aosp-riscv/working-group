@@ -439,11 +439,11 @@ func Build(ctx Context, config Config, what int) {
 	// 我们可以在执行 m 命令时带入一些附加参数控制这些步骤，具体参数控制参考 `build/soong/ui/build/config.go`
 	// 中的 parseArgs 函数, 具体有
 	// * showcommands
-	// * --skip-ninja
-	// * --skip-make
-	// * --skip-kati
-	// * --soong-only
-	// * --skip-soong-tests
+	// * --skip-ninja: 跳过最后执行 runNinjaForBuild 的步骤
+	// * --skip-make: 跳过 runMakeProductConfig 和 runKati*
+	// * --skip-kati: 跳过 runKati*
+	// * --soong-only: 跳过 runKati*，但还是会执行最后的 runNinjaForBuild
+	// * --skip-soong-tests: 跳过 runSoong 中的 test 部分
 	// 等等
 	what := RunAll
 	if config.UseBazel() {
@@ -470,7 +470,16 @@ func Build(ctx Context, config Config, what int) {
 	}
 
 	// 省略 ......
+	if what&RunProductConfig != 0 {
+		// runMakeProductConfig 这个函数定义在 `build/soong/ui/build/dumpvars.go`
+		// 通过调用 dumpMakeVars 将 make 系统中的一些 product 相关变量的值导出来设置给 config，
+		// 为下面 runSoong/runKati/runNinja 做准备，所以代码上有注释
+		// Everything below here depends on product config.
+		runMakeProductConfig(ctx, config)
+	}
 
+	// Everything below here depends on product config.
+	// 省略 ......
 	if what&RunSoong != 0 {
 		// runSoong() 这个函数定义在 `./soong/ui/build/soong.go` 中,
     		// 是 Soong 系统的重点函数！！！
