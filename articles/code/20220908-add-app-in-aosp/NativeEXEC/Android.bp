@@ -1,0 +1,14 @@
+cc_binary {
+     name: "Hello",
+
+     //export_include_dirs: [“src”],
+     srcs: ["src/hello.c"],
+
+     product_specific: true,
+
+     target: {
+           darwin: {
+                enabled: false,
+           },
+     },
+}
