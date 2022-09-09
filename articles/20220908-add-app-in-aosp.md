@@ -1,6 +1,6 @@
 ![](./diagrams/android.png)
 
-文章标题：**为 AOSP 添加一个应用**
+文章标题：**为 AOSP 添加一个 module**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
@@ -12,8 +12,13 @@
 <!-- TOC -->
 
 - [1. 参考](#1-参考)
-- [2. 添加一个 Prebuilt APK](#2-添加一个-prebuilt-apk)
-- [3. 添加一个 Native EXEC](#3-添加一个-native-exec)
+- [2. 如何编写一个 module 的定义文件](#2-如何编写一个-module-的定义文件)
+	- [2.1. Android.mk](#21-androidmk)
+		- [2.1.1. `LOCAL_*` 变量](#211-local_-变量)
+		- [2.1.2. `BUILD_*` 变量](#212-build_-变量)
+	- [2.2. Android.bp](#22-androidbp)
+- [3. 添加一个 Prebuilt APK](#3-添加一个-prebuilt-apk)
+- [4. 添加一个 Native EXEC](#4-添加一个-native-exec)
 
 <!-- /TOC -->
 
@@ -25,7 +30,31 @@
 
 以下例子基于 AOSP for RISCV64，环境搭建参考 [Setup Android 12 on RISC-V][3]。
 
-# 2. 添加一个 Prebuilt APK
+# 2. 如何编写一个 module 的定义文件
+
+## 2.1. Android.mk
+
+### 2.1.1. `LOCAL_*` 变量
+
+全集参考 `build/core/clear_vars.mk`
+
+其他可以参考：
+
+- [Build Cookbook][2]
+
+### 2.1.2. `BUILD_*` 变量
+
+全集参考 `build/make/core/config.mk` 中 `Build system internal files` 部分
+
+其他可以参考：
+
+- 【参考 1】Table 4-2. Module build templates list
+
+## 2.2. Android.bp
+
+官方文档：【参考 2】 [Soong Build System][1]
+
+# 3. 添加一个 Prebuilt APK
 
 这里演示如何在系统的 product 分区中添加一个提前编译好的 APK，所谓的提前编译好可以理解成不是在 AOSP 构建过程中编译生成，而是在 AOSP 源码树外编译生成 APK 文件，这里只是将该 APK 拷贝到 image 中。
 
@@ -74,7 +103,7 @@ $ m
 ```
 
 
-# 3. 添加一个 Native EXEC
+# 4. 添加一个 Native EXEC
 
 - [Android.mk 的例子](./code/20220908-add-app-in-aosp/NativeEXEC/Android.mk)
 

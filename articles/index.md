@@ -23,7 +23,7 @@
 - [BIONIC 中对 IFUNC 的支持][20]
 - [搭建 CTS 环境][21]
 - [Andorid Build System 研究心得][33]
-- [为 AOSP 添加一个应用][34]
+- [为 AOSP 添加一个 module][34]
 
 ## 编程语言与编译技术
 

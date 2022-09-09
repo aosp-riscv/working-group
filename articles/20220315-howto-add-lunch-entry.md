@@ -13,6 +13,7 @@
 - [2. 如何增加一个 GSI 的产品定义](#2-如何增加一个-gsi-的产品定义)
 - [3. lunch 过程中 Android Build System 是如何识别产品的](#3-lunch-过程中-android-build-system-是如何识别产品的)
 - [4. 总结：](#4-总结)
+- [附录：产品定义的继承关系](#附录产品定义的继承关系)
 
 <!-- /TOC -->
 
@@ -59,14 +60,14 @@
 
   我们查看这个文件发现其内容定义更侧重软件模块，主要是在描述该产品对应的文件系统 image 中会包含哪些模块和软件包等。
 
-  在实际的产品开发中，产品的变化可能会十分丰富，所以有时候我们还会定义一些 base product，定义一些公共的产品特性，然后在这个基础上再定义派生的产品。
+  在实际的产品开发中，产品的变化可能会十分丰富，所以有时候我们还会定义一些 base product，定义一些公共的产品特性，然后在这个基础上再定义派生的产品, 具体采用的就是形如 `call inherit-product` 的方法。这些产品定义存在继承的特性，具体的继承关系，可以参考本文附录部分。
 
   > A common method is to create a base product that contains features that 
   > apply to all products, then create product variants based on that base product. 
   > For example, two products that differ only by their radios (CDMA versus GSM) 
   > can inherit from the same base product that doesn't define a radio.`
 
-  产品的 mk 文件中可以定义的 `PRODUCT_*` 的变量。参考 <https://source.android.google.cn/setup/develop/new-device#prod-def>。 特别注意一个系统预定义的变量 `PRODUCT_DEVICE`
+  产品的 mk 文件中可以定义的 `PRODUCT_*` 的变量。参考 <https://source.android.google.cn/setup/develop/new-device#prod-def>，AOSP 源码中所有的 `PRODUCT_*` 可以参考 `build/make/core/product.mk`。 特别注意一个系统预定义的变量 `PRODUCT_DEVICE`
   
   > PRODUCT_DEVICE：Name of the industrial design. This is also the board name, 
   > and the build system uses it to locate BoardConfig.mk.`。
@@ -222,5 +223,24 @@ AOSP 中的产品定义文件是一些名为 `AndroidProducts.mk` 的文件，�
 - 一类是普通产品，由各个 vendor 维护，存放在 `device` 目录下，一般会按照 vendor 分目录分别存放。
 
 
+# 附录：产品定义的继承关系
+
+具体一个产品中要包含哪些 module，这个是需要用户自己定义的。有关 module 的定义方法，我总结了一篇笔记在 [《为 AOSP 添加一个 module》][3]。
+
+AOSP 的 Build System 中为了方便我们定义 product，提高复用性，提供了一套 `inherit-product`/`inherit-product-if-exists` 的方法，同时也提供了一套预先定义好的 prodcut 父类供我们继承使用。这些预定义的 product 父类模板在 `build/make/target/product` 目录下，我简单整理了一下如下图所示：
+
+![](./diagrams/20220315-howto-add-lunch-entry/product-inherit.png)
+
+分为两组，每一组按照 system/system_ext/prduct/vendor 区分，这是按照安装的 partition 分。
+
+- 一组是和 telephony 有关的 packages, 包含了 `list of modules that are specific to products that have telephony hardware`
+
+- 另一组是和除了 telephony 之外相关的 packages。非 telephony 部分的继承树大致为：`base->media->handheld`
+  - base: Base modules and settings
+  - media: contents for media-capable devices (non-wearables)
+  - handheld: contents for a generic phone or tablet device.
+
+
 [1]: ./20211026-lunch.mode
 [2]: ./20211102-codeanalysis-soong_ui.md
+[3]: ./20220908-add-app-in-aosp.md
