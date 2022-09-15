@@ -11,10 +11,10 @@
 
 - [1. 参考](#1-参考)
 - [2. 基本概念](#2-基本概念)
-    - [2.1. DWARF 定义的 section `.debug_frame`](#21-dwarf-定义的-section-debug_frame)
-    - [2.2. LSB 定义的 section `.eh_frame`](#22-lsb-定义的-section-eh_frame)
-    - [2.3. `.eh_frame` vs `.debug_frame`](#23-eh_frame-vs-debug_frame)
-    - [2.4. 编译选项对 section `.debug_frame` 和 `.eh_frame` 的影响](#24-编译选项对-section-debug_frame-和-eh_frame-的影响)
+	- [2.1. DWARF 定义的 section `.debug_frame`](#21-dwarf-定义的-section-debug_frame)
+	- [2.2. LSB 定义的 section `.eh_frame`](#22-lsb-定义的-section-eh_frame)
+	- [2.3. `.eh_frame` vs `.debug_frame`](#23-eh_frame-vs-debug_frame)
+	- [2.4. 编译选项对 section `.debug_frame` 和 `.eh_frame` 的影响](#24-编译选项对-section-debug_frame-和-eh_frame-的影响)
 - [3. 基于 CFI 的栈回溯工作原理分析](#3-基于-cfi-的栈回溯工作原理分析)
 - [4. section `.eh_frame` 中的数据结构](#4-section-eh_frame-中的数据结构)
 - [5. CFI directives](#5-cfi-directives)
@@ -53,7 +53,7 @@
 
 从实际操作上来说就是我们在编译时开启 `-g` 选项即可以生成 DWARF 的这些调试信息，这些信息都存储在 `.debug_` 开头的 section 中，随便找个例子可以如下试试：
 
-```
+```bash
 $ riscv64-unknown-linux-gnu-gcc -g main.c
 $ riscv64-unknown-linux-gnu-readelf -SW a.out | grep "debug"
   [24] .debug_aranges    PROGBITS        0000000000000000 0010a0 0000d0 00      0   0 16
@@ -207,7 +207,7 @@ CFA 的值的计算规则可以基于 SP，因为函数中针对每一条指令�
 
 我们来看一下 `.eh_frame` 的实际内容，使用 readelf 工具，带上 `-wf` 选项，这已经是解码后的展现了，实际都是二进制格式，我们就不研究了，感兴趣可以参考 [LSB 5.0 规范的 Core specification 的 10.6 Exception Frames 章节][12]。借助 hexdump 和对 ELF 文件格式的理解自己查看。
 
-```
+```bash
 $ riscv64-unknown-linux-gnu-readelf -wf foos.o
 Contents of the .eh_frame section:
 
@@ -300,7 +300,7 @@ FDE 结构的组成如下：
 
 但根据以上描述的 CFI 在逻辑上构建一个类似于我们 **表 1** 那样的表是比较繁琐的。readelf 提供了一个选项，可以将其展现成我们期望的形式，换成 `-wF` 即可。在实际使用中也以这种方式为多。
 
-```
+```bash
 $ riscv64-unknown-linux-gnu-readelf -wF foos.o
 Contents of the .eh_frame section:
 
@@ -348,7 +348,7 @@ Contents of the .eh_frame section:
 
 具体编译器是如何生成 `section .eh_frame` 的呢？首先编译器输入源文件，对其编译，在生成汇编的过程中插入一种专为 CFI 设计的 directives。我们可以执行 `riscv64-unknown-linux-gnu-gcc -S foos.c -fomit-frame-pointer -fasynchronous-unwind-tables`，然后看一下生成的 `foos.s`
 
-```cpp
+```asm
 $ cat foos.s
         .file   "foos.c"
         .option nopic
@@ -392,13 +392,13 @@ foo_2:
 
 其中 `backtrace()`, `backtrace_symbols()` 都是库函数，`backtrace()` 可以获取 call stack 中各级函数对应的 stack frame 所对应的 RA，`backtrace_symbols()` 则可以根据获取的 RA 信息解析出对应的 symbol 信息，包括文件和函数名。编译命令如下，`-fomit-frame-pointer` 确保程序不生成 FP，`-fasynchronous-unwind-tables` 保证生成 CFI 信息，注意 `-rdynamic` 是必须的，否则无法得到符号表的名字。
 
-```
+```bash
 $ riscv64-unknown-linux-gnu-gcc test.c foos.c backtrace.c -fomit-frame-pointer -fasynchronous-unwind-tables -rdynamic -o a.out
 ```
 
 用 qemu 尝试运行一下, 因为我们是动态链接，所以执行 qemu 时加一下 `-L` 选项，指定动态链接器所在的 sysroot 路径：
-```
-qemu-riscv64 -L $YOUR_SYSROOT a.out
+```bash
+$ qemu-riscv64 -L $YOUR_SYSROOT a.out
 a.out(unwind_by_backtrace+0x14) [0x10a16]
 a.out(foo_3+0x8) [0x109ca]
 a.out(foo_2+0x8) [0x109da]
@@ -432,8 +432,8 @@ a.out(_start+0x2c) [0x1093c]
 
 注意这个回溯链中任何一个函数如果缺失了 CFI 信息都会导致栈回溯不完整。假设我们故意删除 `foo_2()` 的 CFI 信息，执行后的效果如下：
 
-```
-qemu-riscv64 -L $YOUR_SYSROOT a.out
+```bash
+$ qemu-riscv64 -L $YOUR_SYSROOT a.out
 a.out(unwind_by_backtrace+0x14) [0x10a16]
 a.out(foo_3+0x8) [0x109ca]
 a.out(foo_2+0x8) [0x109da]

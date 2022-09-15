@@ -22,9 +22,9 @@
 - [3. GCC/Clang Built-in Function](#3-gccclang-built-in-function)
 - [4. glibc 提供的 `backtrace`/`backtrace_symbols` 函数](#4-glibc-提供的-backtracebacktrace_symbols-函数)
 - [5. libunwind (nongnu)](#5-libunwind-nongnu)
-    - [5.1. 构建 libunwind (nongnu)](#51-构建-libunwind-nongnu)
-    - [5.2. 使用 libunwind (nongnu)](#52-使用-libunwind-nongnu)
-    - [5.3. libunwind (nongnu) 代码分析](#53-libunwind-nongnu-代码分析)
+	- [5.1. 构建 libunwind (nongnu)](#51-构建-libunwind-nongnu)
+	- [5.2. 使用 libunwind (nongnu)](#52-使用-libunwind-nongnu)
+	- [5.3. libunwind (nongnu) 代码分析](#53-libunwind-nongnu-代码分析)
 
 <!-- /TOC -->
 
@@ -100,7 +100,7 @@ void * __builtin_frame_address (unsigned int level);
 
 自己从源码编译一个 libunwind 库，先从 github 仓库下载源码：
 
-```
+```bash
 $ git clone git@github.com:libunwind/libunwind.git
 $ cd libunwind
 ```
@@ -140,7 +140,7 @@ index fa867367..3a6abb99 100644
 
 然后运行 autoreconf 生成 configure， 下面就没有什么特别需要关注的了，我简单列举构建过程如下：
 
-```
+```bash
 $ cd libunwind
 $ autoreconf -i
 $ BUILD=x86_64-linux-gnu
@@ -158,13 +158,13 @@ $ make install
 
 编译命令行如下：
 
-```
-riscv64-unknown-linux-gnu-gcc -fomit-frame-pointer -fexceptions -I ${PATH_LIBUNWIND_INCLUDE} -L ${PATH_LIBUNWIND_LIB} -lunwind-riscv -lunwind -Wall -o a.out libunwind.c test_libunwind.c
+```bash
+$ riscv64-unknown-linux-gnu-gcc -fomit-frame-pointer -fexceptions -I ${PATH_LIBUNWIND_INCLUDE} -L ${PATH_LIBUNWIND_LIB} -lunwind-riscv -lunwind -Wall -o a.out libunwind.c test_libunwind.c
 ```
 
 编译完后使用 qemu 运行结果如下：
 
-```
+```bash
 $ qemu-riscv64 qemu-riscv64 -L ${PATH_SYSROOT} -E LD_LIBRARY_PATH=${PATH_LIBUNWIND_LIB} a.out
 ip = 108a4, sp = 40007ffdf0 : (foo_3 + 0x00000008)
 ip = 108b4, sp = 40007ffe00 : (foo_2 + 0x00000008)
@@ -178,7 +178,8 @@ ip = 106ac, sp = 40007fffb0 : (_start + 0x0000002c)
 再测试一下涉及 signal frame 的 stack unwinding， 参考例子代码 [libunwind.c][15] 和 [test_libunwind_signal.c][19]
 
 注意运行时显示如下：
-```
+
+```bash
 $ qemu-riscv64 qemu-riscv64 -L ${PATH_SYSROOT} -E LD_LIBRARY_PATH=${PATH_LIBUNWIND_LIB} a.out
 ip = 10948, sp = 40007ff9d0 : (signal_handler + 0x0000000c)
 ip = 400081f000, sp = 40007ff9f0 : (setitimer + 0x0000000c)

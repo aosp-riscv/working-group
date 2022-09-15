@@ -12,13 +12,13 @@
 - [1. 参考](#1-参考)
 - [2. 历史回顾](#2-历史回顾)
 - [3. Bazel](#3-bazel)
-    - [3.1. 安装 Bazel](#31-安装-bazel)
-    - [3.2. 尝试一个例子](#32-尝试一个例子)
+	- [3.1. 安装 Bazel](#31-安装-bazel)
+	- [3.2. 尝试一个例子](#32-尝试一个例子)
 - [4. AOSP 中 Bazel 的进展](#4-aosp-中-bazel-的进展)
-    - [4.1. Before](#41-before)
-    - [4.2. After](#42-after)
-    - [4.3. Now](#43-now)
-    - [4.4. Bazel for AOSP 进展状态](#44-bazel-for-aosp-进展状态)
+	- [4.1. Before](#41-before)
+	- [4.2. After](#42-after)
+	- [4.3. Now](#43-now)
+	- [4.4. Bazel for AOSP 进展状态](#44-bazel-for-aosp-进展状态)
 
 <!-- /TOC -->
 
@@ -63,7 +63,7 @@
 
 首先安装依赖：
 
-```console
+```bash
 $ sudo apt install g++ unzip zip
 ```
 因为我测试构建 c++， 不是 java，所以我没有安装 jdk。
@@ -71,7 +71,7 @@ $ sudo apt install g++ unzip zip
 接下来，从 GitHub 上的 Bazel 版本页面下载名为 bazel-***version***-installer-linux-x86_64.sh 的 Bazel 二进制安装程序。我下载的是截至本文最新的 `bazel-5.2.0-installer-linux-x86_64.sh`。
 
 运行安装程序：
-```console
+```bash
 $ chmod +x bazel-5.2.0-installer-linux-x86_64.sh
 $ ./bazel-5.2.0-installer-linux-x86_64.sh --user
 ```
@@ -87,7 +87,8 @@ $ ./bazel-5.2.0-installer-linux-x86_64.sh --user
 这个例子分三个 stage，由简单到复杂介绍了一些 Bazel 构建的基本概念，我这里就直接根据第三个 stage3 例子来总结一下：
 
 例子的代码可以直接从 github 下载：
-```console
+
+```bash
 $ git clone https://github.com/bazelbuild/examples
 ```
 示例项目位于 `examples/cpp-tutorial/stage3` 目录中，其结构如下所示:
@@ -145,7 +146,7 @@ examples
 
   譬如我们要构建 `examples/cpp-tutorial/stage3` 这个 workspace 下的 main 这个 package 中的 "hello-greet" 这个 target。那么我们要做的就是先 cd 到 stage3 这个 workspace 下然后用 label 引用这个 target 执行构建。具体命令如下：
 
-  ```console
+  ```bash
   $ cd examples/cpp-tutorial/stage3
   $ bazel build //main:hello-greet
   ```

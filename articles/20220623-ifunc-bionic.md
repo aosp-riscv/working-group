@@ -87,7 +87,7 @@ int hwcap() __attribute__((ifunc("hwcap_resolver")));
 
 先找一下可执行程序中的 `__rela_iplt_start` 和 `__rela_iplt_stop` 这两个符号。
 
-```console
+```bash
 $ riscv64-unknown-linux-gnu-readelf -s bionic-unit-tests-static
 Symbol table '.symtab' contains 881232 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
@@ -100,7 +100,7 @@ Symbol table '.symtab' contains 881232 entries:
 这里链接器告诉我们这个程序中存在 IFUNC relocation entrys，加载到内存后起始地址是 0x102d8，结束地址是 0x102a8，间隔 48 个字节，正好占 2 个 `Elf64_Rela` 大小，对应上面代码中的两个 ifunc 函数。
 
 验证一下，先看下程序的 relocation table，发现的确存在两项：
-```console
+```bash
 $ riscv64-unknown-linux-gnu-readelf -r bionic-unit-tests-static
 
 Relocation section '.rela.plt' at offset 0x2a8 contains 2 entries:
@@ -111,7 +111,7 @@ Relocation section '.rela.plt' at offset 0x2a8 contains 2 entries:
 
 再验证一下这两项加载到内存中的地址是否和符号表中的 Value 对应。查看 program headers table：
 
-```console
+```bash
 $ riscv64-unknown-linux-gnu-readelf -lW bionic-unit-tests-static
 
 Elf file type is EXEC (Executable file)

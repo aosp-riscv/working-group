@@ -1,6 +1,6 @@
 ![](./diagrams/android.png)
 
-文章标题：**Andorid Build System 研究心得**
+文章标题：**Android Build System 研究心得**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
@@ -76,6 +76,7 @@ Build System 作为一个框架，【图 1】 中的灰色底框部分，这个�
 在 【图 1】 Build System 的最下面还有一些 Module Build Templates，这些实际对应了一些 Android 为我们提前写好的用于构建诸如可执行程序，共享库的规则的模板，省去了我们自己编写也避免出错。
 
 可以参考 `core/config.mk`：
+
 ```makefile
 # ###############################################################
 # Build system internal files

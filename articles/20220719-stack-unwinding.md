@@ -40,7 +40,7 @@
 
 最常见的栈回溯发生在我们使用调试器（Debugger）对程序进行调试时，譬如使用 gdb 中我们将程序指令 break 住以后，执行 `backtrace` 命令打印整个 call stack，call stack 中每一个 stack frame 一行。
 
-```
+```bash
 (gdb) bt
 #0  foo_3 () at test_backtrace.c:20
 #1  0x00005555555548e6 in foo_2 () at test_backtrace.c:24
@@ -97,7 +97,8 @@ int main()
 }
 ```
 程序运行输出如下：
-```
+
+```bash
  f3() Start 
  f2() Start 
  f1() Start 

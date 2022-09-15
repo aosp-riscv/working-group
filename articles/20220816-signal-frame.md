@@ -11,8 +11,8 @@
 - [1. 参考](#1-参考)
 - [2. 信号的基本概念](#2-信号的基本概念)
 - [3. 信号处理与信号帧](#3-信号处理与信号帧)
-    - [3.1. Trap 处理的基本机制](#31-trap-处理的基本机制)
-    - [3.2. 增加支持信号处理后的 trap 处理机制](#32-增加支持信号处理后的-trap-处理机制)
+	- [3.1. Trap 处理的基本机制](#31-trap-处理的基本机制)
+	- [3.2. 增加支持信号处理后的 trap 处理机制](#32-增加支持信号处理后的-trap-处理机制)
 - [4. 通过 glibc 的 backtrace 函数实现栈回溯的例子](#4-通过-glibc-的-backtrace-函数实现栈回溯的例子)
 
 <!-- /TOC -->
@@ -398,7 +398,8 @@ badframe:
 参考 [《Stack Unwinding 之基于 Call Frame Information》][4] 中的例子。这里加入 signal handler 的处理。[代码参考这里][5]。
 
 用 qemu 尝试运行一下, 因为我们是动态链接，所以执行 qemu 时加一下 `-L` 选项，指定动态链接器所在的 sysroot 路径。
-```
+
+```bash
 a.out(unwind_by_backtrace+0x14) [0x109e8]
 a.out() [0x109ac]
 [0x400081f000]
@@ -410,7 +411,7 @@ a.out(_start+0x2c) [0x1092c]
 
 这个第三行对应的就是 `__vdso_rt_sigreturn`。这里没显示出来怀疑是 qemu 的原因，找了一台真机试了一下：
 
-```
+```bash
 ./a.out(unwind_by_backtrace+0x14) [0x109e8]
 ./a.out() [0x109ac]
 linux-vdso.so.1(__vdso_rt_sigreturn+0) [0x3fbea50800]

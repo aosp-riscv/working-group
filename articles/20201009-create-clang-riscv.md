@@ -11,19 +11,19 @@
 
 - [1. 参考](#1-参考)
 - [2. 准备工作系统环境](#2-准备工作系统环境)
-    - [2.1. 硬件](#21-硬件)
-    - [2.2. 软件](#22-软件)
+	- [2.1. 硬件](#21-硬件)
+	- [2.2. 软件](#22-软件)
 - [3. 构造过程](#3-构造过程)
-    - [3.1. 下载 llvm 的源码](#31-下载-llvm-的源码)
-    - [3.2. 编译前的配置](#32-编译前的配置)
-    - [3.3. 执行编译和安装](#33-执行编译和安装)
+	- [3.1. 下载 llvm 的源码](#31-下载-llvm-的源码)
+	- [3.2. 编译前的配置](#32-编译前的配置)
+	- [3.3. 执行编译和安装](#33-执行编译和安装)
 - [4. 验证一下工具链是否可以工作](#4-验证一下工具链是否可以工作)
 
 <!-- /TOC -->
 
 # 1. 参考
 
-- 【参考 1】：[Getting Started with the LLVM System](https://link.zhihu.com/?target=https%3A//llvm.org/docs/GettingStarted.html)
+- 【参考 1】：[Getting Started with the LLVM System][1]
 
 # 2. 准备工作系统环境
 
@@ -53,13 +53,13 @@
 
 官方源码仓库在 github：<https://github.com/llvm/llvm-project>，国内的用户可以从 gitee 的 mirror <https://gitee.com/mirrors/llvm-project> 下载：
 
-```
+```bash
 $ git clone https://gitee.com/mirrors/llvm-project.git
 ```
 
 下载后进入源码仓库根目录并检出相应版本，目前最新的正式发布版本是 14.0.6，所以我们选择切换到该版本对应的 tag：llvmorg-14.0.6 上
 
-```
+```bash
 $ cd llvm-project/
 $ git checkout llvmorg-14.0.6 -b llvmorg-14.0.6
 ```
@@ -67,7 +67,7 @@ $ git checkout llvmorg-14.0.6 -b llvmorg-14.0.6
 
 编译前需要在 llvm 的源码根目录下新建一个 build 目录，然后进入这个目录进行 make，以前官方文档说 `in-tree build is not supported`， 即不支持在 llvm-project 目录下直接编译，否则会失败，但现在最新的文档上这句话没有了，但我们还是按照老习惯操作吧。这个 build 目录官方的正式定义叫 `OBJ_ROOT`，所有 cmake 生成的项目配置文件，以及编译过程中生成的 `.o` 文件和最终的 bin 文件都会存放在这个目录下，不会污染原来的代码仓库。
 
-```
+```bash
 $ mkdir build
 $ cd build
 ```
@@ -78,7 +78,7 @@ $ cd build
 
 使用 cmake 的基本命令模板如下：
 
-```
+```bash
 $ cd OBJ_ROOT
 $ cmake -G <generator> [options] SRC_ROOT
 ```
@@ -104,7 +104,7 @@ $ cmake -G <generator> [options] SRC_ROOT
 
 基于以上理解执行如下命令：
 
-```
+```bash
 $ cmake -G Ninja \
 -DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_INSTALL_PREFIX=../../install \
@@ -124,14 +124,15 @@ $ cmake -G Ninja \
 - 修改默认的 triple 组合为 `riscv64-unknown-linux-gnu`（避免在后面编译时再通过 `--target` 指定）；除了 llvm 外还会生成 clang。
 
 ## 3.3. 执行编译和安装
-```
+
+```bash
 $ ninja -j $(nproc)
 $ ninja install
 ```
 
 简单检查一下安装的结果
 
-```
+```bash
 $ ls ../../install/ -l
 total 20
 drwxrwxr-x 2 u u 4096 10月  9 11:37 bin
@@ -142,7 +143,7 @@ drwxrwxr-x 7 u u 4096 10月  9 11:37 share
 ```
 
 检查一下生成的 clang 的版本：
-```
+```bash
 $ ../install/bin/clang -v
 clang version 14.0.6 (https://gitee.com/mirrors/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
 Target: riscv64-unknown-linux-gnu
@@ -170,22 +171,25 @@ int main(int argc, char *argv[])
 
 运行 clang 编译程序，通过 `--sysroot` 选项来指定 gnu 工具链的 sysroot，通过 `--gcc-toolchain` 来指定 gcc 工具链的位置。
 
-这里假设使用在 [《制作交叉工具链 riscv-gnu-toolchain》](./20220721-riscv-gcc.md) 一文中制作的 GNU GCC。为方便测试，我们采用静态链接的方式生成可执行程序。
+这里假设使用在 [《制作交叉工具链 riscv-gnu-toolchain》][2] 一文中制作的 GNU GCC。为方便测试，我们采用静态链接的方式生成可执行程序。
 
-```
+```bash
 $ clang --gcc-toolchain=$WS/install --sysroot=$WS/install/sysroot/ -static test.c
 ```
 
 简单检查一下生成的可执行文件格式是否正确：
 
-```
+```bash
 $ file a.out
 a.out: ELF 64-bit LSB executable, UCB RISC-V, version 1 (SYSV), statically linked, for GNU/Linux 4.15.0, with debug_info, not stripped
 ```
 
 的确是满足 64 位 RISC-V。然后利用 qemu 测试生成的 `a.out` ：
 
-```
-qemu-riscv64 ./a.out
+```bash
+$ qemu-riscv64 ./a.out
 Hello, world!
 ```
+
+[1]: https://llvm.org/docs/GettingStarted.html
+[2]: ./20220721-riscv-gcc.md

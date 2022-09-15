@@ -13,12 +13,12 @@
 - [2. NDK 发布包的构建](#2-ndk-发布包的构建)
 - [3. NDK 发布包构建系统浅析](#3-ndk-发布包构建系统浅析)
 - [4. NDK 发布包的构建](#4-ndk-发布包的构建)
-    - [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
-        - [4.1.1. clang](#411-clang)
-        - [4.1.2. sysroot](#412-sysroot)
-    - [4.2. C++ STL 的构建](#42-c-stl-的构建)
-        - [4.2.1. libc++](#421-libc)
-        - [4.2.2. system 运行时库](#422-system-运行时库)
+	- [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
+		- [4.1.1. clang](#411-clang)
+		- [4.1.2. sysroot](#412-sysroot)
+	- [4.2. C++ STL 的构建](#42-c-stl-的构建)
+		- [4.2.1. libc++](#421-libc)
+		- [4.2.2. system 运行时库](#422-system-运行时库)
 
 <!-- /TOC -->
 
@@ -44,14 +44,15 @@
 
 我们下载和 r23b 对应的仓库：
 
-```
-mkdir ndk-r23b && cd ndk-r23b
-repo init -u https://android.googlesource.com/platform/manifest -b ndk-r23b
-repo sync
+```bash
+$ mkdir ndk-r23b && cd ndk-r23b
+$ repo init -u https://android.googlesource.com/platform/manifest -b ndk-r23b
+$ repo sync
 ```
 如果访问 google 仓库受限，也可以换成国内的 mirror，譬如 tsinghua, 将上面的第二步换成如下：
-```
-repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b ndk-r23b
+
+```bash
+$ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b ndk-r23b
 ```
 
 后面的命令操作以我们创建的 `ndk-r23b` 目录作为当前工作目录 `"."`。
@@ -59,20 +60,21 @@ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b 
 关于如何编译 ndk 发布包，可以读一下下载的仓库中的 `./ndk/docs/Building.md` 文档。
 
 构建步骤很简单：
-```
-./ndk/checkbuild.py
+```bash
+$ ./ndk/checkbuild.py
 ```
 
 构建完成后，在 `./out` 目录下就会生成多个目录，其中 `./out/android-ndk-r23b` 下就是我们做出来的 ndk package （和 **图一** 是一样的），虽然仔细看会发现 `./out/android-ndk-r23b` 只是一个符号链接，它实际指向了 `./out/linux/android-ndk-r23b`。其他目录可以认为都是构建过程中间生成的临时目录。
 
 可以查看帮助获取常用选项：
-```
-./ndk/checkbuild.py --help
+```bash
+$ ./ndk/checkbuild.py --help
 ```
 
 如果想缩短构建时间，可以跳过构建后执行的自动化测试
-```
-./ndk/checkbuild.py --no-build-tests
+
+```bash
+$ ./ndk/checkbuild.py --no-build-tests
 ```
 
 # 3. NDK 发布包构建系统浅析
@@ -81,7 +83,7 @@ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b 
 
 所有的构建动作通过 module 组织起来。每个 module 定义了一组动作，用于构建和安装前面 **图一** 上的某个部分。譬如 "LibAndroidSupport" 就是一个 module 所对应的类名称。其构建特别简单，下面的代码实际上表达的意思就是将 `./ndk/sources/android/support` 这个目录复制到 `out/linux/android-ndk-r23b/sources/android/support` 这个目录下就完成了对 LibAndroidSupport 这个 module 的构建和安装。
 
-```
+```python
 class LibAndroidSupport(ndk.builds.PackageModule):
     name = 'libandroid_support'
     path = Path('sources/android/support')
@@ -89,8 +91,9 @@ class LibAndroidSupport(ndk.builds.PackageModule):
 ```
 
 如果我们要单独指定构建和安装一个特定的 module，可以输入如下命令，以 LibAndroidSupport 为例，它的名字是 "libandroid_support"。
-```
-./ndk/checkbuild.py --module libandroid_support
+
+```bash
+$ ./ndk/checkbuild.py --module libandroid_support
 ```
 
 module 的名字可以看代码中 `class LibAndroidSupport` 的属性 `name`。我们也可以在运行 `./ndk/checkbuild.py --help` 时看到所有 module 的名字。
@@ -263,9 +266,3 @@ NDK C++ 运行时支持两种库：
 
 而头文件部分，对应的安装代码是 `./ndk/ndk/checkbuild.py` 中 SystemStl 这个 class。其工作就是简单的复制，从 `./ndk/sources/cxx-stl/system` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/system`。我们看一下 `./ndk/sources/cxx-stl/system` 下的内容，发现主要的就是 include 目录下这些 STL 封装的头文件。
 
-
-
-
-
-
-  
