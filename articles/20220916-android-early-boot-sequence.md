@@ -209,21 +209,21 @@ int FirstStageMain(int argc, char** argv) {
             LOG(FATAL) << "Could not bind mount /first_stage_ramdisk to itself";
         }
 // [    3.680867] init: Switching root to '/system'
-	// 可以确定的是在 SwitchRoot 之前系统已经完成了第二阶段的根文件系统的挂载，这个可以从 console log 的
-	// [    3.183346] ~ [    3.672255] 看出来。
-	// emulator 加载的是 system-qemu.img，这个 image 由 vbmeta.img 和 super.img 组成
-	// 而 super.img 源自 system.img + system_ext.img + product.img + vendor.img, 所以我们看到 console log 中
+        // 可以确定的是在 SwitchRoot 之前系统已经完成了第二阶段的根文件系统的挂载，这个可以从 console log 的
+        // [    3.183346] ~ [    3.672255] 看出来。
+        // emulator 加载的是 system-qemu.img，这个 image 由 vbmeta.img 和 super.img 组成
+        // 而 super.img 源自 system.img + system_ext.img + product.img + vendor.img, 所以我们看到 console log 中
 // [    3.617583] init: [libfs_mgr]Created logical partition system on device /dev/block/dm-0
 // [    3.623456] init: [libfs_mgr]Created logical partition system_ext on device /dev/block/dm-1
 // [    3.629855] init: [libfs_mgr]Created logical partition product on device /dev/block/dm-2
 // [    3.635669] init: [libfs_mgr]Created logical partition vendor on device /dev/block/dm-3
         // 结合最终系统的 df 显示:
         // /dev/block/dm-0      727236 661676     65560  91% /	
-	// /dev/block/dm-3       87036  86764       272 100% /vendor
+        // /dev/block/dm-3       87036  86764       272 100% /vendor
         // /dev/block/dm-2      102912 102596       316 100% /product
         // /dev/block/dm-1      127624 127220       404 100% /system_ext
-	// 这体现了 dynamic partition 的运作机制
-	// 所以此后 exec 执行 /system/bin/init 是执行的第二阶段的 init
+        // 这体现了 dynamic partition 的运作机制
+        // 所以此后 exec 执行 /system/bin/init 是执行的第二阶段的 init
         SwitchRoot("/first_stage_ramdisk");
     }
 
