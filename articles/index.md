@@ -24,7 +24,8 @@
 - [搭建 CTS 环境][21]
 - [Andorid Build System 研究心得][33]
 - [为 AOSP 添加一个 module][34]
-- [Android Init Language 学习笔记][35]
+- [学习笔记：Android Init Language][35]
+- [学习笔记：Android Early Init Boot Sequence][36]
 
 ## 编程语言与编译技术
 
@@ -86,3 +87,4 @@
 [33]: ./20220905-aosp-build-system.md
 [34]: ./20220908-add-app-in-aosp.md
 [35]: ./20220915-andorid-init-language.md
+[36]: ./20220916-android-early-boot-sequence.md

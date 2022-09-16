@@ -1,6 +1,6 @@
 ![](./diagrams/android.png)
 
-文章标题：**Android Init Language 学习笔记**
+文章标题：**学习笔记：Android Init Language**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
