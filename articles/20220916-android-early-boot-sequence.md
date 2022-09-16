@@ -20,6 +20,7 @@
 	- [3.1. first stage init](#31-first-stage-init)
 	- [3.2. SELinux setup](#32-selinux-setup)
 	- [3.3. second stage init](#33-second-stage-init)
+		- [3.3.1. class ActionManager](#331-class-actionmanager)
 
 <!-- /TOC -->
 
@@ -445,7 +446,7 @@ int SetupSelinux(char** argv) {
 > argument. At this point the main phase of init runs and continues the boot process via the init.rc
 > scripts.
 
-当执行 `/system/bin/init`，并且带入的参数是 `"second_stage"` 时，调用 `SecondStageMain()` 函数。
+当执行 `/system/bin/init`，并且带入的参数是 `"second_stage"` 时，调用 `SecondStageMain()` 函数，这个函数定义在 `system/core/init/init.cpp`。
 
 console log 上从 `init: init second stage started!` 开始往下都是这个阶段的输出，我就不列了，会很长，主要结合代码总结一下：
 
@@ -518,7 +519,7 @@ int SecondStageMain(int argc, char** argv) {
     ServiceList& sm = ServiceList::GetInstance();
 
     // 开始解析 init rc 文件
-    // 参考另一篇笔记 《Android Init Language 学习笔记》: 
+    // rc 文件的语法格式参考另一篇笔记 《Android Init Language 学习笔记》: 
     // https://gitee.com/aosp-riscv/working-group/blob/master/articles/20220915-andorid-init-language.md
     // 首先搜索 /system/etc/init/hw/init.rc 这个文件
     // 然后依次搜索这些目录下的 rc 文件
@@ -532,7 +533,9 @@ int SecondStageMain(int argc, char** argv) {
     // init: Parsing file
     // init: Added - 对应 import
     // 都是和这个有关
-    // 所有解析后的数据在内存中缓存，但此时还未触发任何的 action
+    // 所有解析后的 action 会由 ActionManager 进行管理，ActionManager 的分析笔记见下面单独的章节
+	// 所有解析后的 service 会加入 ServiceList 中
+	// 这里只是解析，action 和 command 还没有执行
     LoadBootScripts(am, sm);
 
     // Turning this on and letting the INFO logging be discarded adds 0.2s to
@@ -545,9 +548,8 @@ int SecondStageMain(int argc, char** argv) {
     auto is_installed = android::gsi::IsGsiInstalled() ? "1" : "0";
     SetProperty(gsi::kGsiInstalledProp, is_installed);
 
-    // QueueBuiltinAction 函数会在 init 处理 queue 中添加 action，类似于我们在 rc 文件中手写 action
-    // 但这种调用 QueueBuiltinAction 添加的 action 不会等 trigger，而是在调用 QueueBuiltinAction 的
-    // 同时就会被触发执行，可以参考 log 中的
+    // 这里的操作涉及对 ActionManager，也就 am 这个对象的行为理解，具体参考下面章节总结
+    // QueueBuiltinAction 函数会在 event queue 中添加 BuiltinAction 类型的 event。可以参考 log 中的
     // [    5.890178] init: processing action (SetupCgroups) from (<Builtin Action>:0)
     // ......
     // [    5.958101] init: processing action (SetKptrRestrict) from (<Builtin Action>:0)
@@ -556,9 +558,7 @@ int SecondStageMain(int argc, char** argv) {
     am.QueueBuiltinAction(SetupCgroupsAction, "SetupCgroups");
     am.QueueBuiltinAction(SetKptrRestrictAction, "SetKptrRestrict");
     am.QueueBuiltinAction(TestPerfEventSelinuxAction, "TestPerfEventSelinux");
-    // QueueEventTrigger 会触发 rc 文件中定义的 early-init 被执行
-    // 可以认为从现在开始作为一个入口，前面在 LoadBootScripts 阶段解析保存的 actions 会
-    // 被渐次 trigger 执行
+    // QueueEventTrigger 在 event queue 中添加 EventTrigger 类型的 event
     am.QueueEventTrigger("early-init");
 
     // Queue an action that waits for coldboot done so we know ueventd has set up all of /dev...
@@ -576,7 +576,6 @@ int SecondStageMain(int argc, char** argv) {
             },
             "KeychordInit");
 
-    // 触发 rc 文件中定义的 init 被执行
     // Trigger all the boot actions to get us started.
     am.QueueEventTrigger("init");
 
@@ -592,13 +591,18 @@ int SecondStageMain(int argc, char** argv) {
     // Run all property triggers based on current state of the properties.
     am.QueueBuiltinAction(queue_property_triggers_action, "queue_property_triggers");
 
-    // 至此差不多 init 阶段基于 rc 文件的初始化过程基本结束
-    // 可以看出来一个正常的 boot 过程经历了 "early-init" -> "init" -> "late-init"
+    // 从上面添加 event 的流程可以看出来一个正常的 boot 过程经历了 "early-init" -> "init" -> "late-init"
 
     // init 进程在完成初始化后并不会退出，而是进入一个 while 死循环, 继续负责如下功能
-    // - 系统 shutdown 的收尾工作
-    // - 回收 init 的子进程
-    // - 待补充 ......
+	// - 和本文相关的 boot 初始化过程的实际执行实际上是在这个 while 循环中完成的。前面 LoadBootScripts()
+	//   和 QueueEventTrigger 等操作可以认为只是在准备 action 的执行环境和条件。
+	//   在 while 循环里 init 在系统空闲时根据我们的 event queue 中预先设置的的条件依次过滤出 action 
+	//   并针对这些 action 中的 command 逐条执行，注意一次只执行一条 command，执行完一条
+	//   command 后会退出 am.ExecuteOneCommand()，给其他处理机会，所以 init 可以看成是一种轮询的服务处理方式
+    // - 其他处理，包括：
+	//   - 系统 shutdown 的收尾工作
+    //   - 回收 init 的子进程
+    //   - 待补充 ......
     // Restore prio before main loop
     setpriority(PRIO_PROCESS, 0, 0);
     while (true) {
@@ -651,5 +655,88 @@ int SecondStageMain(int argc, char** argv) {
     }
 
     return 0;
+}
+```
+
+### 3.3.1. class ActionManager
+
+`system/core/init/action_manager.h`
+
+```cpp
+class ActionManager {
+  public:
+    static ActionManager& GetInstance();
+
+    // 省略 ........
+
+    std::vector<std::unique_ptr<Action>> actions_;
+    std::queue<std::variant<EventTrigger, PropertyChange, BuiltinAction>> event_queue_
+            GUARDED_BY(event_queue_lock_);
+    mutable std::mutex event_queue_lock_;
+    std::queue<const Action*> current_executing_actions_;
+    std::size_t current_command_;
+};
+```
+
+重点理解一下这个类的成员：
+
+- `actions_`: 是类型为  Action 的一个 vector，存放了有待处理的所有 actions。这个 vector 的成员通过 `ActionManager::AddAction()` 和 `ActionManager::QueueBuiltinAction()` 进行添加，如果这个 action 是一个 oneshot 类型的，即只运行一次的，则在 `ActionManager::ExecuteOneCommand()` 中当这个 action 中的 command 全部被执行完时，这个 action 会被从 `actions_` 中移除。`ActionManager::AddAction()` 发生在 init 解析 rc 文件的过程中，所有递归遍历的 rc 文件中的 action 都会被添加到 `actions_` 中，除了 rc 文件中定义的 action，还有一些所谓的 Builtin 类型的 action，通过 `ActionManager::QueueBuiltinAction()` 方式添加。
+- `event_queue_`: 这是一个 queue，里面存放着当前需要执行的 trigger event。注意这个队列中存放的元素的类型包含三种不同的类型，可以是 EventTrigger、PropertyChange 或者是 BuiltinAction。前面两种类型对应 README 文档中提到过的 event trigger 和 property trigger，BuiltinAction 类型没有提到，可能是后加的。EventTrigger 通过 `ActionManager::QueueEventTrigger()` 添加。PropertyChange 通过 `ActionManager::QueuePropertyChange()` 添加，BuiltinAction 通过 `ActionManager::QueueBuiltinAction()` 添加。在 `ActionManager::ExecuteOneCommand()` 中会将 `event_queue_` 中的 trigger event 出队处理。
+- `current_executing_actions_`: 当前正在被执行的 action，保存在一个 queue 中。
+- `current_command_`: 维护的是当前处理的 action 中当前正在处理的 command 的序号。
+
+核心的处理函数主要是 `ActionManager::ExecuteOneCommand()`，这个函数在 second stage init 的处理函数 `SecondStageMain()` 中被调用，当 init 进入 while 循环后，当进程空闲时会调用该函数处理一个 command。从下面代码中可以看出来，大致思路是，
+
+- 首先，准备 `current_executing_actions_`。如果有 trigger 的 event 并且 `current_executing_actions_` 队列为空，就去 `actions_` 中根据 trigger 条件找出所有满足条件的 actions 加入到 `current_executing_actions_` 等待执行。
+
+- 其次，从 `current_executing_actions_` 中找到第一个 action，并执行这个 action 当前等待处理的 command 并执行之。`ActionManager::ExecuteOneCommand()` 这个函数一次只执行一个 command，执行完后 init 进入 while 的等待状态处理其他的事件，只有当系统空闲时才会再次调用 `ActionManager::ExecuteOneCommand()` 执行下一条 command，所以 ActionManager 有必要通过 `current_executing_actions_` 维护当前等待处理的 action 以及记住当前 action 中下一条需要处理的 command 的位置 `current_command_`。
+  
+  具体每条指令的执行要继续阅读 `action->ExecuteOneCommand()` 的实现，这里暂不展开。这些命令的执行，有可能在当前进程中同步完成，也有可能会 fork 出子进程以异步方式完成。
+
+- 最后，执行完一条 command 后，更新相关状态，譬如 `++current_command_`，如果当前的 action 中的 command 已经全部执行完，则将该 action 从 `current_executing_actions_` 中出队，而且如果当前执行完的这个 action 是 oneshot 类型的，则会将其从 `actions_` 中移除，这样以后即使还有相关 trigger event 发生，这个 action 也不会被执行了。
+
+```cpp
+void ActionManager::ExecuteOneCommand() {
+    {
+        auto lock = std::lock_guard{event_queue_lock_};
+        // Loop through the event queue until we have an action to execute
+        while (current_executing_actions_.empty() && !event_queue_.empty()) {
+            for (const auto& action : actions_) {
+                if (std::visit([&action](const auto& event) { return action->CheckEvent(event); },
+                               event_queue_.front())) {
+                    current_executing_actions_.emplace(action.get());
+                }
+            }
+            event_queue_.pop();
+        }
+    }
+
+    if (current_executing_actions_.empty()) {
+        return;
+    }
+
+    auto action = current_executing_actions_.front();
+
+    if (current_command_ == 0) {
+        std::string trigger_name = action->BuildTriggersString();
+        LOG(INFO) << "processing action (" << trigger_name << ") from (" << action->filename()
+                  << ":" << action->line() << ")";
+    }
+
+    action->ExecuteOneCommand(current_command_);
+
+    // If this was the last command in the current action, then remove
+    // the action from the executing list.
+    // If this action was oneshot, then also remove it from actions_.
+    ++current_command_;
+    if (current_command_ == action->NumCommands()) {
+        current_executing_actions_.pop();
+        current_command_ = 0;
+        if (action->oneshot()) {
+            auto eraser = [&action](std::unique_ptr<Action>& a) { return a.get() == action; };
+            actions_.erase(std::remove_if(actions_.begin(), actions_.end(), eraser),
+                           actions_.end());
+        }
+    }
 }
 ```
