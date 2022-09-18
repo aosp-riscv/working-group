@@ -26,6 +26,8 @@
 
 # 1. 参考：
 
+- [《Android 8.1 开机流程分析（2）》](https://blog.csdn.net/qq_19923217/article/details/82014989) 虽然基于 8.1，但是部分内容在新的版本种换汤不换药
+
 
 # 2. Android boot 的内核部分
 
@@ -453,14 +455,71 @@ console log 上从 `init: init second stage started!` 开始往下都是这个�
 
 ```cpp
 int SecondStageMain(int argc, char** argv) {
-    // 省略 ......
+    if (REBOOT_BOOTLOADER_ON_PANIC) {
+        InstallRebootSignalHandlers();
+    }
 
+    boot_clock::time_point start_time = boot_clock::now();
+
+    trigger_shutdown = [](const std::string& command) { shutdown_state.TriggerShutdown(command); };
+
+    SetStdioToDevNull(argv);
+    InitKernelLogging(argv);
     LOG(INFO) << "init second stage started!";
 
-    // 省略 ......
+    // Update $PATH in the case the second stage init is newer than first stage init, where it is
+    // first set.
+    if (setenv("PATH", _PATH_DEFPATH, 1) != 0) {
+        PLOG(FATAL) << "Could not set $PATH to '" << _PATH_DEFPATH << "' in second stage";
+    }
 
-    // 初始化 Andorid 的 property 设置
-    // log 中 诸如如下打印
+    // Init should not crash because of a dependence on any other process, therefore we ignore
+    // SIGPIPE and handle EPIPE at the call site directly.  Note that setting a signal to SIG_IGN
+    // is inherited across exec, but custom signal handlers are not.  Since we do not want to
+    // ignore SIGPIPE for child processes, we set a no-op function for the signal handler instead.
+    {
+        struct sigaction action = {.sa_flags = SA_RESTART};
+        action.sa_handler = [](int) {};
+        sigaction(SIGPIPE, &action, nullptr);
+    }
+
+    // Set init and its forked children's oom_adj.
+    if (auto result =
+                WriteFile("/proc/1/oom_score_adj", StringPrintf("%d", DEFAULT_OOM_SCORE_ADJUST));
+        !result.ok()) {
+        LOG(ERROR) << "Unable to write " << DEFAULT_OOM_SCORE_ADJUST
+                   << " to /proc/1/oom_score_adj: " << result.error();
+    }
+
+    // 进程会话密钥处理，这里使用到的是内核提供给用户空间使用的 密钥保留服务 (key retention service)，
+    // 它的主要意图是在 Linux 内核中缓存身份验证数据。远程文件系统和其他内核服务可以使用
+    // 这个服务来管理密码学、身份验证标记、跨域用户映射和其他安全问题。它还使 Linux 内核
+    // 能够快速访问所需的密钥，并可以用来将密钥操作（比如添加、更新和删除）委托给用户空间。
+    // Set up a session keyring that all processes will have access to. It
+    // will hold things like FBE encryption keys. No process should override
+    // its session keyring.
+    keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 1);
+
+    // Indicate that booting is in progress to background fw loaders, etc.
+    close(open("/dev/.booting", O_WRONLY | O_CREAT | O_CLOEXEC, 0000));
+
+    // See if need to load debug props to allow adb root, when the device is unlocked.
+    const char* force_debuggable_env = getenv("INIT_FORCE_DEBUGGABLE");
+    bool load_debug_prop = false;
+    if (force_debuggable_env && AvbHandle::IsDeviceUnlocked()) {
+        load_debug_prop = "true"s == force_debuggable_env;
+    }
+    unsetenv("INIT_FORCE_DEBUGGABLE");
+
+    // Umount the debug ramdisk so property service doesn't read .prop files from there, when it
+    // is not meant to.
+    if (!load_debug_prop) {
+        UmountDebugRamdisk();
+    }
+
+    // 初始化 Andorid 的 property 设置, 有关 property 和 property service 是 
+    // Android 系统中非常重要的一个模块。单独总结。
+    // log 中会看到诸如如下打印
     // Overriding previous property .....
     // Setting product property ......
     PropertyInit();
@@ -476,6 +535,7 @@ int SecondStageMain(int argc, char** argv) {
     // Mount extra filesystems required during second stage init
     MountExtraFilesystems();
 
+    // 进行 SELinux 第二阶段并恢复一些文件安全上下文
     // Now set up SELinux for second stage.
     SelinuxSetupKernelLogging();
     SelabelInitialize();
@@ -486,9 +546,18 @@ int SecondStageMain(int argc, char** argv) {
         PLOG(FATAL) << result.error();
     }
 
+    // 初始化子进程终止信号处理函数
+    // init 是一个守护进程，为了防止 init 的子进程成为僵尸进程(zombie process)，需要
+    // init 在子进程结束时获取子进程的结束码，通过结束码将程序表中的子进程移除
+    // 在 android init 代码中主要使用 epoll 机制处理子进程的终止信号
+    // 实际的 child 进程的回收在下面 while 循环中通过 ReapAnyOutstandingChildren() 处理
     InstallSignalFdHandler(&epoll);
     InstallInitNotifier(&epoll);
-    // 开启属性服务
+    // 开启属性服务，这里涉及到 Android 对权限的处理问题，不是所有进程都可以随意修改任
+    // 何的系统属性，Android 将属性的设置统一交由 init 进程管理，其他进程不能直接修改
+    // 属性，而只能通知 init 进程，通过 property service 的接口来修改，而在这过程中，
+    // init 进程可以进行权限检测控制，决定是否允许修改。
+    // 具体属性服务以及属性本身处理是 Android 系统中非常重要的一个模块，可能需要另外单独总结一下
     StartPropertyService(&property_fd);
 
     // Make the time that init stages started available for bootstat to log.
@@ -594,13 +663,13 @@ int SecondStageMain(int argc, char** argv) {
     // 从上面添加 event 的流程可以看出来一个正常的 boot 过程经历了 "early-init" -> "init" -> "late-init"
 
     // init 进程在完成初始化后并不会退出，而是进入一个 while 死循环, 继续负责如下功能
-	// - 和本文相关的 boot 初始化过程的实际执行实际上是在这个 while 循环中完成的。前面 LoadBootScripts()
-	//   和 QueueEventTrigger 等操作可以认为只是在准备 action 的执行环境和条件。
-	//   在 while 循环里 init 在系统空闲时根据我们的 event queue 中预先设置的的条件依次过滤出 action 
-	//   并针对这些 action 中的 command 逐条执行，注意一次只执行一条 command，执行完一条
-	//   command 后会退出 am.ExecuteOneCommand()，给其他处理机会，所以 init 可以看成是一种轮询的服务处理方式
+    // - 和本文相关的 boot 初始化过程的实际执行实际上是在这个 while 循环中完成的。前面 LoadBootScripts()
+    //   和 QueueEventTrigger 等操作可以认为只是在准备 action 的执行环境和条件。
+    //   在 while 循环里 init 在系统空闲时根据我们的 event queue 中预先设置的的条件依次过滤出 action 
+    //   并针对这些 action 中的 command 逐条执行，注意一次只执行一条 command，执行完一条
+    //   command 后会退出 am.ExecuteOneCommand()，给其他处理机会，所以 init 可以看成是一种轮询的服务处理方式
     // - 其他处理，包括：
-	//   - 系统 shutdown 的收尾工作
+    //   - 系统 shutdown 的收尾工作
     //   - 回收 init 的子进程
     //   - 待补充 ......
     // Restore prio before main loop
@@ -681,8 +750,13 @@ class ActionManager {
 重点理解一下这个类的成员：
 
 - `actions_`: 是类型为  Action 的一个 vector，存放了有待处理的所有 actions。这个 vector 的成员通过 `ActionManager::AddAction()` 和 `ActionManager::QueueBuiltinAction()` 进行添加，如果这个 action 是一个 oneshot 类型的，即只运行一次的，则在 `ActionManager::ExecuteOneCommand()` 中当这个 action 中的 command 全部被执行完时，这个 action 会被从 `actions_` 中移除。`ActionManager::AddAction()` 发生在 init 解析 rc 文件的过程中，所有递归遍历的 rc 文件中的 action 都会被添加到 `actions_` 中，除了 rc 文件中定义的 action，还有一些所谓的 Builtin 类型的 action，通过 `ActionManager::QueueBuiltinAction()` 方式添加。
+
 - `event_queue_`: 这是一个 queue，里面存放着当前需要执行的 trigger event。注意这个队列中存放的元素的类型包含三种不同的类型，可以是 EventTrigger、PropertyChange 或者是 BuiltinAction。前面两种类型对应 README 文档中提到过的 event trigger 和 property trigger，BuiltinAction 类型没有提到，可能是后加的。EventTrigger 通过 `ActionManager::QueueEventTrigger()` 添加。PropertyChange 通过 `ActionManager::QueuePropertyChange()` 添加，BuiltinAction 通过 `ActionManager::QueueBuiltinAction()` 添加。在 `ActionManager::ExecuteOneCommand()` 中会将 `event_queue_` 中的 trigger event 出队处理。
+
+  需要注意的是：`ActionManager::QueuePropertyChange()` 和 property 处理有关，需要知道的是，进程可以直接进行属性的读操作，但是属性系统的写操作必须要通过 property service 机制，最终由 init 进程执行。property service 会在 `HandlePropertySet()` 中回调 `PropertyChanged()` 这个函数，而这个函数会调用 `ActionManager::QueuePropertyChange()`。相当于通知 ActionManager 有 property 值发生变化。
+
 - `current_executing_actions_`: 当前正在被执行的 action，保存在一个 queue 中。
+
 - `current_command_`: 维护的是当前处理的 action 中当前正在处理的 command 的序号。
 
 核心的处理函数主要是 `ActionManager::ExecuteOneCommand()`，这个函数在 second stage init 的处理函数 `SecondStageMain()` 中被调用，当 init 进入 while 循环后，当进程空闲时会调用该函数处理一个 command。从下面代码中可以看出来，大致思路是，
