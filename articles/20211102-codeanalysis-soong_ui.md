@@ -271,13 +271,21 @@ In dumpvar mode, print the value of the legacy make variable VAR to stdout
 from the beginning of the build.
 ```
 
-给个例子，执行下面命令相当于执行 `echo $TARGET_PRODUCT`
+给个例子，执行下面命令可以打印出 `TARGET_PRODUCT` 的值，注意这些变量有可能不是 shell 的 env 变量，大部分是 make 变量，所以简单地用 `echo $XXX` 有可能是不行的。
+
 ```bash
 $ ./out/soong_ui --dumpvar-mode TARGET_PRODUCT
 sdk_phone64_riscv64
 ```
+简化版本是调用 `envsetup.sh` 中预定义的函数 `get_build_var`
+
+```bash
+$ get_build_var TARGET_PRODUCT
+sdk_phone64_riscv64
+```
 
 再给个例子, `report_config` 这个特殊的 VAR 会将当前选择的 product 的基本配置信息都打印出来：
+
 ```bash
 $ ./out/soong_ui --dumpvar-mode report_config
 ============================================
@@ -304,6 +312,8 @@ OUT_DIR=out
 PRODUCT_SOONG_NAMESPACES=device/generic/goldfish device/generic/goldfish-opengl hardware/google/camera hardware/google/camera/devices/EmulatedCamera device/generic/goldfish device/generic/goldfish-opengl
 ============================================
 ```
+
+类似地，可以调用 `envsetup.sh` 中预定义的函数 `printconfig` 达到同样的效果。
 
 ### 2.2.4. `"--dumpvars-mode"`
 
