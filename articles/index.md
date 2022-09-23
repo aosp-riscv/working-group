@@ -26,6 +26,7 @@
 - [为 AOSP 添加一个 module][34]
 - [学习笔记：Android Init Language][35]
 - [学习笔记：Android Early Init Boot Sequence][36]
+- [学习笔记: VNDK 基本概念][37]
 
 ## 编程语言与编译技术
 
@@ -88,3 +89,4 @@
 [34]: ./20220908-add-app-in-aosp.md
 [35]: ./20220915-andorid-init-language.md
 [36]: ./20220916-android-early-boot-sequence.md
+[37]: ./20220923-vndk.md
