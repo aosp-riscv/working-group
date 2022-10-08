@@ -1,0 +1,4 @@
+VER_1 {
+        global: foo;
+        local:  *;      # Hide all other symbols
+};

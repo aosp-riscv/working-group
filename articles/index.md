@@ -38,6 +38,7 @@
 - [制作交叉工具链 riscv-gnu-toolchain][25]
 - [Stack Unwinding 之基于 Call Frame Information][26]
 - [用于栈回溯的一些库][28]
+- [学习笔记: Symbol Versioning 基本使用][38]
 
 
 ## Linux
@@ -90,3 +91,4 @@
 [35]: ./20220915-andorid-init-language.md
 [36]: ./20220916-android-early-boot-sequence.md
 [37]: ./20220923-vndk.md
+[38]: ./20221008-symbol-version.md

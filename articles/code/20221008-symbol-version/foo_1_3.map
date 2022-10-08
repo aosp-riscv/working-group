@@ -1,0 +1,11 @@
+VER_1.1 {
+	global: foo1;
+};
+
+VER_1.2 {
+	global: foo2;
+} VER_1.1;
+
+VER_1.3 {
+	global: foo3;
+} VER_1.2;
