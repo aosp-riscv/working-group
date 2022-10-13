@@ -1,5 +1,17 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-09-30 Status update
+
+  - RVI upstream:
+    - added riscv64 for tapas & banchan: https://github.com/riscv-android-src/platform-build/pull/7
+    - add riscv64 for vndk snapshot build script: https://github.com/riscv-android-src/platform-development/pull/2
+  - Articles update:
+    - Study Notes: Andorid Build System: https://zhuanlan.zhihu.com/p/561492724
+    - How to add application for AOSP: https://zhuanlan.zhihu.com/p/562629048
+    - Study Notes: Android Init Language: https://zhuanlan.zhihu.com/p/564715676
+    - Android Early Init Boot Sequence: https://zhuanlan.zhihu.com/p/565027512
+    - Study Notes: VNDK basic concepts: https://zhuanlan.zhihu.com/p/567512089
+
 - 2022-08-30 Status update 
 
   - RVI upstream:
