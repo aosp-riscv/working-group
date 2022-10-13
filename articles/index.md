@@ -1,5 +1,9 @@
 # 文章分类索引
 
+## android-review 进展
+
+- [2022/10/13][40]
+
 ## 安卓（Android）
 
 - [AOSP 的版本管理][1]
@@ -52,8 +56,6 @@
 - [尝试运行第一个支持 RISC-V 的 QEMU 版本（v2.12.0）][14]
 
 
-
-
 [1]: ./20200911-platform-version.md
 [2]: ./20200915-android-linux-version.md
 [3]: ./20200929-build-riscv-android-kernel.md
@@ -92,3 +94,4 @@
 [36]: ./20220916-android-early-boot-sequence.md
 [37]: ./20220923-vndk.md
 [38]: ./20221008-symbol-version.md
+[40]: ./android-review/20221013.md
