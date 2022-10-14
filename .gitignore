@@ -15,3 +15,5 @@ _book
 *.mobi
 
 .vscode/
+
+search_cmds.txt
