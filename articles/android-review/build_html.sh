@@ -95,6 +95,10 @@ print_url2 platform/system/core
 println	"<h2>Framework</h2>"
 print_url platform/art
 
+println	"<h2>Emulator</h2>"
+print_url platform/external/qemu
+print_url platform/tools/emulator
+
 println	"<h2>Others</h2>"
 println "<p>Match all repositories, in case any item is missed.</p>"
 print_others
