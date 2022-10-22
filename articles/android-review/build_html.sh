@@ -44,6 +44,15 @@ print_url2() {
 	println	"<a href=$URL>$REPO, filter: riscv64 or riscv</a><br>"	
 }
 
+print_others() {
+	local FILTER="(riscv64+or+riscv)"
+	local URL="https://android-review.googlesource.com/q/-owner:+Auto+AND+merged+after:+$DATE_AFTER+AND+merged+before:+$DATE_BEFORE+AND+$FILTER"
+	println	"<a href=$URL>$REPO, filter: riscv64 or riscv</a><br>"
+	local FILTER="(risc)"
+	local URL="https://android-review.googlesource.com/q/-owner:+Auto+AND+merged+after:+$DATE_AFTER+AND+merged+before:+$DATE_BEFORE+AND+$FILTER"
+	println	"<a href=$URL>$REPO, filter: risc</a><br>"
+}
+
 HTML_TITLE="AOSP RISC-V Progress Report [$DATE_AFTER ~ $DATE_BEFORE]"
 
 println "<!DOCTYPE html>"
@@ -65,12 +74,13 @@ print_url2 platform/build/soong
 println	"<h2>Bionic</h2>"
 print_url2 platform/bionic
 print_url platform/bionic
+print_url2 platform/external/kernel-headers
 
 println	"<h2>Kernel</h2>"
-print_url2 platform/external/kernel-headers
 print_url2 kernel/build
 print_url kernel/configs
 print_url kernel/common
+print_url kernel/tests
 
 println	"<h2>Toolchain</h2>"
 print_url toolchain/binutils
@@ -84,6 +94,10 @@ print_url2 platform/system/core
 
 println	"<h2>Framework</h2>"
 print_url platform/art
+
+println	"<h2>Others</h2>"
+println "<p>Match all repositories, in case any item is missed.</p>"
+print_others
 
 println "</body>"
 
