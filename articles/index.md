@@ -51,6 +51,7 @@
 - [聊一聊 Linux 上信号处理过程中的信号栈帧][27]
 - [和 ptrace 有关的一些笔记][29]
 - [在 QEMU 上运行 RISC-V 64 位版本的 Linux][30]
+- [Linux 设备模型之 kobject 和 kset][42]
 
 ## 开发工具
 
@@ -97,3 +98,4 @@
 [38]: ./20221008-symbol-version.md
 [40]: ./android-review/20221013.md
 [41]: ./android-review/20221028.md
+[42]: ./20221029-kobject-kset.md
