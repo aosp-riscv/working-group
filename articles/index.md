@@ -52,6 +52,7 @@
 - [和 ptrace 有关的一些笔记][29]
 - [在 QEMU 上运行 RISC-V 64 位版本的 Linux][30]
 - [Linux 设备模型之 kobject 和 kset][42]
+- [学习笔记：编写一个内核模块][43]
 
 ## 开发工具
 
@@ -99,3 +100,4 @@
 [40]: ./android-review/20221013.md
 [41]: ./android-review/20221028.md
 [42]: ./20221029-kobject-kset.md
+[43]: ./20221101-write-lkm.md
