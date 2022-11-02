@@ -54,6 +54,7 @@
 - [Linux 设备模型之 kobject 和 kset][42]
 - [学习笔记：编写一个内核模块][43]
 - [Linux 中的 sysfs][44]
+- [Linux 驱动模型之三剑客][45]
 
 ## 开发工具
 
@@ -103,3 +104,4 @@
 [42]: ./20221029-kobject-kset.md
 [43]: ./20221101-write-lkm.md
 [44]: ./20221101-sysfs.md
+[45]: ./20221102-bus-device-driver.md
