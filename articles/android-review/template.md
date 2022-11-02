@@ -11,6 +11,7 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 	- [1.1. platform/build](#11-platformbuild)
 	- [1.2. platform/soong](#12-platformsoong)
 	- [1.3. platform/bazel](#13-platformbazel)
+	- [1.4. platform/manifest](#14-platformmanifest)
 - [2. Bionic](#2-bionic)
 	- [2.1. 内核头文件处理](#21-内核头文件处理)
 	- [2.2. libc 导出符号处理](#22-libc-导出符号处理)
@@ -25,6 +26,7 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 	- [4.1. toolchain/llvm_android](#41-toolchainllvm_android)
 	- [4.2. toolchain/llvm-project](#42-toolchainllvm-project)
 	- [4.3. toolchain/rustc](#43-toolchainrustc)
+	- [4.4. platform/prebuilts/clang/host/linux-x86/](#44-platformprebuiltsclanghostlinux-x86)
 - [5. System](#5-system)
 	- [5.1. platform/system/core](#51-platformsystemcore)
 	- [5.2. 其他](#52-其他)
@@ -51,6 +53,12 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 详细说明：
 
 ## 1.3. platform/bazel
+
+具体涉及 PR 包括：
+
+详细说明：
+
+## 1.4. platform/manifest
 
 具体涉及 PR 包括：
 
@@ -151,7 +159,13 @@ rustc 仓库
 具体涉及 PR 包括：
 
 详细说明:
- 
+
+## 4.4. platform/prebuilts/clang/host/linux-x86/
+
+具体涉及 PR 包括：
+
+详细说明:
+
 # 5. System
 
 AOSP 的 system image 的核心部分

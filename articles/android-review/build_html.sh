@@ -93,7 +93,7 @@ println	"<h2>System</h2>"
 print_url2 platform/system/core
 
 println	"<h2>Framework</h2>"
-print_url platform/art
+print_url2 platform/art
 
 println	"<h2>Emulator</h2>"
 print_url platform/external/qemu
