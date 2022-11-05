@@ -67,6 +67,7 @@ println "<body>"
 println	"<h1>$HTML_TITLE</h1>"
 
 println	"<h2>Build System</h2>"
+print_url2 platform/manifest
 print_url2 platform/build
 print_url2 platform/build/soong
 print_url2 platform/build/bazel
