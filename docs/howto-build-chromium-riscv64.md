@@ -76,18 +76,15 @@ gclient config --spec 'solutions = [
 target_os = ["android"]
 '
 gclient sync --nohooks
-```
-
-When `fetch` completes, it will have created a hidden `.gclient` file and a
-directory called `src` in the working directory. The remaining instructions
-assume you have switched to the `src` directory:
-
-```shell
 cd src
 git submodule foreach 'git config -f $toplevel/.git/config submodule.$name.ignore all'
 git config --add remote.origin.fetch '+refs/tags/*:refs/tags/*'
 git config diff.ignoreSubmodules all
 ```
+
+When `fetch` completes, it will have created a hidden `.gclient` file and a
+directory called `src` in the working directory. The remaining instructions
+assume you have switched to the `src` directory already.
 
 # 4. Install additional build dependencies
 
