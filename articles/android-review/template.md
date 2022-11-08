@@ -8,10 +8,10 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 <!-- TOC -->
 
 - [1. Build System](#1-build-system)
-	- [1.1. platform/build](#11-platformbuild)
-	- [1.2. platform/soong](#12-platformsoong)
-	- [1.3. platform/bazel](#13-platformbazel)
-	- [1.4. platform/manifest](#14-platformmanifest)
+	- [1.1. platform/manifest](#11-platformmanifest)
+	- [1.2. platform/build](#12-platformbuild)
+	- [1.3. platform/soong](#13-platformsoong)
+	- [1.4. platform/bazel](#14-platformbazel)
 - [2. Bionic](#2-bionic)
 	- [2.1. 内核头文件处理](#21-内核头文件处理)
 	- [2.2. libc 导出符号处理](#22-libc-导出符号处理)
@@ -40,25 +40,25 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 
 # 1. Build System
 
-## 1.1. platform/build
+## 1.1. platform/manifest
 
 具体涉及 PR 包括：
 
 详细说明：
 
-## 1.2. platform/soong
+## 1.2. platform/build
 
 具体涉及 PR 包括：
 
 详细说明：
 
-## 1.3. platform/bazel
+## 1.3. platform/soong
 
 具体涉及 PR 包括：
 
 详细说明：
 
-## 1.4. platform/manifest
+## 1.4. platform/bazel
 
 具体涉及 PR 包括：
 
