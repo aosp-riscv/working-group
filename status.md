@@ -1,5 +1,21 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-10-31 status update
+
+  - Google AOSP upstream: Google started to accept PR about riscv support for AOSP since Oct/1, 2022. We have set up tracking sheets online to track the progress and will update it bi-weekly.
+    - Android (RISC-V) Review (Issue 20221013): https://zhuanlan.zhihu.com/p/573209602
+    - Android (RISC-V) Review (Issue 20221027): https://zhuanlan.zhihu.com/p/577758988
+
+  - RVI Android SIG Repo PR：
+    - add step to apply patch for emulator: https://github.com/riscv-android-src/riscv-android/pull/7
+    - add changelog for 10/1 release: https://github.com/riscv-android-src/riscv-android/pull/8
+    - upgrade repo branch for emulator: https://github.com/riscv-android-src/riscv-android/pull/10
+    - porting chromium for andorid, create initial verion of apk based on chromium 106. Created development repo https://github.com/aosp-riscv/chromium, and integration branch: riscv64-android-12.0.0_dev.
+
+  - Articles update:
+    - How to use Symbol Versioning: https://zhuanlan.zhihu.com/p/571729654
+    - Linux Driver module: kobject & kset: https://zhuanlan.zhihu.com/p/578581653
+
 - 2022-09-30 Status update
 
   - RVI upstream:
