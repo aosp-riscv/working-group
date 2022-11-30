@@ -1,12 +1,44 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-11-30 status update
+
+  - Google AOSP upstream: 
+    - Google started to accept PR about riscv support for AOSP since Oct/1, 2022. We have set up tracking sheets online to track the progress and will update it bi-weekly.
+      - Android (RISC-V) Review (Issue 3): https://zhuanlan.zhihu.com/p/581900441
+      - Android (RISC-V) Review (Issue 4): https://zhuanlan.zhihu.com/p/585980181
+    - Support GKI kernel/modules building on Google upstream master
+      - [use platform_get_irq() to get irq number](https://android-review.googlesource.com/c/kernel/common-modules/virtual-device/+/2308369): merged
+      - [ANDROID: support gki kernel build for riscv64](https://android-review.googlesource.com/c/kernel/common/+/2310347): abandoned and replaced with [ANDROID: GKI: Add 64-bit RISC-V config](https://android-review.googlesource.com/c/kernel/common/+/2310710)
+      - [Initial support for riscv64 kernel build](https://android-review.googlesource.com/c/kernel/build/+/2310387): merged.
+      - [ANDROID: Virtual device modules for RISC-V 64-bit](https://android-review.googlesource.com/c/kernel/common-modules/virtual-device/+/2308370): co-work with googler and in reviewing
+
+  - RVI Android SIG work update:
+
+    - https://github.com/riscv-android-src/kernel-manifest/pull/1
+    - https://github.com/riscv-android-src/kernel-common/pull/2
+    - https://github.com/riscv-android-src/kernel-common-modules-virtual-device/pull/1
+    - https://github.com/riscv-android-src/kernel-prebuilts-common-modules-virtual-device-5.10-riscv64/pull/1
+    - https://github.com/riscv-android-src/manifest/pull/9
+    - https://github.com/riscv-android-src/kernel-prebuilts-5.10-riscv64/pull/2
+    - https://github.com/riscv-android-src/riscv-android/pull/11
+    - https://github.com/riscv-android-src/riscv-android/pull/15
+
+    initial changes about supporting Android apk for chromium
+    - https://github.com/aosp-riscv/chromium/pull/1
+    - https://github.com/aosp-riscv/working-group/pull/52
+
+  - Articles update:
+    - Linux Driver Module: kobject & kset (in Chinese): https://zhuanlan.zhihu.com/p/578581653
+    - How to write a Linux kernel module (in Chinese): https://zhuanlan.zhihu.com/p/579301578
+    - Linux sysfs (in Chinese): https://zhuanlan.zhihu.com/p/579434022
+
 - 2022-10-31 status update
 
   - Google AOSP upstream: Google started to accept PR about riscv support for AOSP since Oct/1, 2022. We have set up tracking sheets online to track the progress and will update it bi-weekly.
     - Android (RISC-V) Review (Issue 20221013): https://zhuanlan.zhihu.com/p/573209602
     - Android (RISC-V) Review (Issue 20221027): https://zhuanlan.zhihu.com/p/577758988
 
-  - RVI Android SIG Repo PR：
+  - RVI Android SIG Repo PR:
     - add step to apply patch for emulator: https://github.com/riscv-android-src/riscv-android/pull/7
     - add changelog for 10/1 release: https://github.com/riscv-android-src/riscv-android/pull/8
     - upgrade repo branch for emulator: https://github.com/riscv-android-src/riscv-android/pull/10
