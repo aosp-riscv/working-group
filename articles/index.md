@@ -34,6 +34,7 @@
 - [学习笔记：Android Init Language][35]
 - [学习笔记：Android Early Init Boot Sequence][36]
 - [学习笔记: VNDK 基本概念][37]
+- [代码笔记：Android LLVM toolchain 构建系统][48]
 
 ## 编程语言与编译技术
 
@@ -109,3 +110,4 @@
 [45]: ./20221102-bus-device-driver.md
 [46]: ./android-review/20221111.md
 [47]: ./android-review/20221125.md
+[48]: ./20221206-android-llvm-build-system.md
