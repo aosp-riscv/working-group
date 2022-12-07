@@ -82,6 +82,7 @@ print_url2 kernel/build
 print_url kernel/configs
 print_url kernel/common
 print_url kernel/tests
+print_url2 kernel/common-modules/virtual-device
 
 println	"<h2>Toolchain</h2>"
 print_url toolchain/binutils
