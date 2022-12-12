@@ -496,6 +496,17 @@ DeviceSysrootsBuilder 是指交叉工具链 clang 中自带的 runtime sysroot�
 
 Device 侧 sysroot 分为两套版本，一个是用于 ndk，构建 app，一个是用于构建 aosp（platform，即 platform/prebuilts/clang/host/linux-x86）。
 
+注意后面在构建 runtime 的时候也会用到 ndk 或者 platform 的 sysroot。
+
+`--sysroot=$OUT_DIR/sysroots/ndk/$ARCH`
+- builtin
+
+`--sysroot=$OUT_DIR/sysroots/platform/$ARCH`
+- libunwind
+- platform-libcxxabi
+- compiler-rt
+
+
 之所以分为 ndk 和 platform 两套，有很多原因：
 - 譬如：对于 C++ 头文件，ndk 的 sysroot 中自带有标准的 c++ 头文件，而 platform 编译时，可能使用多种 c++ 头文件，即不是固定的，需要在编译时通过 `-nostdinc++ -isystem <path_to_cpp_headers>`, 参考 configs::cxxflags()。
 - 又譬如，某些 runtime 库（如 libunwind），在 ndk 环境下被使用时要求是隐藏符号，另一份是给 platform 的构建用的需要导出符号。参考 LibUnwindBuilder 的注释。同样，对于 libc++ 的库也有同样的处理要求。
@@ -707,6 +718,42 @@ def _build_config(self) -> None:
 - out/lib/builtins-aarch64-unknown-linux-musl
 - out/lib/builtins-arm-unknown-linux-musleabihf
 
+具体，以 Android-ARM 为例。TBD， 还需要再看看
+
+```python
+def install_config(self) -> None:
+    # Copy the library into the toolchain resource directory (lib/linux) and
+    # runtimes_ndk_cxx.
+    arch = self._config.target_arch
+	# sarch = "arm"
+    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
+    if isinstance(self._config, configs.LinuxMuslConfig) and arch == hosts.Arch.ARM:
+        sarch = 'armhf'
+	# 生成的文件名为 libclang_rt.builtins-arm-android.a
+    filename = 'libclang_rt.builtins-' + sarch
+    filename += '-android.a' if self._config.target_os.is_android else '.a'
+    filename_exported = 'libclang_rt.builtins-' + sarch + '-android-exported.a'
+
+    src_path = self.output_dir / 'lib' / self._config.target_os.crt_dir / filename
+    self.output_resource_dir.mkdir(parents=True, exist_ok=True)
+    if self.is_exported:
+        # This special copy exports its symbols and is only intended for use
+        # in Bionic's libc.so.
+        shutil.copy2(src_path, self.output_resource_dir / filename_exported)
+    else:
+        shutil.copy2(src_path, self.output_resource_dir / filename)
+        # Also install to self.resource_dir, if it's different,
+        # for use when building target libraries.
+        if self.resource_dir != self.output_resource_dir:
+            self.resource_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_path, self.resource_dir / filename)
+        # Make a copy for the NDK.
+        if self._config.target_os.is_android:
+            dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_path, dst_dir / filename)
+```
+
 #### 2.3.8.3. LibUnwindBuilder
 
 ```python
@@ -731,7 +778,7 @@ def _build_config(self) -> None:
 
 - ndk (platform=False static=False None)
   - output： out/lib/libunwind-<ARCH>-ndk-cxx-hermetic
-  - install：out/stage2-install/runtimes_ndk_cxx/ARCH
+  - install：out/stage2-install/runtimes_ndk_cxx/$ARCH
 
 output 是覆盖了基类的 output_dir
 
@@ -753,6 +800,11 @@ config_list: List[configs.Config] = configs.android_configs(
   - install: out/stage2-install/lib64/clang/12.0.7/lib/linux/ARCH
 
 #### 2.3.8.5. CompilerRTBuilder
+
+```python
+src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
+```
+即对应 `out/llvm-project/compiler-rt`
 
 ```python
 	config_list: List[configs.Config] = (
