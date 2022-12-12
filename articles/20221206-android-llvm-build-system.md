@@ -14,7 +14,7 @@
 	- [1.1. 构建入口](#11-构建入口)
 	- [1.2. 构建主程序](#12-构建主程序)
 	- [1.3. build system](#13-build-system)
-	- [其他](#其他)
+	- [1.4. 其他](#14-其他)
 - [2. builders](#2-builders)
 	- [2.1. builder.registry](#21-builderregistry)
 	- [2.2. base builders](#22-base-builders)
@@ -23,7 +23,7 @@
 		- [2.2.3. LLVMBaseBuilder](#223-llvmbasebuilder)
 		- [2.2.4. AutoconfBuilder](#224-autoconfbuilder)
 	- [2.3. builders](#23-builders)
-		- [Stage1Builder](#stage1builder)
+		- [2.3.1. Stage1Builder](#231-stage1builder)
 		- [2.3.2. Stage2Builder](#232-stage2builder)
 		- [2.3.3. SwigBuilder](#233-swigbuilder)
 		- [2.3.4. LibXml2Builder](#234-libxml2builder)
@@ -167,7 +167,7 @@ LLVM Android 的 build system 采用 python 编写，由 builders 和 configs �
   INFO:base_builders:Building builtins for Linux / hosts.Arch.ARM
   ```
 
-## 其他
+## 1.4. 其他
 
 `$TOP/toolchain/llvm_android/constants.py`, 这里列出了重要的常量定义。
 
@@ -363,7 +363,7 @@ Base builder for both llvm and individual runtime lib.
 
 builders 比较多
 
-### Stage1Builder
+### 2.3.1. Stage1Builder
 
 关于为何要 two stages，参考 
 - https://llvm.org/docs/AdvancedBuilds.html
