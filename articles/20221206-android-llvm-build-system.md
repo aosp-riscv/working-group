@@ -498,7 +498,7 @@ Device 侧 sysroot 分为两套版本，一个是用于 ndk，构建 app，一�
 
 之所以分为 ndk 和 platform 两套，有很多原因：
 - 譬如：对于 C++ 头文件，ndk 的 sysroot 中自带有标准的 c++ 头文件，而 platform 编译时，可能使用多种 c++ 头文件，即不是固定的，需要在编译时通过 `-nostdinc++ -isystem <path_to_cpp_headers>`, 参考 configs::cxxflags()。
-- 又譬如，某些库（如 libbunwind）给 ndk 用的，要求是隐藏符号，另一份是给 platform 的构建用的需要导出符号。参考 LibUnwindBuilder 的注释。
+- 又譬如，某些 runtime 库（如 libunwind），在 ndk 环境下被使用时要求是隐藏符号，另一份是给 platform 的构建用的需要导出符号。参考 LibUnwindBuilder 的注释。同样，对于 libc++ 的库也有同样的处理要求。
 
 - output_dir: 只针对 AndroidConfig， 参考 AndroidConfig::sysroot(), 为 $OUT_DIR/sysroots, 再根据是 platform 还是 ndk 分为
   - $OUT_DIR/sysroots/ndk
@@ -547,13 +547,14 @@ def _build_config(self) -> None:
     shutil.copytree(src_sysroot / 'usr' / 'include',
                     sysroot / 'usr' / 'include', symlinks=True)
 
-    # 拷贝完后，基于 platform 和 ndk 的区别，
+    # 拷贝完后，基于 platform 和 ndk 的区别，下面针对 ARCH 为 arm 举例：
 	# 如果 config 中 platform = true 则将 $OUT_DIR/sysroots/platform/arm/usr/include/c++ 目录删掉
-    # 如果是 ndk，则添加：cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include
+    # 如果是 ndk，则为 ARCH 添加一个 usr/local/include 的目录：拷贝 src 和 target 如下：
+	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include
 	# 所以如果以 ARCH 为 arm 为例，我们 diff $OUT_DIR/sysroots/ndk/arm  $OUT_DIR/sysroots/platform/arm，我们会发现 ndk 的版本下的内容比 platform 下的多
-	# - `usr/include/c++` 整个目录
-	# - `usr/local/include` 整个目录
-	# 为什么会这样，TBD 原因待分析，是不是 platform 构建中 android 用了一套自己的 c++？
+	# - `usr/include/c++` 整个目录：这个原因前面分析过了
+	# - `usr/local/include` 整个目录：TBD 为啥 ndk 需要这个目录，还不是很清楚，猜测是在使用 ndk 构建一些应用时，include 路径会包含这个路径并 include 这个路径下的文件，但是在 platform 构建时不会涉及。
+	# 
     if platform:
        # Remove the STL headers.
        shutil.rmtree(sysroot / 'usr' / 'include' / 'c++')
