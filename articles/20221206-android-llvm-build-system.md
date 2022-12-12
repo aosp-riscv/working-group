@@ -490,9 +490,9 @@ LIBEDIT_SRC_DIR: Path = EXTERNAL_DIR / 'libedit'
 
 #### 2.3.8.1. DeviceSysrootsBuilder
 
-DeviceSysrootsBuilder 是指构建 toolchain/clang 所使用的，用于构建运行在 target 设备上的程序的 sysroot。本身属于 runtime 构建的一部分，虽然本质上构建 sysroot 的主要工作就是从 prebuilt 的 ndk 拷贝部分过来，但这是基础框架，其他 runtime 的库编译完后也是要安装到 sysroot 下的。
+DeviceSysrootsBuilder 是指交叉工具链 clang 中自带的 runtime sysroot。本身属于 runtime 构建的一部分，虽然本质上构建 sysroot 的主要工作就是从 prebuilt 的 ndk 拷贝部分过来，但这是基础框架，其他 runtime 的库编译完后也是要安装到 sysroot 下的。
 
-和 DeviceSysrootsBuilder 对应，还有一个 HostSysrootsBuilder，但目前只有对 windows 的 clang 才需要构建 host 侧的 sysroot。所以暂时不看了。
+和 DeviceSysrootsBuilder 对应，还有一个 HostSysrootsBuilder，但目前只有对 windows 的 clang 才需要构建 host 侧的 sysroot。所以暂时不看了(output_dir 对应的是 `$OUT_DIR/sysroots/x86_64-w64-mingw32`)。
 
 Device 侧 sysroot 分为两套版本，一个是用于 ndk，构建 app，一个是用于构建 aosp（platform，即 platform/prebuilts/clang/host/linux-x86）。
 
@@ -512,33 +512,48 @@ def _build_config(self) -> None:
     config: configs.AndroidConfig = cast(configs.AndroidConfig, self._config)
     arch = config.target_arch
     platform = config.platform
-    # 这个是输出的目录，针对 AndroidConfig， 假设 platform = true， arch 为 arm
+    # 这个是输出的目录，针对 AndroidConfig， 
+	# 假设 platform = true， arch 为 arm
     # 参考 AndroidConfig::sysroot(), 则对应的 sysroot 路径为 $OUT_DIR/sysroots/platform/arm
     sysroot = config.sysroot
     if sysroot.exists():
         shutil.rmtree(sysroot)
         sysroot.mkdir(parents=True, exist_ok=True)
 
-    # 源目录来自 toolchain/prebuilts/ndk/r24/toolchains/llvm/prebuilt/linux-x86_64/sysroot
-	# toolchain/prebuilts/ndk/r24/ 这个目录对应的仓库是 https://android.googlesource.com/toolchain/prebuilts/ndk/r24
+    # 源目录（src_sysroot）来自 `$TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot`
+	# toolchain/prebuilts/ndk/r25/ 这个目录对应的仓库是 https://android.googlesource.com/toolchain/prebuilts/ndk/r25
 
     # sysroot 分两部分，一部分是头文件，一部分是二进制库
 	
-    # 这里先从 prebuilt 的 ndk 中复制头文件过来，头文件只有一份，包含了所有支持的 target ARCH，即不管 config.target_arch 是什么，会把 include 下所有的 arch 的头文件都复制过来
+    # 这里先从源目录中复制头文件过来，
+	# `$src_sysroot/usr/include` 中头文件只有一份，包含了所有支持的 target ARCH，
+	# ls -l toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
+	# aarch64-linux-android
+	# arm-linux-androideabi
+	# i686-linux-android
+	# x86_64-linux-android
+	# ......
+	
+	# 所以拷贝的结果就是，不管 config.target_arch 是什么，会把 `$src_sysroot/usr/include` 下所有的 arch 的头文件都复制过来
     # 参考 $OUT_DIR/sysroots/platform/arm/usr/include 下有 arm-linux-androideabi， 也有 aarch64-linux-android/...
-    # 我比较了一下 $OUT_DIR/sysroots/platform/$ARCH/usr/include 都是一样的
+    # 我比较了一下四个 ARCH 对应的 $OUT_DIR/sysroots/platform/$ARCH/usr/include 都是一样的
 	
     # Copy the NDK prebuilt's sysroot, but for the platform variant, omit
     # the STL and android_support headers and libraries.
 	src_sysroot = paths.NDK_BASE / 'toolchains' / 'llvm' / 'prebuilt' / 'linux-x86_64' / 'sysroot'
 
-    # cp -rL toolchain/prebuilts/ndk/r24/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include $OUT_DIR/sysroots/platform/arm/usr/include
+    # cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include $OUT_DIR/sysroots/platform/arm/usr/include
 	# Copy over usr/include.
     shutil.copytree(src_sysroot / 'usr' / 'include',
                     sysroot / 'usr' / 'include', symlinks=True)
 
-    # 如果是 platform 则将 $OUT_DIR/sysroots/platform/arm/usr/include/c++ 目录删掉
-    # 如果是 ndk，则添加：cp -rL toolchain/prebuilts/ndk/r24/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include 
+    # 拷贝完后，基于 platform 和 ndk 的区别，
+	# 如果 config 中 platform = true 则将 $OUT_DIR/sysroots/platform/arm/usr/include/c++ 目录删掉
+    # 如果是 ndk，则添加：cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include
+	# 所以如果以 ARCH 为 arm 为例，我们 diff $OUT_DIR/sysroots/ndk/arm  $OUT_DIR/sysroots/platform/arm，我们会发现 ndk 的版本下的内容比 platform 下的多
+	# - `usr/include/c++` 整个目录
+	# - `usr/local/include` 整个目录
+	# 为什么会这样，TBD 原因待分析，是不是 platform 构建中 android 用了一套自己的 c++？
     if platform:
        # Remove the STL headers.
        shutil.rmtree(sysroot / 'usr' / 'include' / 'c++')
@@ -548,19 +563,34 @@ def _build_config(self) -> None:
                        sysroot / 'usr' / 'local' / 'include', symlinks=True)
 
     # 这里开始复制二进制库
-
-	# toolchain/prebuilts/ndk/r24/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib 下的库是按照 triple 分的
+	# $TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib 下的库是按照 triple 分的
 	# - aarch64-linux-android
 	# - arm-linux-androideabi
 	# - i686-linux-android
 	# - x86_64-linux-android
 	# 所以这里根据 config.target_arch 复制对应目录下的内容
+	# 以 arm 为例，就是执行如下赋值
+	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi \
+	#        out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi
 	# Copy over usr/lib/$TRIPLE.
     src_lib = src_sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
     dest_lib = sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
     shutil.copytree(src_lib, dest_lib, symlinks=True)
 
-    # TBD 不太清楚原因是什么
+    # 复制完后，做如下额外处理：
+	# - 删除 libcompiler_rt-extras.a，TBD 不太清楚原因是什么
+	# - 对于 platform=true 的 config，删除 NDK 的 libc++，
+	#   以 arm 为例，具体就是删除掉
+	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下的 libc++abi.a、libc++_static.a 和 libc++_shared.so
+	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下各个 API-level 子目录下的 libc++.a 和 libc++.so
+	# - 对于 platform=true 的 config，会做一些假文件（stub），具体包括：
+	#   - 在 out 目录下新建一个 platform_stubs/$ARCH, 然后在下面新建一个 libc++.c，里面会手动写入一些空函数
+	#   - 在 out/sysroots/platform/$ARCH/ 下新建 usr/lib 目录，然后基于上面建的 libc++.c，编译链接一个 stub 的 libc++.so 出来。
+	#     编译时设置的 --target，为何是 29 参考 toolchain/llvm_android/configs.py 中的 api_level 函数说明。29 是 API level
+	#     注意，如果我们对比 out/sysroots/platform/$ARCH/usr/lib 和 out/sysroots/ndk/$ARCH/usr/lib，我们还会发现 platfrom 的版本下还会多一个 `libc++abi.so`
+	#     这个文件是 PlatformLibcxxAbiBuilder::install_config 中新建出来的，实际上只是一个 txt 文件
+	# 以上描述对应具体代码如下
+	
 	# Remove the NDK's libcompiler_rt-extras.  For the platform, also remove
     # the NDK libc++.
     (dest_lib / 'libcompiler_rt-extras.a').unlink()
@@ -595,7 +625,6 @@ def _build_config(self) -> None:
                     raise RuntimeError('sysroot file should have been ' +
                                        f'removed: {os.path.join(parent, f)}')
 
-        # 针对 platform，编译构建一个 stub 的 libc++.so
 	if platform:
         # Create a stub library for the platform's libc++.
         platform_stubs = paths.OUT_DIR / 'platform_stubs' / config.ndk_arch
@@ -614,8 +643,6 @@ def _build_config(self) -> None:
                 void _ZTISt9type_info() {}
             """))
 
-        # 注意编译时设置的 --target，为何是 29 参考 toolchain/llvm_android/configs.py
-        # 中的 api_level 函数说明。29 是 API level
         utils.check_call([self.toolchain.cc,
                           f'--target={config.llvm_triple}',
                           '-fuse-ld=lld', '-nostdlib', '-shared',
