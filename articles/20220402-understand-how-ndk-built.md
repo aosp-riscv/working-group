@@ -11,6 +11,8 @@
 
 - [1. NDK 发布包目录总览](#1-ndk-发布包目录总览)
 - [2. NDK 发布包的构建](#2-ndk-发布包的构建)
+	- [2.1. 构建 r23b](#21-构建-r23b)
+	- [2.2. 构建 master-ndk](#22-构建-master-ndk)
 - [3. NDK 发布包构建系统浅析](#3-ndk-发布包构建系统浅析)
 - [4. NDK 发布包的构建](#4-ndk-发布包的构建)
 	- [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
@@ -42,6 +44,8 @@
 
 # 2. NDK 发布包的构建
 
+## 2.1. 构建 r23b
+
 我们下载和 r23b 对应的仓库：
 
 ```bash
@@ -57,7 +61,7 @@ $ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -
 
 后面的命令操作以我们创建的 `ndk-r23b` 目录作为当前工作目录 `"."`。
 
-关于如何编译 ndk 发布包，可以读一下下载的仓库中的 `./ndk/docs/Building.md` 文档。
+关于如何编译 ndk 发布包，可以读一下下载的仓库中的 `./ndk/docs/Building.md` 文档，或者访问在线文档 ["Building the NDK"][1]。
 
 构建步骤很简单：
 ```bash
@@ -75,6 +79,98 @@ $ ./ndk/checkbuild.py --help
 
 ```bash
 $ ./ndk/checkbuild.py --no-build-tests
+```
+
+## 2.2. 构建 master-ndk
+
+
+先建立 python 构建环境，参考 ["Building the NDK"][1] 的 "Python environment setup"，先安装 Poetry。我的系统环境是 Ubuntu 20.04。参考 参考 [Poetry 官方文档][2], 需要至少 Python 3.7 以上版本。
+
+```bash
+$ curl -sSL https://install.python-poetry.org | python3 -
+Retrieving Poetry metadata
+
+# Welcome to Poetry!
+
+This will download and install the latest version of Poetry,
+a dependency and package manager for Python.
+
+It will add the `poetry` command to Poetry's bin directory, located at:
+
+/home/wangchen/.local/bin
+
+You can uninstall at any time by executing this script with the --uninstall option,
+and these changes will be reverted.
+
+Installing Poetry (1.3.1): Done
+
+Poetry (1.3.1) is installed now. Great!
+
+You can test that everything is set up by executing:
+
+`poetry --version`
+```
+
+我实验时安装的 poetry 版本是 1.3.1。
+
+然后下载 ndk 版本：
+
+```bash
+$ mkdir master-ndk
+$ cd master-ndk
+$ repo init -u https://android.googlesource.com/platform/manifest -b master-ndk
+$ repo sync
+```
+
+下载完后，进入 ndk 子目录，将项目配置为使用我们下载的 prebuilt 的 Python 而不是使用系统自带的 python。然后确保在每次执行过 repo sync 后同步依赖。
+
+```bash
+$ cd ndk
+$ poetry env use ../prebuilts/python/linux-x86/bin/python3
+Creating virtualenv ndk-IVJjSDzg-py3.10 in /home/wangchen/.cache/pypoetry/virtualenvs
+Using virtualenv: /home/wangchen/.cache/pypoetry/virtualenvs/ndk-IVJjSDzg-py3.10
+$ poetry install
+```
+
+开始构建，推荐使用 poetry 启动一个新的 shell 来运行 python。
+
+```bash
+$ poetry shell
+Spawning shell within /home/wangchen/.cache/pypoetry/virtualenvs/ndk-IVJjSDzg-py3.10
+wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$ . /home/wangchen/.cache/pypoetry/virtualenvs/ndk-IVJjSDzg-py3.10/bin/activate
+(ndk-py3.10) wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$
+```
+
+此时可以执行 checkbuild.py 来开启构建了
+```bash
+(ndk-py3.10) wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$ python checkbuild.py
+Machine has 52 CPUs
+Building modules: base-toolchain black canary-readme changelog clang cpufeatures gtest libc++ libc++abi libshaderc make meta mypy native_app_glue ndk-build ndk-build-shortcut ndk-gdb ndk-gdb-shortcut ndk-lldb-shortcut ndk-stack ndk-stack-shortcut ndk-which ndk-which-shortcut ndk_helper platforms pylint python-packages pythonlint readme shader-tools simpleperf source.properties sysroot system-stl toolbox toolchain vulkan wrap.sh yasm
+Build finished
+Building tests...
+
+PASS 27216/27448 FAIL 0/27448 SKIP 232/27448
+
+build: PASS 1484/1672 FAIL 0/1672 SKIP 188/1672
+
+device: PASS 628/672 FAIL 0/672 SKIP 44/672
+
+libc++: PASS 25104/25104 FAIL 0/25104 SKIP 0/25104
+
+
+Installed size: 1653 MiB
+Finished successfully
+Build: 0:02:46
+Packaging: 0:00:00
+Testing: 0:09:08
+Total: 0:11:54
+```
+
+构建完后可以执行 exit 退出 poetry 的 shell
+```bash
+(ndk-py3.10) wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$ exit
+exit
+wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$
 ```
 
 # 3. NDK 发布包构建系统浅析
@@ -266,3 +362,5 @@ NDK C++ 运行时支持两种库：
 
 而头文件部分，对应的安装代码是 `./ndk/ndk/checkbuild.py` 中 SystemStl 这个 class。其工作就是简单的复制，从 `./ndk/sources/cxx-stl/system` 拷贝复制到 `./out/linux/android-ndk-r23b/sources/cxx-stl/system`。我们看一下 `./ndk/sources/cxx-stl/system` 下的内容，发现主要的就是 include 目录下这些 STL 封装的头文件。
 
+[1]:https://android.googlesource.com/platform/ndk/+/master/docs/Building.md
+[2]:https://python-poetry.org/docs/
