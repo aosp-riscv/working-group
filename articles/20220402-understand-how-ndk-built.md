@@ -9,10 +9,11 @@
 
 <!-- TOC -->
 
-- [1. NDK 发布包目录总览](#1-ndk-发布包目录总览)
+- [1. 什么是 Android NDK](#1-什么是-android-ndk)
 - [2. NDK 发布包的构建](#2-ndk-发布包的构建)
-	- [2.1. 构建 r23b](#21-构建-r23b)
+	- [2.1. 建立 python 构建环境](#21-建立-python-构建环境)
 	- [2.2. 构建 master-ndk](#22-构建-master-ndk)
+	- [2.3. 构建一个特定的 NDK release 版本](#23-构建一个特定的-ndk-release-版本)
 - [3. NDK 发布包构建系统浅析](#3-ndk-发布包构建系统浅析)
 - [4. NDK 发布包的构建](#4-ndk-发布包的构建)
 	- [4.1. llvm 工具链的构建](#41-llvm-工具链的构建)
@@ -25,64 +26,15 @@
 <!-- /TOC -->
 
 
-# 1. NDK 发布包目录总览
+# 1. 什么是 Android NDK
 
-先去 ndk 发布网站下一个最新版本的 ndk 发布包，<https://developer.android.google.cn/ndk/downloads?hl=zh-cn>
+有关什么是 Android NDK，可以参考另一篇笔记：[《深入理解 Android NDK》][3]。
 
-截至本文写作最新的 LTS 版本是 r23b，我下载了一个 Linux 64 位 (x86) 版本 “android-ndk-r23b-linux.zip” 的作为本文介绍的基础，其他的发布包内容和目录安排大同小异。
-
-下载解压后目录安排如下，只保留了目录，省去了文件部分：
-
-![](./diagrams/20220402-understand-how-ndk-built/ndk-dir-layout.png)
-
-**[图一] 发布包目录结构**
-
-具体目录的内容和用途我就不一一介绍了。我比较关心的是红框框起来的两部分
-- cxx-stl: 这个是存放了 C++ 开发需要的 STL 库
-- toolchains：这个是存放了用于编译的工具链，我们比较关心的是 llvm 下的东西，这是我们大部分情况下使用的工具链（clang）。而 renderscript 目录下存放的是用于编译 Renderscript 的工具链，不在我们考虑的重点范围内。
-
+只有深刻理解了 Android NDK 的组成构造，才能有良好的基础理解 NDK 发布包的构建步骤。
 
 # 2. NDK 发布包的构建
 
-## 2.1. 构建 r23b
-
-我们下载和 r23b 对应的仓库：
-
-```bash
-$ mkdir ndk-r23b && cd ndk-r23b
-$ repo init -u https://android.googlesource.com/platform/manifest -b ndk-r23b
-$ repo sync
-```
-如果访问 google 仓库受限，也可以换成国内的 mirror，譬如 tsinghua, 将上面的第二步换成如下：
-
-```bash
-$ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b ndk-r23b
-```
-
-后面的命令操作以我们创建的 `ndk-r23b` 目录作为当前工作目录 `"."`。
-
-关于如何编译 ndk 发布包，可以读一下下载的仓库中的 `./ndk/docs/Building.md` 文档，或者访问在线文档 ["Building the NDK"][1]。
-
-构建步骤很简单：
-```bash
-$ ./ndk/checkbuild.py
-```
-
-构建完成后，在 `./out` 目录下就会生成多个目录，其中 `./out/android-ndk-r23b` 下就是我们做出来的 ndk package （和 **图一** 是一样的），虽然仔细看会发现 `./out/android-ndk-r23b` 只是一个符号链接，它实际指向了 `./out/linux/android-ndk-r23b`。其他目录可以认为都是构建过程中间生成的临时目录。
-
-可以查看帮助获取常用选项：
-```bash
-$ ./ndk/checkbuild.py --help
-```
-
-如果想缩短构建时间，可以跳过构建后执行的自动化测试
-
-```bash
-$ ./ndk/checkbuild.py --no-build-tests
-```
-
-## 2.2. 构建 master-ndk
-
+## 2.1. 建立 python 构建环境 
 
 先建立 python 构建环境，参考 ["Building the NDK"][1] 的 "Python environment setup"，先安装 Poetry。我的系统环境是 Ubuntu 20.04。参考 参考 [Poetry 官方文档][2], 需要至少 Python 3.7 以上版本。
 
@@ -113,6 +65,8 @@ You can test that everything is set up by executing:
 
 我实验时安装的 poetry 版本是 1.3.1。
 
+## 2.2. 构建 master-ndk
+
 然后下载 ndk 版本：
 
 ```bash
@@ -120,6 +74,12 @@ $ mkdir master-ndk
 $ cd master-ndk
 $ repo init -u https://android.googlesource.com/platform/manifest -b master-ndk
 $ repo sync
+```
+
+如果访问 google 仓库受限，也可以换成国内的 mirror，譬如 tsinghua, 将上面的第 3 步换成如下：
+
+```bash
+$ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b master-ndk
 ```
 
 下载完后，进入 ndk 子目录，将项目配置为使用我们下载的 prebuilt 的 Python 而不是使用系统自带的 python。然后确保在每次执行过 repo sync 后同步依赖。
@@ -166,12 +126,47 @@ Testing: 0:09:08
 Total: 0:11:54
 ```
 
+可以运行 `python ./ndk/checkbuild.py --help` 查看帮助获取常用选项。
+
+如果想缩短构建时间，可以跳过构建后执行的自动化测试，例子：`python ./ndk/checkbuild.py --no-build-tests`。
+
 构建完后可以执行 exit 退出 poetry 的 shell
 ```bash
 (ndk-py3.10) wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$ exit
 exit
 wangchen@p9-plct:/aosp/wangchen/dev-ndk/master-ndk/ndk$
 ```
+
+## 2.3. 构建一个特定的 NDK release 版本
+
+以截至本文最新的 r25b 为例。
+
+如果你已经下载了 master-ndk，则可以直接切换到 ndk-r25b 去。方法很简单，在刚才的基础上输入如下 repo 命令
+
+```bash
+$ cd master-ndk
+$ repo init -b ndk-r25b
+$ repo sync
+```
+
+或者直接新建一个目录下载 r25b 对应的仓库：
+
+```bash
+$ mkdir ndk-r25b && cd ndk-r25b
+$ repo init -u https://android.googlesource.com/platform/manifest -b ndk-r25b
+$ repo sync
+```
+如果访问 google 仓库受限，也可以换成国内的 mirror，譬如 tsinghua, 将上面的第二步换成如下：
+
+```bash
+$ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b ndk-r25b
+```
+
+后面的构建命令和处理 master-ndk 操作是一样的，这里就不赘述了。
+
+关于如何编译 ndk 发布包，可以读一下下载的仓库中的 `./ndk/docs/Building.md` 文档，或者访问在线文档 ["Building the NDK"][1]。
+
+构建完成后，在 `./out` 目录下就会生成多个目录，其中 `./out/android-ndk-r25b` 下就是我们做出来的 ndk package （和从 Android NDK release 网站下载的是一样的），虽然仔细看会发现 `./out/android-ndk-r23b` 只是一个符号链接，它实际指向了 `./out/linux/android-ndk-r25b`。其他目录可以认为都是构建过程中间生成的临时目录。
 
 # 3. NDK 发布包构建系统浅析
 
@@ -364,3 +359,4 @@ NDK C++ 运行时支持两种库：
 
 [1]:https://android.googlesource.com/platform/ndk/+/master/docs/Building.md
 [2]:https://python-poetry.org/docs/
+[3]:./20221214-what-is-ndk.md

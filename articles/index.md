@@ -37,6 +37,7 @@
 - [学习笔记：Android Early Init Boot Sequence][36]
 - [学习笔记: VNDK 基本概念][37]
 - [代码笔记：Android LLVM toolchain 构建系统][48]
+- [深入理解 Android NDK][51]
 
 ## 编程语言与编译技术
 
@@ -115,3 +116,4 @@
 [48]: ./20221206-android-llvm-build-system.md
 [49]: ./android-review/20221209.md
 [50]: ./android-review/20221223.md
+[51]: ./20221214-what-is-ndk.md
