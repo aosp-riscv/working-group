@@ -15,9 +15,9 @@
 	- [2.1. 工具链/Toolchain](#21-工具链toolchain)
 	- [2.2. Sysroot](#22-sysroot)
 - [3. NDK 提供的库和 API](#3-ndk-提供的库和-api)
-	- [3.1. Core C/C++](#31-core-cc)
-		- [3.1.1. C library](#311-c-library)
-		- [3.1.2. C++ library](#312-c-library)
+	- [3.1. 核心（Core） C/C++](#31-核心core-cc)
+		- [3.1.1. C 库](#311-c-库)
+		- [3.1.2. C++ 库](#312-c-库)
 		- [3.1.3. Logging](#313-logging)
 		- [3.1.4. Trace](#314-trace)
 		- [3.1.5. zlib compression：](#315-zlib-compression)
@@ -29,7 +29,7 @@
 		- [3.2.5. Sync API：](#325-sync-api)
 	- [3.3. Camera 摄像相关：](#33-camera-摄像相关)
 	- [3.4. Media 多媒体相关：](#34-media-多媒体相关)
-		- [3.4.1. `libmediandk`](#341-libmediandk)
+		- [3.4.1. libmediandk](#341-libmediandk)
 		- [3.4.2. OpenMAX AL：](#342-openmax-al)
 	- [3.5. Android native application APIs：](#35-android-native-application-apis)
 		- [3.5.1. Hardware Buffer APIs：](#351-hardware-buffer-apis)
@@ -48,7 +48,7 @@
 
 先去 ndk 发布网站下一个最新版本的 ndk 发布包看看，<https://developer.android.google.cn/ndk/downloads?hl=zh-cn>。这个 URL 对应的总是最新的 NDK 版本，本文例子参考的具体 ndk 版本是 25b，我下载了一个 Linux 64 位 (x86) 版本 “android-ndk-r25b-linux.zip” 的作为本文介绍的基础，其他的发布包内容和目录安排大同小异。对应下载 URL：<https://dl.google.com/android/repository/android-ndk-r25b-linux.zip>。 
 
-下载解压后目录安排如下，只保留了目录，省去了文件部分：
+下载解压后目录安排如下，没有完全展开，部分目录展开到两级：
 
 ![](./diagrams/20221214-what-is-ndk/ndk-r25b-dir-layout.png)
 
@@ -267,7 +267,7 @@ NDK 中的 sysroot 目录在 `<NDK>/toolchains/llvm/prebuilt/linux-x86_64/sysroo
 
 	所以对于 NDK 中的动态库，我们也可以认为有两类，一类是正常的 so，需要随 apk 一起打包发布，还有一类是 "system stub libraries"，它们只是提供作为连接时解析符号用，并不包含实际实现指令，所以是不需要打包进 apk 的，目标系统上会提供这些 "system stub libraries" 对应的实际 "system libraries"。
 
-  - 静态库（static libraries），文件后缀为 `.a`，编译链接时直接和 app 链接。和动态库不同，首先它不按照 API-level 分，一般只提供一个，因为 API 都是后向兼容的，所以不存在针对不同 API level 开发的 app 静态链接失败的问题。其次因为是要实际静态链接，所以 `.a` 文件不存在 stub 的问题。
+  - 静态库（static libraries），文件后缀为 `.a`，编译链接时直接和 app 链接。和动态库不同，首先它不按照 API-level 分，一般只提供一个，我理解这是首先这些静态库都是基础库（除了内核系统调用不会再依赖其他的库），在 API 上是严格确保后向兼容的，所以 NDK 只要提供对应着当前 NDK 已知的最高版本的 API level 的一份静态库就好了，不需要按 API level 分别提供，其次因为是要实际静态链接，所以 `.a` 文件不存在 stub 的问题。
 
   所以综上所述，按照 [Bionic and libc’s stub implementations][5] 上 Libraries 章节的说法，`The NDK contains three types of libraries`。
 
@@ -309,9 +309,9 @@ $ cat system_libs.json
   "libz.so": "19"
 ```
 
-## 3.1. Core C/C++
+## 3.1. 核心（Core） C/C++
 
-### 3.1.1. C library
+### 3.1.1. C 库
 
 NDK 提供了标准的 C11 library 头文件，譬如 `stdlib.h` 和 `stdio.h`，这个和 GNU 是一样的。
 
@@ -321,7 +321,7 @@ Android 上的 C 库，由以下几个主要的库组成，具体实现在 bioni
 - libm：独立的数学库
 - libdl: 该库支持 dlopen/dlsym， 使用时需要 `#include <dlfcn.h>` 并显式链接。
 
-### 3.1.2. C++ library
+### 3.1.2. C++ 库
 
 提供 C++17 支持。更多参考 [C++ Library Support](https://developer.android.google.cn/ndk/guides/cpp-support).
 
@@ -341,7 +341,7 @@ NDK 提供了两种 STL:
 
 ### 3.1.3. Logging
 
-需要 `#include <android/log.h>`
+> include <android/log.h>
 
 Logging 功能由 `liblog` 提供，这个库提供了一组 APIs for logging to logcat。[官网对 logging API 的介绍][8]。
 
@@ -365,29 +365,33 @@ google 官网给出的这个库的官网在 <http://www.zlib.net/manual.html>
 
 不同版本的 OpenGL 对应的头文件/链接库/起始支持的 API level：
 
-- OpenGL ES 1.x：<GLES/gl.h> and <GLES/glext.h>，link with `libGLESv1_CM`, OpenGL ES 1.0 is available since API level 4.
-- OpenGL ES 2.0：<GLES2/gl2.h> and <GLES2/gl2ext.h>，link with `libGLESv2`, OpenGL ES 2.0 is available since API level 5.
-- OpenGL ES 3.0：<GLES3/gl3.h> and <GLES3/gl3ext.h>，link with `libGLESv3`, OpenGL ES 3.0 is available since API level 18.
-- OpenGL ES 3.1：<GLES3/gl31.h> and <GLES3/gl3ext.h>，link with `libGLESv3`, OpenGL ES 3.1 is available since API level 21.
-- OpenGL ES 3.2：<GLES3/gl32.h> and <GLES3/gl3ext.h>，link with `libGLESv3`, OpenGL ES 3.2 is available since API level 24.
+- OpenGL ES 1.x：`<GLES/gl.h>` and `<GLES/glext.h>`，link with `libGLESv1_CM`, OpenGL ES 1.0 is available since API level 4.
+- OpenGL ES 2.0：`<GLES2/gl2.h>` and `<GLES2/gl2ext.h>`，link with `libGLESv2`, OpenGL ES 2.0 is available since API level 5.
+- OpenGL ES 3.0：`<GLES3/gl3.h>` and `<GLES3/gl3ext.h>`，link with `libGLESv3`, OpenGL ES 3.0 is available since API level 18.
+- OpenGL ES 3.1：`<GLES3/gl31.h>` and `<GLES3/gl3ext.h>`，link with `libGLESv3`, OpenGL ES 3.1 is available since API level 21.
+- OpenGL ES 3.2：`<GLES3/gl32.h>` and `<GLES3/gl3ext.h>`，link with `libGLESv3`, OpenGL ES 3.2 is available since API level 24.
 
-注意：All Android-based devices support OpenGL ES 1.0 and 2.0. 但是 Only Android devices that have the necessary GPU fully support later versions of OpenGL ES, but the libraries are present on all devices that support the API level where they were introduced. 我的理解 3.x 提供的一些功能（API）是需要一些特定的硬件 GPU 支持的，代码中调用这些 API，只要链接不出问题编译构建是可以通过的，但是如果真的要确保使用需要有硬件的支持，软件中可以通过调用特定的函数询问版本是否支持。
+注意：
+
+> All Android-based devices support OpenGL ES 1.0 and 2.0. 但是 Only Android devices that have the necessary GPU fully support later versions of OpenGL ES, but the libraries are present on all devices that support the API level where they were introduced. 
+
+我的理解 3.x 提供的一些功能（API）是需要一些特定的硬件 GPU 支持的，代码中调用这些 API，只要链接不出问题编译构建是可以通过的，但是如果真的要确保使用需要有硬件的支持，软件中可以通过调用特定的函数询问版本是否支持。
 
 ### 3.2.2. EGL
 
-需要 include <EGL/egl.h> and <EGL/eglext.h>
+> include `<EGL/egl.h>` and `<EGL/eglext.h>`
 
-`libEGL`，for allocating and managing OpenGL ES contexts and surfaces
+> `libEGL`，for allocating and managing OpenGL ES contexts and surfaces
 
 ### 3.2.3. Vulkan
 
-include <vulkan/vulkan.h>
+> include `<vulkan/vulkan.h>`
 
-`libvulkan`，a low-overhead, cross-platform API for high-performance 3D graphics rendering.
+> `libvulkan`，a low-overhead, cross-platform API for high-performance 3D graphics rendering.
 
 ### 3.2.4. Bitmaps
 
-`libjnigraphics`， allows access to the pixel buffers of Java `Bitmap` objects.
+> `libjnigraphics`， allows access to the pixel buffers of Java `Bitmap` objects.
 
 是 java API `Bitmap` 对象封装的 native API
 
@@ -397,21 +401,21 @@ include <vulkan/vulkan.h>
 
 ## 3.3. Camera 摄像相关：
 
-`libcamera2ndk`， perform fine-grained photo capture and processing
+> `libcamera2ndk`， perform fine-grained photo capture and processing
 
 ## 3.4. Media 多媒体相关：
 
-### 3.4.1. `libmediandk`
+### 3.4.1. libmediandk
 
-provide low-level native interfaces similar to `MediaExtractor`, `MediaCodec` and other related Java APIs.
+> provide low-level native interfaces similar to `MediaExtractor`, `MediaCodec` and other related Java APIs.
 
 ### 3.4.2. OpenMAX AL：
 
-include <OMXAL/OpenMAXAL.h> and <OMXAL/OpenMAXAL_Platform.h>
+> include <OMXAL/OpenMAXAL.h> and <OMXAL/OpenMAXAL_Platform.h>
 
-The NDK distribution of OpenMAX AL also provides Android-specific extensions. For information about these extensions, see the comments in <OMXAL/OpenMAXAL_Android.h>.
+> The NDK distribution of OpenMAX AL also provides Android-specific extensions. For information about these extensions, see the comments in <OMXAL/OpenMAXAL_Android.h>.
 
-`libOpenMAXAL`, native multimedia handling
+> `libOpenMAXAL`, native multimedia handling
 
 ## 3.5. Android native application APIs：
 
@@ -432,30 +436,31 @@ The NDK distribution of OpenMAX AL also provides Android-specific extensions. Fo
 - Storage
 - SurfaceTexture
 
-`libnativewindow` for more recent Native Window functionality
+> `libnativewindow` for more recent Native Window functionality
 
 ### 3.5.1. Hardware Buffer APIs：
 
-create your own pipelines for cross-process buffer management
+> create your own pipelines for cross-process buffer management
 
-include <android/hardware_buffer.h>
+> include <android/hardware_buffer.h>
 
 为 Java 提供了面向 HardwareBuffer object 的封装 JNI API
-include <android/hardware_buffer_jni.h>
+
+> include <android/hardware_buffer_jni.h>
 
 ## 3.6. Audio 音频处理
 
 ### 3.6.1. AAudio：
 
-`libaaudio`，currently-supported native audio API. It replaced OpenSL ES, and provides better support for high-performance audio apps that require low-latency audio.
+> `libaaudio`，currently-supported native audio API. It replaced OpenSL ES, and provides better support for high-performance audio apps that require low-latency audio.
 
 ### 3.6.2. OpenSL ES
 
-`libOpenSLES`， another native audio API which is also supported
+> `libOpenSLES`， another native audio API which is also supported
 
 ## 3.7. Neural Networks API
 
-`libneuralnetworks`，provides apps with hardware acceleration for on-device machine learning operations.
+> `libneuralnetworks`，provides apps with hardware acceleration for on-device machine learning operations.
 
 
 
