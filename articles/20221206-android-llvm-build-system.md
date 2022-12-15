@@ -710,15 +710,15 @@ def _build_config(self) -> None:
 - INFO:base_builders:Building builtins for Linux / hosts.Arch.ARM
 ```
 
-输出在：
-- out/lib/builtins-<ARCH>-ndk-cxx
+输出对应在：
+- out/lib/builtins-<ARCH>-arm-ndk-cxx
 - out/lib/builtins-baremetal
 - out/lib/builtins-arm-ndk-cxx-exported
 - out/lib/builtins-i386-ndk-cxx-exported
 - out/lib/builtins-aarch64-unknown-linux-musl
 - out/lib/builtins-arm-unknown-linux-musleabihf
 
-具体，以 Android-ARM 为例。TBD， 还需要再看看
+具体，以 Android-ARM 为例。
 
 ```python
 def install_config(self) -> None:
@@ -730,24 +730,40 @@ def install_config(self) -> None:
     if isinstance(self._config, configs.LinuxMuslConfig) and arch == hosts.Arch.ARM:
         sarch = 'armhf'
 	# 生成的文件名为 libclang_rt.builtins-arm-android.a
+	# 或者 libclang_rt.builtins-arm-android-exported.a
     filename = 'libclang_rt.builtins-' + sarch
     filename += '-android.a' if self._config.target_os.is_android else '.a'
     filename_exported = 'libclang_rt.builtins-' + sarch + '-android-exported.a'
 
+	# ninja 构建后生成的文件在 out/lib/builtins-arm-ndk-cxx/lib/linux/libclang_rt.builtins-arm-android.a
     src_path = self.output_dir / 'lib' / self._config.target_os.crt_dir / filename
+	
+	# 这里的 output_resource_dir 指的路径是形如：out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/
+	# 也就是上面注释说的 "toolchain resource directory (lib/linux)"
     self.output_resource_dir.mkdir(parents=True, exist_ok=True)
-    if self.is_exported:
+    
+	if self.is_exported:
+        # 如果指定 exported 则 
+	    # cp \
+	    # out/lib/builtins-arm-ndk-cxx-exported/lib/linux/libclang_rt.builtins-arm-android.a \
+	    # out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/libclang_rt.builtins-arm-android-exported.a
+
         # This special copy exports its symbols and is only intended for use
         # in Bionic's libc.so.
-        shutil.copy2(src_path, self.output_resource_dir / filename_exported)
+		shutil.copy2(src_path, self.output_resource_dir / filename_exported)
     else:
         shutil.copy2(src_path, self.output_resource_dir / filename)
-        # Also install to self.resource_dir, if it's different,
+        
+		# TBD 这是一种例外处理
+		# Also install to self.resource_dir, if it's different,
         # for use when building target libraries.
         if self.resource_dir != self.output_resource_dir:
             self.resource_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src_path, self.resource_dir / filename)
-        # Make a copy for the NDK.
+        
+		# 这里会 cp 到 一份给 ndk 用，即
+		# out/install/linux-x86/clang-dev/runtimes_ndk_cxx/libclang_rt.builtins-arm-android.a
+		# Make a copy for the NDK.
         if self._config.target_os.is_android:
             dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
             dst_dir.mkdir(parents=True, exist_ok=True)
@@ -806,6 +822,7 @@ src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
 ```
 即对应 `out/llvm-project/compiler-rt`
 
+有关 configs：
 ```python
 	config_list: List[configs.Config] = (
         configs.android_configs(platform=True) +
@@ -813,18 +830,102 @@ src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
     )
 ```
 
-分别会制作 platform 和 ndk
-- platform
-  - output：out/lib/compiler-rt-ARCH
-  - install：out/stage2-install/lib64/clang/12.0.7
-- ndk
-  - output: out/lib/compiler-rt-ARCH-ndk-cxx
-  - install: out/lib/compiler-rt-ARCH-ndk-cxx-install
+android_configs 会遍历所有支持的 ARCH，这里再按照 platform 和 非 platform（即 ndk） 方式分，所以共有 8 组
 
+```
+INFO:builder_registry:Building compiler-rt.
+INFO:base_builders:Building compiler-rt for Android-ARM (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-I386 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-ARM (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-I386 (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=False static=False None)
+```
+
+cmake 选项方面，platform 和 ndk 版本有如下区别：
+- `--target`：取值为 `<ARCH>-linux-android<API-level>`，其中 `<API-level>` 具体看 configs::api_level(), 针对 platform 和 ndk 的取值会不同，其中 platform 的版本固定取 29，ndk 版本可能取 19 也可能是 21
+- `--sysroot`：platform 会指定为 `out/sysroots/platform/<ARCH>`，ndk 版本会指定为 `out/sysroots/ndk/<ARCH>`。因为 sysroot 本身就是分 platform 和 ndk 两个版本的
+- `-DCMAKE_CXX_FLAGS`: platform 版本比 ndk 版本多如下：
+  ```
+  -nostdinc++
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/prebuilts/clang/host/linux-x86/clang-r458507/include/c++/v1
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/include
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/kernel/uapi
+  ```
+- `-DCMAKE_INSTALL_PREFIX`: platform 指定 ninja install 时安装到 `out/stage2-install/lib/clang/X.Y.Z`; ndk 版本指定安装到 `out/lib/compiler-rt-<ARCH>-ndk-cxx-install`
+- `-DCMAKE_SYSROOT`: 和 `--sysroot` 的效果一样。
+- `-DANDROID_PLATFORM_LEVEL`: 和 `--target` 的处理原则类似，但作用不同
+- `-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE`: 和 `--target` 的处理原则类似，但作用不同
+- `-DSANITIZER_COMMON_LINK_LIBS`: ndk 版本比 platform 版本多一个 `-landroid_support`
+- `-DCOMPILER_RT_HWASAN_WITH_INTERCEPTORS=OFF`: platform 有这个，ndk 的没有。
+
+这的确会造成 platform 和 ndk 的两种版本生成的结果不同。
+
+针对 config 的安装，以 ARM 为例
+```python
+def install_config(self) -> None:
+	# ninja 构建过程中生成的库
+	# platform 版本的放在 out/lib/compiler-rt-arm/lib/linux/*.a
+	# ndk 版本你的放在    out/lib/compiler-rt-arm-ndk-cxx/lib/linux/*.a
+	# 以上在 log 中都可以看到：搜 "Build files have been written to:"
+
+	# 这里是执行 ninja install
+	# 针对 platform 版本会安装在 out/stage2-install/lib/clang/16.0.1/lib/linux/*.a
+	# 针对 ndk 版本会安装在      out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/*.a
+	# 这是由 cmake 的 configure 过程中的 CMAKE_INSTALL_PREFIX 指定的，platform 和 ndk 的版本该值有区别
+    # Still run `ninja install`.
+    super().install_config()
+
+    # 参考 CompilerRTBuilder::install_dir()
+	# 针对 platform 版本，lib_dir 指向 out/stage2-install/lib/clang/16.0.1/lib/linux/
+	# 针对 ndk 版本，版本，lib_dir 指向 out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/
+    lib_dir = self.install_dir / 'lib' / 'linux'
+
+    # 这是对 fuzzer 库的额外处理
+	# Install the fuzzer library to the old {arch}/libFuzzer.a path for
+    # backwards compatibility.
+    arch = self._config.target_arch
+    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
+    static_lib_filename = 'libclang_rt.fuzzer-' + sarch + '-android.a'
+
+    arch_dir = lib_dir / arch.value
+    arch_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(lib_dir / static_lib_filename, arch_dir / 'libFuzzer.a')
+
+    # 针对 ndk 版本会将其复制到 out/stage2-install/runtimes_ndk_cxx
+	# 我理解此时的 self.output_toolchain 就是 out/stage2-install
+    if not self._config.platform:
+        dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
+        shutil.copytree(lib_dir, dst_dir, dirs_exist_ok=True)
+```
+
+综上所述，对每个 ARCH，我们都会对应三个目录，
+- out/lib/compiler-rt-<ARCH>：platform 版本的 output_dir
+- out/stage2-install/lib/clang/16.0.1: platform 版本的 install_dir
+- out/lib/compiler-rt-<ARCH>-ndk-cxx：ndk 版本的 output_dir
+- out/lib/compiler-rt-<ARCH>-ndk-cxx-install: ndk 版本的 install_dir
 
 #### 2.3.8.6. TsanBuilder
 
-未分析
+```python
+class TsanBuilder(base_builders.LLVMRuntimeBuilder):
+    name: str = 'tsan'
+    src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
+    config_list: List[configs.Config] = configs.android_ndk_tsan_configs()
+```
+
+注意 config 是 android_ndk_tsan_configs，所以是 ndk 相关的
+
+制作过程：
+
+- step 1: cmake -> 创建 out/lib/tsan-aarch64-ndk-cxx 目录
+- step 2: ninja -> 在 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成库文件
+- step 3: ninja install -> 将头文件和 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成的库文件安装到 out/lib/tsan-aarch64-ndk-cxx-install/
+- step 4: 将 out/lib/tsan-aarch64-ndk-cxx-install/lib/linux 下的 tsan 库文件手动复制到 out/install/linux-x86/clang-dev/runtimes_ndk_cxx/
+
+其中 step 3 和 step 4 见 TsanBuilder::install_config
 
 #### 2.3.8.7. CompilerRTHostI386Builder
 
@@ -1131,9 +1232,12 @@ def main():
         if do_bolt_instrument:
             bolt_instrument(stage2)
 	
-    # package_toolchain 中有一段 for 循环调用 "utils.check_call([strip_cmd, '-S', '-x', binary])"
-    # package_toolchain -> install_wrappers
-    # log 最后 external/toolchain-utils/compiler_wrapper/build.py
+	# package_toolchain 的主要逻辑是将 out/stage2-install 下的东西复制到 out/install/linux-x86/clang-dev 下去
+	# 然后就是对这个结果进行修饰，譬如
+    # 有一段 for 循环调用 "utils.check_call([strip_cmd, '-S', '-x', binary])" 执行 strip
+	# 等等。
+    # 注意 package_toolchain 会调用 install_wrappers，这个函数会调用 external/toolchain-utils/compiler_wrapper/build.py 这个脚本
+	# 构建出一个叫做 ./out/llvm_android_wrapper 的程序，具体做什么的，还不清楚 TBD
     if do_package and need_host:
         package_toolchain(
             stage2,
@@ -1150,3 +1254,18 @@ def main():
 
     return 0
 ```
+
+这里再整理一下构建的完整流程，结合构建过程中 out 目录下会生成的内容：
+
+- 生成 out/llvm-project，源码打补丁
+- 执行 stage1，cmake 和 ninja 编译输出在 out/stage1
+- 执行 stage1 的 ninja install，输出在 out/stage1-install，此时将 default toolchian 修改为指向 out/stage1-install 下的 clang，为 stage2 做准备
+- 构建一些 stage2 会依赖的库，譬如 swig 等，这些库都会放在 out/lib 下，基本上形式为一个 output_dir，一个 install_dir， 譬如对 swig，存在 output_dir 为 out/lib/swig-linux， install_dir 为 out/lib/swig-linux-install
+- 开始构建 stage2，cmake 和 ninja 编译输出在 out/stage2
+- 执行 stage1 的 ninja install，输出在 out/stage2-install，此时将 default toolchian 修改为指向 out/stage2-install 下的 clang，为构建 runtime 做准备
+- Builder.output_toolchain = stage2.installed_toolchain 这一步很重要，目的就是确保后面 runtime 构建的输出安装在 out/stage2-install 下。譬如 out/stage2-install/runtimes_ndk_cxx 这里的内容就是在后面构建 runtime 库时创建出来的
+- 开始构建 runtime 库
+  - 首先构建 sysroots，输出在 out/sysroots，下面分 platform 和 ndk 两个版本，基本上所有的 runtime 库都会考虑这个问题。sysroots 要先建立，后面编译一些 runtime 库的时候会依赖于这里的 sysroot（`--sysroot`）
+  - 后面的 runtimes 的 output_dir 和 install_dir 都在 out/lib 下。稍微复杂的就是会涉及 -install 或者 -exported。
+- stage2 测试，先略过
+- 最终打包（package_toolchain），将 out/stage2-install 下的东西复制到 out/install/linux-x86/clang-dev 下去，并做一些调整，譬如 strip 等。
