@@ -1257,15 +1257,15 @@ def main():
 
 这里再整理一下构建的完整流程，结合构建过程中 out 目录下会生成的内容：
 
-- 生成 out/llvm-project，源码打补丁
-- 执行 stage1，cmake 和 ninja 编译输出在 out/stage1
-- 执行 stage1 的 ninja install，输出在 out/stage1-install，此时将 default toolchian 修改为指向 out/stage1-install 下的 clang，为 stage2 做准备
-- 构建一些 stage2 会依赖的库，譬如 swig 等，这些库都会放在 out/lib 下，基本上形式为一个 output_dir，一个 install_dir， 譬如对 swig，存在 output_dir 为 out/lib/swig-linux， install_dir 为 out/lib/swig-linux-install
-- 开始构建 stage2，cmake 和 ninja 编译输出在 out/stage2
-- 执行 stage1 的 ninja install，输出在 out/stage2-install，此时将 default toolchian 修改为指向 out/stage2-install 下的 clang，为构建 runtime 做准备
-- Builder.output_toolchain = stage2.installed_toolchain 这一步很重要，目的就是确保后面 runtime 构建的输出安装在 out/stage2-install 下。譬如 out/stage2-install/runtimes_ndk_cxx 这里的内容就是在后面构建 runtime 库时创建出来的
+- 生成 `out/llvm-project`，源码打补丁
+- default toolchian 此时默认是用的 prebuilt 提供的一个 clang。执行 stage1，cmake 和 ninja 编译输出在 `out/stage1`
+- 执行 stage1 的 ninja install，输出在 `out/stage1-install`，此时将 default toolchian 修改为指向 `out/stage1-install` 下的 clang，为 stage2 做准备
+- 构建一些 stage2 会依赖的库，譬如 swig 等，这些库都会放在 `out/lib` 下，基本上形式为一个 output_dir，一个 install_dir， 譬如对 swig，存在 output_dir 为 `out/lib/swig-linux`， install_dir 为 `out/lib/swig-linux-install`
+- 开始构建 stage2，cmake 和 ninja 编译输出在 `out/stage2`
+- 执行 stage2 的 ninja install，输出在 `out/stage2-install`，此时将 default toolchian 修改为指向 `out/stage2-install` 下的 clang，为构建 runtime 做准备
+- `Builder.output_toolchain = stage2.installed_toolchain` 这一步很重要，目的就是确保后面 runtime 构建过程中执行一些手动安装在 `out/stage2-install` 下。譬如 `out/stage2-install/runtimes_ndk_cxx` 这里的内容就是在后面构建 runtime 库时创建出来的。
 - 开始构建 runtime 库
-  - 首先构建 sysroots，输出在 out/sysroots，下面分 platform 和 ndk 两个版本，基本上所有的 runtime 库都会考虑这个问题。sysroots 要先建立，后面编译一些 runtime 库的时候会依赖于这里的 sysroot（`--sysroot`）
-  - 后面的 runtimes 的 output_dir 和 install_dir 都在 out/lib 下。稍微复杂的就是会涉及 -install 或者 -exported。
+  - 首先构建 sysroots，输出在 `out/sysroots`，下面分 platform 和 ndk 两个版本，基本上所有的 runtime 库都会考虑这个问题。sysroots 要先建立，后面编译一些 runtime 库的时候会依赖于这里的 sysroot（`--sysroot`）
+  - 后面的 runtimes 的 output_dir 和 install_dir 都在 `out/lib` 下。稍微复杂的就是会涉及 `*-install` 或者 `*-exported`。
 - stage2 测试，先略过
-- 最终打包（package_toolchain），将 out/stage2-install 下的东西复制到 out/install/linux-x86/clang-dev 下去，并做一些调整，譬如 strip 等。
+- 最终打包（`package_toolchain()`），将 `out/stage2-install` 下的东西复制到 `out/install/linux-x86/clang-dev` 下去，并做一些调整，譬如 strip 等。
