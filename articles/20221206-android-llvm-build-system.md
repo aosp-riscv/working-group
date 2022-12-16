@@ -15,36 +15,36 @@
 	- [1.2. 构建主程序](#12-构建主程序)
 	- [1.3. build system](#13-build-system)
 	- [1.4. 其他](#14-其他)
-- [2. builders](#2-builders)
-	- [2.1. builder.registry](#21-builderregistry)
-	- [2.2. base builders](#22-base-builders)
-		- [2.2.1. Builder](#221-builder)
-		- [2.2.2. CMakeBuilder](#222-cmakebuilder)
-		- [2.2.3. LLVMBaseBuilder](#223-llvmbasebuilder)
-		- [2.2.4. AutoconfBuilder](#224-autoconfbuilder)
-	- [2.3. builders](#23-builders)
-		- [2.3.1. Stage1Builder](#231-stage1builder)
-		- [2.3.2. Stage2Builder](#232-stage2builder)
-		- [2.3.3. SwigBuilder](#233-swigbuilder)
-		- [2.3.4. LibXml2Builder](#234-libxml2builder)
-		- [2.3.5. XzBuilder](#235-xzbuilder)
-		- [2.3.6. LibNcursesBuilder](#236-libncursesbuilder)
-		- [2.3.7. LibEditBuilder](#237-libeditbuilder)
-		- [2.3.8. runtime](#238-runtime)
-			- [2.3.8.1. DeviceSysrootsBuilder](#2381-devicesysrootsbuilder)
-			- [2.3.8.2. BuiltinsBuilder](#2382-builtinsbuilder)
-			- [2.3.8.3. LibUnwindBuilder](#2383-libunwindbuilder)
-			- [2.3.8.4. PlatformLibcxxAbiBuilder](#2384-platformlibcxxabibuilder)
-			- [2.3.8.5. CompilerRTBuilder](#2385-compilerrtbuilder)
-			- [2.3.8.6. TsanBuilder](#2386-tsanbuilder)
-			- [2.3.8.7. CompilerRTHostI386Builder](#2387-compilerrthosti386builder)
-			- [2.3.8.8. MuslHostRuntimeBuilder](#2388-muslhostruntimebuilder)
-			- [2.3.8.9. LibOMPBuilder](#2389-libompbuilder)
-			- [2.3.8.10. LldbServerBuilder](#23810-lldbserverbuilder)
-			- [2.3.8.11. SanitizerMapFileBuilder](#23811-sanitizermapfilebuilder)
-- [3. 主流程](#3-主流程)
-	- [3.1. 命令选项](#31-命令选项)
-	- [3.2. 构建主函数 main](#32-构建主函数-main)
+- [2. 主流程](#2-主流程)
+	- [2.1. 命令选项](#21-命令选项)
+	- [2.2. 构建主函数 main](#22-构建主函数-main)
+- [3. builders](#3-builders)
+	- [3.1. builder.registry](#31-builderregistry)
+	- [3.2. base builders](#32-base-builders)
+		- [3.2.1. Builder](#321-builder)
+		- [3.2.2. CMakeBuilder](#322-cmakebuilder)
+		- [3.2.3. LLVMBaseBuilder](#323-llvmbasebuilder)
+		- [3.2.4. AutoconfBuilder](#324-autoconfbuilder)
+	- [3.3. builders](#33-builders)
+		- [3.3.1. Stage1Builder](#331-stage1builder)
+		- [3.3.2. Stage2Builder](#332-stage2builder)
+		- [3.3.3. SwigBuilder](#333-swigbuilder)
+		- [3.3.4. LibXml2Builder](#334-libxml2builder)
+		- [3.3.5. XzBuilder](#335-xzbuilder)
+		- [3.3.6. LibNcursesBuilder](#336-libncursesbuilder)
+		- [3.3.7. LibEditBuilder](#337-libeditbuilder)
+		- [3.3.8. runtime](#338-runtime)
+			- [3.3.8.1. DeviceSysrootsBuilder](#3381-devicesysrootsbuilder)
+			- [3.3.8.2. BuiltinsBuilder](#3382-builtinsbuilder)
+			- [3.3.8.3. LibUnwindBuilder](#3383-libunwindbuilder)
+			- [3.3.8.4. PlatformLibcxxAbiBuilder](#3384-platformlibcxxabibuilder)
+			- [3.3.8.5. CompilerRTBuilder](#3385-compilerrtbuilder)
+			- [3.3.8.6. TsanBuilder](#3386-tsanbuilder)
+			- [3.3.8.7. CompilerRTHostI386Builder](#3387-compilerrthosti386builder)
+			- [3.3.8.8. MuslHostRuntimeBuilder](#3388-muslhostruntimebuilder)
+			- [3.3.8.9. LibOMPBuilder](#3389-libompbuilder)
+			- [3.3.8.10. LldbServerBuilder](#33810-lldbserverbuilder)
+			- [3.3.8.11. SanitizerMapFileBuilder](#33811-sanitizermapfilebuilder)
 
 <!-- /TOC -->
 
@@ -131,6 +131,8 @@ INFO:builder_registry:Building host-sysroots.
 }
 ```
 
+更详细的执行流程分析，请移步 [主流程分析](#2-主流程)。
+
 ## 1.3. build system
 
 LLVM Android 的 build system 采用 python 编写，由 builders 和 configs 两组类构成。其中
@@ -167,795 +169,15 @@ LLVM Android 的 build system 采用 python 编写，由 builders 和 configs �
   INFO:base_builders:Building builtins for Linux / hosts.Arch.ARM
   ```
 
+  更多详细的对主要 builders 的总结，请移步 [builders 介绍](#3-builders)。
+
 ## 1.4. 其他
 
 `$TOP/toolchain/llvm_android/constants.py`, 这里列出了重要的常量定义。
 
+# 2. 主流程
 
-# 2. builders
-
-## 2.1. builder.registry
-
-代码文件：`$TOP/toolchain/llvm_android/builder_registry.py`
-
-可以认为就是调用 builder 的一个封装类，利用 decorate 语法糖, 调用方式参考 Builder 类的 `build()` 方法的写法如下，效果就是当我们在对从 Builder 派生的子类执行 `build()` 方法时，程序会首先执行 BuilderRegistry 类的 `register_and_build()` 方法。
-
-```python
-@BuilderRegistry.register_and_build
-    def build(self) -> None:
-```
-
-再看 BuilderRegistry 类的 `register_and_build()` 方法：
-
-```python
-@classmethod
-    def register_and_build(cls, function):
-        """A decorator to wrap a build() method for a Builder."""
-        def wrapper(builder, *args, **kwargs) -> None:
-            name = builder.name
-            cls._builders[name] = builder
-            if cls.should_build(name):
-                logger().info("Building %s.", name)
-                function(builder, *args, **kwargs)
-            else:
-                logger().info("Skipping %s.", name)
-        return wrapper
-```
-
-其效果就是，当我们调用实际的 builder 的 `build()` 方法时会在 log 中打印 "INFO:builder_registry:Building XXXX"，然后在调用实际的 `build()` 方法，起到一种封装调用的效果。
-
-## 2.2. base builders
-
-这里定义了一些基类， 挑几个主要的看一下：
-
-### 2.2.1. Builder
-
-主要属性：
-
-- `name: str = ""`：这个在 Builder 中定义为空，具体派生子类中会给自己起一个名字，会被用在 log 中。
-
-- `config_list: List[configs.Config]`
-  每个 Builder 以及其派生的子类对象都会维护一个 Config 的 list。每个 Config 顶对应一个构建的配置，也同时对应一个对应的构建动作。
-
-- `toolchain: toolchains.Toolchain = toolchains.get_prebuilt_toolchain()`
-  
-  代表了用来执行构建所用的 toolchain，默认取 prebuilt 的 toolchain。如果是 stage2 中则会更新其为 stage1 中制作的 new toolchain
-
-重要的方法：
-- build 
-  
-  ```python
-  @BuilderRegistry.register_and_build
-  def build(self) -> None:
-        """Builds all configs."""
-        for config in self.config_list:
-            self._config = config
-
-            logger().info('Building %s for %s', self.name, self._config)
-            self._build_config()
-        self.install()
-  ```
-  
-  几乎所有从 Builder 派生的子类的都会执行 `build()`，这个函数实现了构建的主框架流程，`build()` 内部会遍历 `config_list` 这个列表， 取出每个 config，针对每个 config 调用 `_build_config()`, 最后统一调用 `install()`。
-  
-  `_build_config()` 和 `install()` 这是两个非常重要的虚方法，会被子类重载实现，执行具体的构建和安装动作。
-  
-- `_build_config()`：根据当前的 config，也就是 `self._config` 进行构建。Builder 的这个函数是一个纯虚函数，需要子类重写实现，最主要的实现者包括：
-  
-  - AutoconfBuilder
-  - CMakeBuilder：实现了基本的 build 过程， 包括 cmake -> ninja -> ninja install, 其中 ninja install 由调用 install_config 实现 
-    - LLVMBaseBuilder： n/a
-      - LLVMRuntimeBuilder: n/a
-        - CompilerRTHostI386Builder
-        - PlatformLibcxxAbiBuilder
-  - SanitizerMapFileBuilder: full-overwrite
-  - HostSysrootsBuilder：full-overwrite
-  - DeviceSysrootsBuilder ：full-overwrite
-
-- `install()` 基类的虚函数，Builder 什么也没有实现。会被子类重写，定义对应的安装过程规则。会重写整个虚函数的子类很少，目前只看到 CompilerRTBuilder
-
-
-### 2.2.2. CMakeBuilder
-
-如果一个项目实际基于 cmake 实现其 build system，实际驱动采用 ninja, 则其对应的 builder 从 CMakeBuilder 派生，触发执行 cmake 定义的构建动作。
-
-llvm 下的大部分项目的 build-system 采用 cmake，参考本文提供的 builder 类图可以有个总体把握。
-
-主要方法：
-
-- `cmake_defines()`: 这是是针对采用 cmake 这种方式来定义 cmake 的 configure 的，所以这个函数是 CMakeBuilder 以及其派生类才会有，如果采用其他的 build system，应该会有另外的 xxx_defines。cmake_defines 中引用 `self._config`（也就是 Config，在父类的 build() 中传入）。
-
-- `_build_config()`: 所有从 Builder 派生的子类都需要实现这个方法，Builder 的该方法是一个纯虚方法，实际并没有实现什么，所以 CMakeBuilder 覆盖了父类 Builder 同名方法， 定义了基于 cmake 的构建的主要动作。
-
-  ```python
-  def _build_config(self) -> None:
-      if self.remove_cmake_cache:
-      self._rm_cmake_cache(self.output_dir)
-  
-      if self.remove_install_dir and self.install_dir.exists():
-      shutil.rmtree(self.install_dir)
-  
-      # 下面这三句话就是在组装第一条执行cmake的命令
-      cmake_cmd: List[str] = [str(paths.CMAKE_BIN_PATH), '-G', 'Ninja']
-      cmake_cmd.extend(f'-D{key}={val}' for key, val in self.cmake_defines.items())
-      cmake_cmd.append(str(self.src_dir))
-  
-      # 创建输出路径
-      self.output_dir.mkdir(parents=True, exist_ok=True)
-  
-      # 这里创建的 out/stage1/cmake_invocation.sh 不知道有什么用，感觉就是可以让我们看看实际的 cmake 的选项供调试用
-      env = self.env
-      utils.create_script(self.output_dir / 'cmake_invocation.sh', cmake_cmd, env)
-      # 执行第一条 cmake 的命令，
-  	  # 参考 toolchain/llvm_android/utils.py 中 会 check_call -> subprocess_run
-  	  # 每次执行会打印 "subprocess.run:%s %s"
-  	  # 然后创建子进程传入 cmd，cd 进入 out 目录后执行 
-  	  utils.check_call(cmake_cmd, cwd=self.output_dir, env=env)
-  
-  	  # _ninja 内部同样调用 check_call 执行 ninja 命令
-      self._ninja(self.ninja_targets)
-  	  # 调用 check_call 执行 ninja install
-      self.install_config()
-  ```
-
-- `install_config()`: CMakeBuilder 开始有这个函数，原因是 `_build_config()` 会调用该函数。这个函数和 install 的区别是，`install_config()` 是针对当前 config 的，而 `install()` 是对所有 config 的，可以再仔细看一下 Builder 中对 `build()` 和 `install()` 的说明。
-  
-  CMakeBuilder 的 `install_config()` 本质上就是执行 "ninja install"，这意味这凡是没有 full-overwrite 的继承子类，都是会先执行 "ninja install"，然后在执行自己的特定 install 步骤，而那些 full-overwrite 的子类则一般不执行 ninja install，而是只执行自定义的安装步骤
-
-  有以下派生自 CMakeBuilder 的子类会 overwrite install_config，其中部分子类会 full-overwrite
-  - LLVMBuilder
-    - Stage1Builder
-    - Stage2Builder
-    - WindowsToolchainBuilder
-  - LLVMRuntimeBuilder: n/a
-    - LibUnwindBuilder：full-overwrite
-    - LibOMPBuilder: full-overwrite
-    - LldbServerBuilder: full-overwrite
-    - CompilerRTBuilder
-    - TsanBuilder
-    - LibCxxBuilder
-    - PlatformLibcxxAbiBuilder: full-overwrite
-    - BuiltinsBuilder: full-overwrite
-
-### 2.2.3. LLVMBaseBuilder
-
-Base builder for both llvm and individual runtime lib.
-
-从 CMakeBuilder 派生，说明这些项目都是用 cmake
-
-会直接派生两个子类：
-- LLVMRuntimeBuilder： Base builder for llvm runtime libs. 下面会直接派生一些 builder
-  - LibUnwindBuilder
-  - CompilerRTBuilder
-  - ......
-- LLVMBuilder： Builder for LLVM project. 下面会直接派生一些最终的 builder，譬如
-  - Stage1Builder
-  - Stage2Builder
-  - WindowsToolchainBuilder
-
-值得一提的是 LLVMBuilder 定义了一个纯虚函数 llvm_targets，这个纯虚函数会被 LLVMBuilder 派生的 Stage1Builder/Stage2Builder/WindowsToolchainBuilder overwrite，而最终会被 LLVMBuilder::cmake_defines 使用，用于定义 `LLVM_TARGETS_TO_BUILD` 的值。
-
-
-### 2.2.4. AutoconfBuilder
-
-这个类和 CMakeBuilder 一样都派生于 Builder
-
-从 AutoconfBuilder 派生的子类有：
-
-- LibNcursesBuilder
-- LibEditBuilder
-- SwigBuilder
-
-和 CMakeBuilder 类似，AutoconfBuilder 有如下几个重要的成员函数
-
-- `_build_config()`, 大致逻辑如下
-  - 运行 configure， 具体的 config 命令会写入到 output_dir / 'config_invocation.sh'。搜索这个文件会看到有：
-  ```bash
-  find out -name "config_invocation.sh"
-  out/lib/libncurses-linux/config_invocation.sh
-  out/lib/libedit-linux/config_invocation.sh
-  out/lib/swig-linux/config_invocation.sh
-  ```
-  - 执行 make
-  - 执行 make install
-
-## 2.3. builders
-
-builders 比较多
-
-### 2.3.1. Stage1Builder
-
-关于为何要 two stages，参考 
-- https://llvm.org/docs/AdvancedBuilds.html
-- https://en.wikipedia.org/wiki/Bootstrapping_(compilers)
-- https://www.tutorialspoint.com/what-is-compiler-bootstrapping
-- https://stackoverflow.com/questions/65751457/how-could-one-possibly-bootstrap-a-c-compilerfrom-source 一个很有趣的介绍，感觉在compiler 出现之前，我们其实应该先有一个解释器和汇编器，然后基于解释器和汇编器我们就可以从 0 开始写一个编译器
-
-Stage1Builder 是从 CMakeBuilder 为基类派生下来的 Builder，派生关系是：`CMakeBuilder <-- LLVMBaseBuilder <-- LLVMBuilder <-- Stage1Builder`
-
-整个构建过程基本可以参考 CMakeBuilder 的 `_build_config()` 实现。
-
-- 第一步: cmake
-
-  注意 Stage1Builder 初始化时传入的参数是 LinuxConfig，最终形成的 cmake 选项可以参考 build.log
-
-- 第二步：ninja
-
-  生成的内容在 out/stage1
-
-- 第三步：ninja install
-  
-  安装在 out/stage1-install
-
-Stage1Builder 会在 out 下生成 stage1 目录，里面存放所有的 stage1 的临时文件和生成的目标文件，
-
-cmake 会生成一些重要的文件供 ninja 使用，包括：
-- `$TOP/out/stage1/CMakeFiles/rules.ninja`， 定义了 ninja 的一些 rules，会被 build.ninja 所 include
-- `$TOP/out/stage1/build.ninja`：ninja 的 build文件
-
-### 2.3.2. Stage2Builder
-
-Stage2 的 cmake 命令具体参考 build.log
-
-- output_dir： out/stage2
-- install_dir: out/stage2-install
-
-### 2.3.3. SwigBuilder
-
-源码在 `$TOP/external/swig/`, 参考代码 `$TOP/toolchain/llvm_android/paths.py`
-
-```python
-SWIG_SRC_DIR: Path = EXTERNAL_DIR / 'swig'
-```
-
-构建输出在 out/lib/swig-linux
-安装在 out/lib/swig-linux-install/
-
-有关 swig，可以看一下 `$TOP/external/swig/README`
-
-SWIG (Simplified Wrapper and Interface Generator)
-
-https://en.wikipedia.org/wiki/SWIG
-
-> The Simplified Wrapper and Interface Generator (SWIG) is an open-source software tool used to connect computer programs or libraries written in C or C++ with scripting languages such as Lua, Perl, PHP, Python, R, Ruby, Tcl, and other languages like C#, Java, JavaScript, Go, D, OCaml, Octave, Scilab and Scheme. Output can also be in the form of XML.
-
-https://note.qidong.name/2018/01/hello-swig-example/
-
-我理解 swig 的作用是：假设我们有用 C、C++ 写了一些函数，而在高级语言譬如 python 里想要调用这些函数，swig 帮我们自动生成一些对应的 c 代码和 python 代码，起到胶水的作用。
-
-在 LLVM 中，如果我们要构建 lldb，那么依赖于 swig。
-
-### 2.3.4. LibXml2Builder
-
-Libxml2 是一个 C 语言的 XML 程序库，可以简单方便地提供对 XML 文档的各种操作，并且支持 XPATH 查询，以及部分的支持 XSLT 转换等功能。
-
-源码在 `$TOP/external/libxml2`
-
-```python
-LIBXML2_SRC_DIR: Path = EXTERNAL_DIR / 'libxml2'
-```
-
-- 构建输出在 out/lib/libxml2-linux
-- 安装在 out/lib/libxml2-linux-install/
-
-llvm 的构建依赖 libxml 这个库，这里为 stage2 构建自己的，不用系统的。可以在 stage2 的 cmake 中看到
-```
--DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-llvm/clang-toolchain/out/lib/libxml2-linux-install/include/libxml2
--DLIBXML2_LIBRARY=/aosp/wangchen/dev-llvm/clang-toolchain/out/lib/libxml2-linux-install/lib/libxml2.so.2.9.10
-```
-而在 stage1 中没有设置这个所以 cmake 的时候 log 中会出现 Could NOT find LibXml2 (missing: LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR) 
-
-### 2.3.5. XzBuilder
-
-XZ Utils, 参考 `$TOP/toolchain/xz/README`
-
-> XZ Utils provide a general-purpose data-compression library plus
-> command-line tools. The native file format is the .xz format, but
-> also the legacy .lzma format is supported.
-
-
-```python
-XZ_SRC_DIR: Path = TOOLCHAIN_DIR / 'xz'
-```
-
-- src: toolchain/xz
-- output: out/lib/liblzma-linux
-- install: out/lib/liblzma-linux-install
-
-### 2.3.6. LibNcursesBuilder
-
-```python
-LIBNCURSES_SRC_DIR: Path = EXTERNAL_DIR / 'libncurses'
-```
-
-- src: external/libncurses
-- output: out/lib/libncurses-linux
-- install: out/lib/libncurses-linux-install
-
-### 2.3.7. LibEditBuilder
-
-https://www.thrysoee.dk/editline/
-
-> Generic line editing, history, and tokenization functions similar to GNU Readline.
-
-```python
-LIBEDIT_SRC_DIR: Path = EXTERNAL_DIR / 'libedit'
-```
-
-- src: external/libedit
-- output:
-- install
-
-### 2.3.8. runtime
-
-#### 2.3.8.1. DeviceSysrootsBuilder
-
-DeviceSysrootsBuilder 是指交叉工具链 clang 中自带的 runtime sysroot。本身属于 runtime 构建的一部分，虽然本质上构建 sysroot 的主要工作就是从 prebuilt 的 ndk 拷贝部分过来，但这是基础框架，其他 runtime 的库编译完后也是要安装到 sysroot 下的。
-
-和 DeviceSysrootsBuilder 对应，还有一个 HostSysrootsBuilder，但目前只有对 windows 的 clang 才需要构建 host 侧的 sysroot。所以暂时不看了(output_dir 对应的是 `$OUT_DIR/sysroots/x86_64-w64-mingw32`)。
-
-Device 侧 sysroot 分为两套版本，一个是用于 ndk，构建 app，一个是用于构建 aosp（platform，即 platform/prebuilts/clang/host/linux-x86）。
-
-注意后面在构建 runtime 的时候也会用到 ndk 或者 platform 的 sysroot。
-
-`--sysroot=$OUT_DIR/sysroots/ndk/$ARCH`
-- builtin
-
-`--sysroot=$OUT_DIR/sysroots/platform/$ARCH`
-- libunwind
-- platform-libcxxabi
-- compiler-rt
-
-
-之所以分为 ndk 和 platform 两套，有很多原因：
-- 譬如：对于 C++ 头文件，ndk 的 sysroot 中自带有标准的 c++ 头文件，而 platform 编译时，可能使用多种 c++ 头文件，即不是固定的，需要在编译时通过 `-nostdinc++ -isystem <path_to_cpp_headers>`, 参考 configs::cxxflags()。
-- 又譬如，某些 runtime 库（如 libunwind），在 ndk 环境下被使用时要求是隐藏符号，另一份是给 platform 的构建用的需要导出符号。参考 LibUnwindBuilder 的注释。同样，对于 libc++ 的库也有同样的处理要求。
-
-- output_dir: 只针对 AndroidConfig， 参考 AndroidConfig::sysroot(), 为 $OUT_DIR/sysroots, 再根据是 platform 还是 ndk 分为
-  - $OUT_DIR/sysroots/ndk
-  - $OUT_DIR/sysroots/platform
-  然后继续按照 target 的 arch 分 arm/arm64/riscv64/x86/x86_64
-- install_dir : 没什么动作，实际上对 sysroot，output_dir 即 install_dir
-
-
-```python
-def _build_config(self) -> None:
-    config: configs.AndroidConfig = cast(configs.AndroidConfig, self._config)
-    arch = config.target_arch
-    platform = config.platform
-    # 这个是输出的目录，针对 AndroidConfig， 
-	# 假设 platform = true， arch 为 arm
-    # 参考 AndroidConfig::sysroot(), 则对应的 sysroot 路径为 $OUT_DIR/sysroots/platform/arm
-    sysroot = config.sysroot
-    if sysroot.exists():
-        shutil.rmtree(sysroot)
-        sysroot.mkdir(parents=True, exist_ok=True)
-
-    # 源目录（src_sysroot）来自 `$TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot`
-	# toolchain/prebuilts/ndk/r25/ 这个目录对应的仓库是 https://android.googlesource.com/toolchain/prebuilts/ndk/r25
-
-    # sysroot 分两部分，一部分是头文件，一部分是二进制库
-	
-    # 这里先从源目录中复制头文件过来，
-	# `$src_sysroot/usr/include` 中头文件只有一份，包含了所有支持的 target ARCH，
-	# ls -l toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
-	# aarch64-linux-android
-	# arm-linux-androideabi
-	# i686-linux-android
-	# x86_64-linux-android
-	# ......
-	
-	# 所以拷贝的结果就是，不管 config.target_arch 是什么，会把 `$src_sysroot/usr/include` 下所有的 arch 的头文件都复制过来
-    # 参考 $OUT_DIR/sysroots/platform/arm/usr/include 下有 arm-linux-androideabi， 也有 aarch64-linux-android/...
-    # 我比较了一下四个 ARCH 对应的 $OUT_DIR/sysroots/platform/$ARCH/usr/include 都是一样的
-	
-    # Copy the NDK prebuilt's sysroot, but for the platform variant, omit
-    # the STL and android_support headers and libraries.
-	src_sysroot = paths.NDK_BASE / 'toolchains' / 'llvm' / 'prebuilt' / 'linux-x86_64' / 'sysroot'
-
-    # cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include $OUT_DIR/sysroots/platform/arm/usr/include
-	# Copy over usr/include.
-    shutil.copytree(src_sysroot / 'usr' / 'include',
-                    sysroot / 'usr' / 'include', symlinks=True)
-
-    # 拷贝完后，基于 platform 和 ndk 的区别，下面针对 ARCH 为 arm 举例：
-	# 如果 config 中 platform = true 则将 $OUT_DIR/sysroots/platform/arm/usr/include/c++ 目录删掉
-    # 如果是 ndk，则为 ARCH 添加一个 usr/local/include 的目录：拷贝 src 和 target 如下：
-	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include
-	# 所以如果以 ARCH 为 arm 为例，我们 diff $OUT_DIR/sysroots/ndk/arm  $OUT_DIR/sysroots/platform/arm，我们会发现 ndk 的版本下的内容比 platform 下的多
-	# - `usr/include/c++` 整个目录：这个原因前面分析过了
-	# - `usr/local/include` 整个目录：TBD 为啥 ndk 需要这个目录，还不是很清楚，猜测是在使用 ndk 构建一些应用时，include 路径会包含这个路径并 include 这个路径下的文件，但是在 platform 构建时不会涉及。
-	# 
-    if platform:
-       # Remove the STL headers.
-       shutil.rmtree(sysroot / 'usr' / 'include' / 'c++')
-    else:
-       # Add the android_support headers from usr/local/include.
-       shutil.copytree(src_sysroot / 'usr' / 'local' / 'include',
-                       sysroot / 'usr' / 'local' / 'include', symlinks=True)
-
-    # 这里开始复制二进制库
-	# $TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib 下的库是按照 triple 分的
-	# - aarch64-linux-android
-	# - arm-linux-androideabi
-	# - i686-linux-android
-	# - x86_64-linux-android
-	# 所以这里根据 config.target_arch 复制对应目录下的内容
-	# 以 arm 为例，就是执行如下赋值
-	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi \
-	#        out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi
-	# Copy over usr/lib/$TRIPLE.
-    src_lib = src_sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
-    dest_lib = sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
-    shutil.copytree(src_lib, dest_lib, symlinks=True)
-
-    # 复制完后，做如下额外处理：
-	# - 删除 libcompiler_rt-extras.a，TBD 不太清楚原因是什么
-	# - 对于 platform=true 的 config，删除 NDK 的 libc++，
-	#   以 arm 为例，具体就是删除掉
-	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下的 libc++abi.a、libc++_static.a 和 libc++_shared.so
-	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下各个 API-level 子目录下的 libc++.a 和 libc++.so
-	# - 对于 platform=true 的 config，会做一些假文件（stub），具体包括：
-	#   - 在 out 目录下新建一个 platform_stubs/$ARCH, 然后在下面新建一个 libc++.c，里面会手动写入一些空函数
-	#   - 在 out/sysroots/platform/$ARCH/ 下新建 usr/lib 目录，然后基于上面建的 libc++.c，编译链接一个 stub 的 libc++.so 出来。
-	#     编译时设置的 --target，为何是 29 参考 toolchain/llvm_android/configs.py 中的 api_level 函数说明。29 是 API level
-	#     注意，如果我们对比 out/sysroots/platform/$ARCH/usr/lib 和 out/sysroots/ndk/$ARCH/usr/lib，我们还会发现 platfrom 的版本下还会多一个 `libc++abi.so`
-	#     这个文件是 PlatformLibcxxAbiBuilder::install_config 中新建出来的，实际上只是一个 txt 文件
-	# 以上描述对应具体代码如下
-	
-	# Remove the NDK's libcompiler_rt-extras.  For the platform, also remove
-    # the NDK libc++.
-    (dest_lib / 'libcompiler_rt-extras.a').unlink()
-    if platform:
-        (dest_lib / 'libc++abi.a').unlink()
-        (dest_lib / 'libc++_static.a').unlink()
-        (dest_lib / 'libc++_shared.so').unlink()
-        # Each per-API-level directory has libc++.so, libc++.a, and libcompiler_rt-extras.a.
-        for subdir in dest_lib.iterdir():
-            if subdir.is_symlink() or not subdir.is_dir():
-                continue
-            if not re.match(r'\d+$', subdir.name):
-                continue
-            (subdir / 'libcompiler_rt-extras.a').unlink()
-            if platform:
-                (subdir / 'libc++.a').unlink()
-                (subdir / 'libc++.so').unlink()
-        # Verify that there aren't any extra copies somewhere else in the
-        # directory hierarchy.
-        verify_gone = ['libcompiler_rt-extras.a', 'libunwind.a']
-        if platform:
-            verify_gone += [
-                'libc++abi.a',
-                'libc++_static.a',
-                'libc++_shared.so',
-                'libc++.a',
-                'libc++.so',
-            ]
-        for (parent, _, files) in os.walk(sysroot):
-            for f in files:
-                if f in verify_gone:
-                    raise RuntimeError('sysroot file should have been ' +
-                                       f'removed: {os.path.join(parent, f)}')
-
-	if platform:
-        # Create a stub library for the platform's libc++.
-        platform_stubs = paths.OUT_DIR / 'platform_stubs' / config.ndk_arch
-        platform_stubs.mkdir(parents=True, exist_ok=True)
-        libdir = sysroot / 'usr' / 'lib'
-        libdir.mkdir(parents=True, exist_ok=True)
-        with (platform_stubs / 'libc++.c').open('w') as f:
-            f.write(textwrap.dedent("""\
-                void __cxa_atexit() {}
-                void __cxa_demangle() {}
-                void __cxa_finalize() {}
-                void __dynamic_cast() {}
-                void _ZTIN10__cxxabiv117__class_type_infoE() {}
-                void _ZTIN10__cxxabiv120__si_class_type_infoE() {}
-                void _ZTIN10__cxxabiv121__vmi_class_type_infoE() {}
-                void _ZTISt9type_info() {}
-            """))
-
-        utils.check_call([self.toolchain.cc,
-                          f'--target={config.llvm_triple}',
-                          '-fuse-ld=lld', '-nostdlib', '-shared',
-                          '-Wl,-soname,libc++.so',
-                          '-o{}'.format(libdir / 'libc++.so'),
-                          str(platform_stubs / 'libc++.c')])
-```
-
-
-#### 2.3.8.2. BuiltinsBuilder
-
-输入：`$TOP/out/llvm-project/compiler-rt/lib/builtins`
-
-参考 BuiltinsBuilder.config_list()
-
-```python
-    
-    # 在 buildin 的库制作中，下面的描述意思是 buildin 只制作针对 ndk 的版本，
-    # 但注意不是说 platform 构建中不用 buildin，这里的解释意思是 platform 构建中还是
-    # 会用到 buildin，只是 按 ndk 制作的版本 platform 也可以用，所以我们只要做一份就够了。
-    # 所以 target 侧的 builtin 全部都是 platform=False
-    # Only target the NDK, not the platform. The NDK copy is sufficient for the
-    # platform builders, and both NDK+platform builders use the same toolchain,
-    # which can only have a single copy installed into its resource directory.
-    @property
-    def config_list(self) -> List[configs.Config]:
-        result = configs.android_configs(platform=False)
-        result.append(configs.BaremetalAArch64Config())
-        # For arm32 and x86, build a special version of the builtins library
-        # where the symbols are exported, not hidden. This version is needed
-        # to continue exporting builtins from libc.so and libm.so.
-        for arch in [configs.AndroidARMConfig(), configs.AndroidI386Config()]:
-            arch.platform = False
-            arch.extra_config = {'is_exported': True}
-            result.append(arch)
-        # 后面这两个构建的是 host 侧的 builtin
-        result.append(configs.LinuxMuslConfig(hosts.Arch.AARCH64))
-        result.append(configs.LinuxMuslConfig(hosts.Arch.ARM))
-        return result
-```
-
-综上，我们看 log
-
-```
-- INFO:base_builders:Building builtins for Android-ARM (platform=False static=False None)
-- INFO:base_builders:Building builtins for Android-AARCH64 (platform=False static=False None)
-- INFO:base_builders:Building builtins for Android-I386 (platform=False static=False None)
-- INFO:base_builders:Building builtins for Android-X86_64 (platform=False static=False None)
-- INFO:base_builders:Building builtins for Baremetal
-- INFO:base_builders:Building builtins for Android-ARM (platform=False static=False {'is_exported': True})
-- INFO:base_builders:Building builtins for Android-I386 (platform=False static=False {'is_exported': True})
-- INFO:base_builders:Building builtins for Linux / hosts.Arch.AARCH64
-- INFO:base_builders:Building builtins for Linux / hosts.Arch.ARM
-```
-
-输出对应在：
-- out/lib/builtins-<ARCH>-arm-ndk-cxx
-- out/lib/builtins-baremetal
-- out/lib/builtins-arm-ndk-cxx-exported
-- out/lib/builtins-i386-ndk-cxx-exported
-- out/lib/builtins-aarch64-unknown-linux-musl
-- out/lib/builtins-arm-unknown-linux-musleabihf
-
-具体，以 Android-ARM 为例。
-
-```python
-def install_config(self) -> None:
-    # Copy the library into the toolchain resource directory (lib/linux) and
-    # runtimes_ndk_cxx.
-    arch = self._config.target_arch
-	# sarch = "arm"
-    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
-    if isinstance(self._config, configs.LinuxMuslConfig) and arch == hosts.Arch.ARM:
-        sarch = 'armhf'
-	# 生成的文件名为 libclang_rt.builtins-arm-android.a
-	# 或者 libclang_rt.builtins-arm-android-exported.a
-    filename = 'libclang_rt.builtins-' + sarch
-    filename += '-android.a' if self._config.target_os.is_android else '.a'
-    filename_exported = 'libclang_rt.builtins-' + sarch + '-android-exported.a'
-
-	# ninja 构建后生成的文件在 out/lib/builtins-arm-ndk-cxx/lib/linux/libclang_rt.builtins-arm-android.a
-    src_path = self.output_dir / 'lib' / self._config.target_os.crt_dir / filename
-	
-	# 这里的 output_resource_dir 指的路径是形如：out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/
-	# 也就是上面注释说的 "toolchain resource directory (lib/linux)"
-    self.output_resource_dir.mkdir(parents=True, exist_ok=True)
-    
-	if self.is_exported:
-        # 如果指定 exported 则 
-	    # cp \
-	    # out/lib/builtins-arm-ndk-cxx-exported/lib/linux/libclang_rt.builtins-arm-android.a \
-	    # out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/libclang_rt.builtins-arm-android-exported.a
-
-        # This special copy exports its symbols and is only intended for use
-        # in Bionic's libc.so.
-		shutil.copy2(src_path, self.output_resource_dir / filename_exported)
-    else:
-        shutil.copy2(src_path, self.output_resource_dir / filename)
-        
-		# TBD 这是一种例外处理
-		# Also install to self.resource_dir, if it's different,
-        # for use when building target libraries.
-        if self.resource_dir != self.output_resource_dir:
-            self.resource_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src_path, self.resource_dir / filename)
-        
-		# 这里会 cp 到 一份给 ndk 用，即
-		# out/install/linux-x86/clang-dev/runtimes_ndk_cxx/libclang_rt.builtins-arm-android.a
-		# Make a copy for the NDK.
-        if self._config.target_os.is_android:
-            dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
-            dst_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src_path, dst_dir / filename)
-```
-
-#### 2.3.8.3. LibUnwindBuilder
-
-```python
-    # Build two copies of the builtins library:
-    #  - A copy targeting the NDK with hidden symbols.
-    #  - A copy targeting the platform with exported symbols.
-    # Bionic's libc.so exports the unwinder, so it needs a copy with exported
-    # symbols. Everything else uses the NDK copy.
-    config_list: List[configs.Config] = (
-        configs.android_configs(platform=True) +
-        configs.android_configs(platform=False)
-    )
-```
-
-
-需要注意的是，在 LibUnwindBuilder::cmake_defines 中，`defines['LIBUNWIND_ENABLE_SHARED'] = 'FALSE'`， 这导致不会生成 libunwind.so 只有 libunwind.a 具体原因不知道 TBD
-
-针对所有 ARCH，分两组
-- platform (platform=True static=False None)
-  - output： out/lib/libunwind-<ARCH>-exported
-  - install：out/stage2-install/lib64/clang/<clang-version>/lib/linux/<ARCH>
-
-- ndk (platform=False static=False None)
-  - output： out/lib/libunwind-<ARCH>-ndk-cxx-hermetic
-  - install：out/stage2-install/runtimes_ndk_cxx/$ARCH
-
-output 是覆盖了基类的 output_dir
-
-这里 install 的路径参考 LLVMRuntimeBuilder::install_dir 这个函数 overwrite 了基类的  install_dir， 这会影响 CMAKE_INSTALL_PREFIX 的值
-
-
-#### 2.3.8.4. PlatformLibcxxAbiBuilder
-
-```python
-config_list: List[configs.Config] = configs.android_configs(
-        platform=True, suppress_libcxx_headers=True)
-```
-只针对 platform 制作，suppress_libcxx_headers 起到什么效果，TBD
-
-从其 _build_config() 可以看出，只构建 64 bit 的 AARCH64 和 X86_64,对 32 位的 ARCH 没有做什么，譬如 ARM/I386 , 但例外是 RISCV64 没有(见 `_is_64bit()`) TBD
-
-- (platform=True static=False None) 
-  - output:  out/lib/platform-libcxxabi-ARCH
-  - install: out/stage2-install/lib64/clang/12.0.7/lib/linux/ARCH
-
-#### 2.3.8.5. CompilerRTBuilder
-
-```python
-src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
-```
-即对应 `out/llvm-project/compiler-rt`
-
-有关 configs：
-```python
-	config_list: List[configs.Config] = (
-        configs.android_configs(platform=True) +
-        configs.android_configs(platform=False)
-    )
-```
-
-android_configs 会遍历所有支持的 ARCH，这里再按照 platform 和 非 platform（即 ndk） 方式分，所以共有 8 组
-
-```
-INFO:builder_registry:Building compiler-rt.
-INFO:base_builders:Building compiler-rt for Android-ARM (platform=True static=False None)
-INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=True static=False None)
-INFO:base_builders:Building compiler-rt for Android-I386 (platform=True static=False None)
-INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=True static=False None)
-INFO:base_builders:Building compiler-rt for Android-ARM (platform=False static=False None)
-INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=False static=False None)
-INFO:base_builders:Building compiler-rt for Android-I386 (platform=False static=False None)
-INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=False static=False None)
-```
-
-cmake 选项方面，platform 和 ndk 版本有如下区别：
-- `--target`：取值为 `<ARCH>-linux-android<API-level>`，其中 `<API-level>` 具体看 configs::api_level(), 针对 platform 和 ndk 的取值会不同，其中 platform 的版本固定取 29，ndk 版本可能取 19 也可能是 21
-- `--sysroot`：platform 会指定为 `out/sysroots/platform/<ARCH>`，ndk 版本会指定为 `out/sysroots/ndk/<ARCH>`。因为 sysroot 本身就是分 platform 和 ndk 两个版本的
-- `-DCMAKE_CXX_FLAGS`: platform 版本比 ndk 版本多如下：
-  ```
-  -nostdinc++
-  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/prebuilts/clang/host/linux-x86/clang-r458507/include/c++/v1
-  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/include
-  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/kernel/uapi
-  ```
-- `-DCMAKE_INSTALL_PREFIX`: platform 指定 ninja install 时安装到 `out/stage2-install/lib/clang/X.Y.Z`; ndk 版本指定安装到 `out/lib/compiler-rt-<ARCH>-ndk-cxx-install`
-- `-DCMAKE_SYSROOT`: 和 `--sysroot` 的效果一样。
-- `-DANDROID_PLATFORM_LEVEL`: 和 `--target` 的处理原则类似，但作用不同
-- `-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE`: 和 `--target` 的处理原则类似，但作用不同
-- `-DSANITIZER_COMMON_LINK_LIBS`: ndk 版本比 platform 版本多一个 `-landroid_support`
-- `-DCOMPILER_RT_HWASAN_WITH_INTERCEPTORS=OFF`: platform 有这个，ndk 的没有。
-
-这的确会造成 platform 和 ndk 的两种版本生成的结果不同。
-
-针对 config 的安装，以 ARM 为例
-```python
-def install_config(self) -> None:
-	# ninja 构建过程中生成的库
-	# platform 版本的放在 out/lib/compiler-rt-arm/lib/linux/*.a
-	# ndk 版本你的放在    out/lib/compiler-rt-arm-ndk-cxx/lib/linux/*.a
-	# 以上在 log 中都可以看到：搜 "Build files have been written to:"
-
-	# 这里是执行 ninja install
-	# 针对 platform 版本会安装在 out/stage2-install/lib/clang/16.0.1/lib/linux/*.a
-	# 针对 ndk 版本会安装在      out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/*.a
-	# 这是由 cmake 的 configure 过程中的 CMAKE_INSTALL_PREFIX 指定的，platform 和 ndk 的版本该值有区别
-    # Still run `ninja install`.
-    super().install_config()
-
-    # 参考 CompilerRTBuilder::install_dir()
-	# 针对 platform 版本，lib_dir 指向 out/stage2-install/lib/clang/16.0.1/lib/linux/
-	# 针对 ndk 版本，版本，lib_dir 指向 out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/
-    lib_dir = self.install_dir / 'lib' / 'linux'
-
-    # 这是对 fuzzer 库的额外处理
-	# Install the fuzzer library to the old {arch}/libFuzzer.a path for
-    # backwards compatibility.
-    arch = self._config.target_arch
-    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
-    static_lib_filename = 'libclang_rt.fuzzer-' + sarch + '-android.a'
-
-    arch_dir = lib_dir / arch.value
-    arch_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(lib_dir / static_lib_filename, arch_dir / 'libFuzzer.a')
-
-    # 针对 ndk 版本会将其复制到 out/stage2-install/runtimes_ndk_cxx
-	# 我理解此时的 self.output_toolchain 就是 out/stage2-install
-    if not self._config.platform:
-        dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
-        shutil.copytree(lib_dir, dst_dir, dirs_exist_ok=True)
-```
-
-综上所述，对每个 ARCH，我们都会对应三个目录，
-- out/lib/compiler-rt-<ARCH>：platform 版本的 output_dir
-- out/stage2-install/lib/clang/16.0.1: platform 版本的 install_dir
-- out/lib/compiler-rt-<ARCH>-ndk-cxx：ndk 版本的 output_dir
-- out/lib/compiler-rt-<ARCH>-ndk-cxx-install: ndk 版本的 install_dir
-
-#### 2.3.8.6. TsanBuilder
-
-```python
-class TsanBuilder(base_builders.LLVMRuntimeBuilder):
-    name: str = 'tsan'
-    src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
-    config_list: List[configs.Config] = configs.android_ndk_tsan_configs()
-```
-
-注意 config 是 android_ndk_tsan_configs，所以是 ndk 相关的
-
-制作过程：
-
-- step 1: cmake -> 创建 out/lib/tsan-aarch64-ndk-cxx 目录
-- step 2: ninja -> 在 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成库文件
-- step 3: ninja install -> 将头文件和 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成的库文件安装到 out/lib/tsan-aarch64-ndk-cxx-install/
-- step 4: 将 out/lib/tsan-aarch64-ndk-cxx-install/lib/linux 下的 tsan 库文件手动复制到 out/install/linux-x86/clang-dev/runtimes_ndk_cxx/
-
-其中 step 3 和 step 4 见 TsanBuilder::install_config
-
-#### 2.3.8.7. CompilerRTHostI386Builder
-
-未分析
-
-#### 2.3.8.8. MuslHostRuntimeBuilder
-
-未分析
-
-#### 2.3.8.9. LibOMPBuilder
-
-```python
-	config_list: List[configs.Config] = (
-        configs.android_configs(platform=True, extra_config={'is_shared': False}) +
-        configs.android_configs(platform=False, extra_config={'is_shared': False}) +
-        configs.android_configs(platform=False, extra_config={'is_shared': True})
-    )
-```
-
-#### 2.3.8.10. LldbServerBuilder
-
-未分析
-
-#### 2.3.8.11. SanitizerMapFileBuilder
-
-未分析
-
-# 3. 主流程
-
-## 3.1. 命令选项
+## 2.1. 命令选项
 
 参考 `parse_args()` 这个函数，`parse_args()` 这个函数负责解析我们执行 `python toolchain/llvm_android/build.py` 时可以带的命令行参数选项。`main()` 函数的第一行就是调用 `parse_args()` 对命令行进行解析。
 
@@ -1008,7 +230,7 @@ $ python toolchain/llvm_android/build.py --no-build windows
 - '--windows-sdk': 设置 Windows SDK 的 path，
 - '--musl'/'--no-musl': 一组互斥选项，设置是否要基于 musl 的 libc，默认为不使用 musl，默认使用 bionic？TBD
 
-## 3.2. 构建主函数 main
+## 2.2. 构建主函数 main
 
 main 函数分析
 
@@ -1257,7 +479,7 @@ def main():
 
 这里再整理一下构建的完整流程，结合构建过程中 out 目录下会生成的内容：
 
-- 生成 `out/llvm-project`，源码打补丁
+- 生成 `out/llvm-project`，源码打补丁。
 - default toolchian 此时默认是用的 prebuilt 提供的一个 clang。执行 stage1，cmake 和 ninja 编译输出在 `out/stage1`
 - 执行 stage1 的 ninja install，输出在 `out/stage1-install`，此时将 default toolchian 修改为指向 `out/stage1-install` 下的 clang，为 stage2 做准备
 - 构建一些 stage2 会依赖的库，譬如 swig 等，这些库都会放在 `out/lib` 下，基本上形式为一个 output_dir，一个 install_dir， 譬如对 swig，存在 output_dir 为 `out/lib/swig-linux`， install_dir 为 `out/lib/swig-linux-install`
@@ -1269,3 +491,785 @@ def main():
   - 后面的 runtimes 的 output_dir 和 install_dir 都在 `out/lib` 下。稍微复杂的就是会涉及 `*-install` 或者 `*-exported`。
 - stage2 测试，先略过
 - 最终打包（`package_toolchain()`），将 `out/stage2-install` 下的东西复制到 `out/install/linux-x86/clang-dev` 下去，并做一些调整，譬如 strip 等。
+
+# 3. builders
+
+## 3.1. builder.registry
+
+代码文件：`$TOP/toolchain/llvm_android/builder_registry.py`
+
+可以认为就是调用 builder 的一个封装类，利用 decorate 语法糖, 调用方式参考 Builder 类的 `build()` 方法的写法如下，效果就是当我们在对从 Builder 派生的子类执行 `build()` 方法时，程序会首先执行 BuilderRegistry 类的 `register_and_build()` 方法。
+
+```python
+@BuilderRegistry.register_and_build
+    def build(self) -> None:
+```
+
+再看 BuilderRegistry 类的 `register_and_build()` 方法：
+
+```python
+@classmethod
+    def register_and_build(cls, function):
+        """A decorator to wrap a build() method for a Builder."""
+        def wrapper(builder, *args, **kwargs) -> None:
+            name = builder.name
+            cls._builders[name] = builder
+            if cls.should_build(name):
+                logger().info("Building %s.", name)
+                function(builder, *args, **kwargs)
+            else:
+                logger().info("Skipping %s.", name)
+        return wrapper
+```
+
+其效果就是，当我们调用实际的 builder 的 `build()` 方法时会在 log 中打印 "INFO:builder_registry:Building XXXX"，然后在调用实际的 `build()` 方法，起到一种封装调用的效果。
+
+## 3.2. base builders
+
+这里定义了一些基类， 挑几个主要的看一下：
+
+### 3.2.1. Builder
+
+主要属性：
+
+- `name: str = ""`：这个在 Builder 中定义为空，具体派生子类中会给自己起一个名字，会被用在 log 中。
+
+- `config_list: List[configs.Config]`
+  每个 Builder 以及其派生的子类对象都会维护一个 Config 的 list。每个 Config 顶对应一个构建的配置，也同时对应一个对应的构建动作。
+
+- `toolchain: toolchains.Toolchain = toolchains.get_prebuilt_toolchain()`
+  
+  代表了用来执行构建所用的 toolchain，默认取 prebuilt 的 toolchain。如果是 stage2 中则会更新其为 stage1 中制作的 new toolchain
+
+重要的方法：
+- build 
+  
+  ```python
+  @BuilderRegistry.register_and_build
+  def build(self) -> None:
+        """Builds all configs."""
+        for config in self.config_list:
+            self._config = config
+
+            logger().info('Building %s for %s', self.name, self._config)
+            self._build_config()
+        self.install()
+  ```
+  
+  几乎所有从 Builder 派生的子类的都会执行 `build()`，这个函数实现了构建的主框架流程，`build()` 内部会遍历 `config_list` 这个列表， 取出每个 config，针对每个 config 调用 `_build_config()`, 最后统一调用 `install()`。
+  
+  `_build_config()` 和 `install()` 这是两个非常重要的虚方法，会被子类重载实现，执行具体的构建和安装动作。
+  
+- `_build_config()`：根据当前的 config，也就是 `self._config` 进行构建。Builder 的这个函数是一个纯虚函数，需要子类重写实现，最主要的实现者包括：
+  
+  - AutoconfBuilder
+  - CMakeBuilder：实现了基本的 build 过程， 包括 cmake -> ninja -> ninja install, 其中 ninja install 由调用 install_config 实现 
+    - LLVMBaseBuilder： n/a
+      - LLVMRuntimeBuilder: n/a
+        - CompilerRTHostI386Builder
+        - PlatformLibcxxAbiBuilder
+  - SanitizerMapFileBuilder: full-overwrite
+  - HostSysrootsBuilder：full-overwrite
+  - DeviceSysrootsBuilder ：full-overwrite
+
+- `install()` 基类的虚函数，Builder 什么也没有实现。会被子类重写，定义对应的安装过程规则。会重写整个虚函数的子类很少，目前只看到 CompilerRTBuilder
+
+
+### 3.2.2. CMakeBuilder
+
+如果一个项目实际基于 cmake 实现其 build system，实际驱动采用 ninja, 则其对应的 builder 从 CMakeBuilder 派生，触发执行 cmake 定义的构建动作。
+
+llvm 下的大部分项目的 build-system 采用 cmake，参考本文提供的 builder 类图可以有个总体把握。
+
+主要方法：
+
+- `cmake_defines()`: 这是是针对采用 cmake 这种方式来定义 cmake 的 configure 的，所以这个函数是 CMakeBuilder 以及其派生类才会有，如果采用其他的 build system，应该会有另外的 xxx_defines。cmake_defines 中引用 `self._config`（也就是 Config，在父类的 build() 中传入）。
+
+- `_build_config()`: 所有从 Builder 派生的子类都需要实现这个方法，Builder 的该方法是一个纯虚方法，实际并没有实现什么，所以 CMakeBuilder 覆盖了父类 Builder 同名方法， 定义了基于 cmake 的构建的主要动作。
+
+  ```python
+  def _build_config(self) -> None:
+      if self.remove_cmake_cache:
+      self._rm_cmake_cache(self.output_dir)
+  
+      if self.remove_install_dir and self.install_dir.exists():
+      shutil.rmtree(self.install_dir)
+  
+      # 下面这三句话就是在组装第一条执行cmake的命令
+      cmake_cmd: List[str] = [str(paths.CMAKE_BIN_PATH), '-G', 'Ninja']
+      cmake_cmd.extend(f'-D{key}={val}' for key, val in self.cmake_defines.items())
+      cmake_cmd.append(str(self.src_dir))
+  
+      # 创建输出路径
+      self.output_dir.mkdir(parents=True, exist_ok=True)
+  
+      # 这里创建的 out/stage1/cmake_invocation.sh 不知道有什么用，感觉就是可以让我们看看实际的 cmake 的选项供调试用
+      env = self.env
+      utils.create_script(self.output_dir / 'cmake_invocation.sh', cmake_cmd, env)
+      # 执行第一条 cmake 的命令，
+  	  # 参考 toolchain/llvm_android/utils.py 中 会 check_call -> subprocess_run
+  	  # 每次执行会打印 "subprocess.run:%s %s"
+  	  # 然后创建子进程传入 cmd，cd 进入 out 目录后执行 
+  	  utils.check_call(cmake_cmd, cwd=self.output_dir, env=env)
+  
+  	  # _ninja 内部同样调用 check_call 执行 ninja 命令
+      self._ninja(self.ninja_targets)
+  	  # 调用 check_call 执行 ninja install
+      self.install_config()
+  ```
+
+- `install_config()`: CMakeBuilder 开始有这个函数，原因是 `_build_config()` 会调用该函数。这个函数和 install 的区别是，`install_config()` 是针对当前 config 的，而 `install()` 是对所有 config 的，可以再仔细看一下 Builder 中对 `build()` 和 `install()` 的说明。
+  
+  CMakeBuilder 的 `install_config()` 本质上就是执行 "ninja install"，这意味这凡是没有 full-overwrite 的继承子类，都是会先执行 "ninja install"，然后在执行自己的特定 install 步骤，而那些 full-overwrite 的子类则一般不执行 ninja install，而是只执行自定义的安装步骤
+
+  有以下派生自 CMakeBuilder 的子类会 overwrite install_config，其中部分子类会 full-overwrite
+  - LLVMBuilder
+    - Stage1Builder
+    - Stage2Builder
+    - WindowsToolchainBuilder
+  - LLVMRuntimeBuilder: n/a
+    - LibUnwindBuilder：full-overwrite
+    - LibOMPBuilder: full-overwrite
+    - LldbServerBuilder: full-overwrite
+    - CompilerRTBuilder
+    - TsanBuilder
+    - LibCxxBuilder
+    - PlatformLibcxxAbiBuilder: full-overwrite
+    - BuiltinsBuilder: full-overwrite
+
+### 3.2.3. LLVMBaseBuilder
+
+Base builder for both llvm and individual runtime lib.
+
+从 CMakeBuilder 派生，说明这些项目都是用 cmake
+
+会直接派生两个子类：
+- LLVMRuntimeBuilder： Base builder for llvm runtime libs. 下面会直接派生一些 builder
+  - LibUnwindBuilder
+  - CompilerRTBuilder
+  - ......
+- LLVMBuilder： Builder for LLVM project. 下面会直接派生一些最终的 builder，譬如
+  - Stage1Builder
+  - Stage2Builder
+  - WindowsToolchainBuilder
+
+值得一提的是 LLVMBuilder 定义了一个纯虚函数 llvm_targets，这个纯虚函数会被 LLVMBuilder 派生的 Stage1Builder/Stage2Builder/WindowsToolchainBuilder overwrite，而最终会被 LLVMBuilder::cmake_defines 使用，用于定义 `LLVM_TARGETS_TO_BUILD` 的值。
+
+
+### 3.2.4. AutoconfBuilder
+
+这个类和 CMakeBuilder 一样都派生于 Builder
+
+从 AutoconfBuilder 派生的子类有：
+
+- LibNcursesBuilder
+- LibEditBuilder
+- SwigBuilder
+
+和 CMakeBuilder 类似，AutoconfBuilder 有如下几个重要的成员函数
+
+- `_build_config()`, 大致逻辑如下
+  - 运行 configure， 具体的 config 命令会写入到 output_dir / 'config_invocation.sh'。搜索这个文件会看到有：
+  ```bash
+  find out -name "config_invocation.sh"
+  out/lib/libncurses-linux/config_invocation.sh
+  out/lib/libedit-linux/config_invocation.sh
+  out/lib/swig-linux/config_invocation.sh
+  ```
+  - 执行 make
+  - 执行 make install
+
+## 3.3. builders
+
+builders 比较多
+
+### 3.3.1. Stage1Builder
+
+关于为何要 two stages，参考 
+- https://llvm.org/docs/AdvancedBuilds.html
+- https://en.wikipedia.org/wiki/Bootstrapping_(compilers)
+- https://www.tutorialspoint.com/what-is-compiler-bootstrapping
+- https://stackoverflow.com/questions/65751457/how-could-one-possibly-bootstrap-a-c-compilerfrom-source 一个很有趣的介绍，感觉在compiler 出现之前，我们其实应该先有一个解释器和汇编器，然后基于解释器和汇编器我们就可以从 0 开始写一个编译器
+
+Stage1Builder 是从 CMakeBuilder 为基类派生下来的 Builder，派生关系是：`CMakeBuilder <-- LLVMBaseBuilder <-- LLVMBuilder <-- Stage1Builder`
+
+整个构建过程基本可以参考 CMakeBuilder 的 `_build_config()` 实现。
+
+- 第一步: cmake
+
+  注意 Stage1Builder 初始化时传入的参数是 LinuxConfig，最终形成的 cmake 选项可以参考 build.log
+
+- 第二步：ninja
+
+  生成的内容在 out/stage1
+
+- 第三步：ninja install
+  
+  安装在 out/stage1-install
+
+Stage1Builder 会在 out 下生成 stage1 目录，里面存放所有的 stage1 的临时文件和生成的目标文件，
+
+cmake 会生成一些重要的文件供 ninja 使用，包括：
+- `$TOP/out/stage1/CMakeFiles/rules.ninja`， 定义了 ninja 的一些 rules，会被 build.ninja 所 include
+- `$TOP/out/stage1/build.ninja`：ninja 的 build文件
+
+### 3.3.2. Stage2Builder
+
+Stage2 的 cmake 命令具体参考 build.log
+
+- output_dir： out/stage2
+- install_dir: out/stage2-install
+
+### 3.3.3. SwigBuilder
+
+源码在 `$TOP/external/swig/`, 参考代码 `$TOP/toolchain/llvm_android/paths.py`
+
+```python
+SWIG_SRC_DIR: Path = EXTERNAL_DIR / 'swig'
+```
+
+构建输出在 out/lib/swig-linux
+安装在 out/lib/swig-linux-install/
+
+有关 swig，可以看一下 `$TOP/external/swig/README`
+
+SWIG (Simplified Wrapper and Interface Generator)
+
+https://en.wikipedia.org/wiki/SWIG
+
+> The Simplified Wrapper and Interface Generator (SWIG) is an open-source software tool used to connect computer programs or libraries written in C or C++ with scripting languages such as Lua, Perl, PHP, Python, R, Ruby, Tcl, and other languages like C#, Java, JavaScript, Go, D, OCaml, Octave, Scilab and Scheme. Output can also be in the form of XML.
+
+https://note.qidong.name/2018/01/hello-swig-example/
+
+我理解 swig 的作用是：假设我们有用 C、C++ 写了一些函数，而在高级语言譬如 python 里想要调用这些函数，swig 帮我们自动生成一些对应的 c 代码和 python 代码，起到胶水的作用。
+
+在 LLVM 中，如果我们要构建 lldb，那么依赖于 swig。
+
+### 3.3.4. LibXml2Builder
+
+Libxml2 是一个 C 语言的 XML 程序库，可以简单方便地提供对 XML 文档的各种操作，并且支持 XPATH 查询，以及部分的支持 XSLT 转换等功能。
+
+源码在 `$TOP/external/libxml2`
+
+```python
+LIBXML2_SRC_DIR: Path = EXTERNAL_DIR / 'libxml2'
+```
+
+- 构建输出在 out/lib/libxml2-linux
+- 安装在 out/lib/libxml2-linux-install/
+
+llvm 的构建依赖 libxml 这个库，这里为 stage2 构建自己的，不用系统的。可以在 stage2 的 cmake 中看到
+```
+-DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-llvm/clang-toolchain/out/lib/libxml2-linux-install/include/libxml2
+-DLIBXML2_LIBRARY=/aosp/wangchen/dev-llvm/clang-toolchain/out/lib/libxml2-linux-install/lib/libxml2.so.2.9.10
+```
+而在 stage1 中没有设置这个所以 cmake 的时候 log 中会出现 Could NOT find LibXml2 (missing: LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR) 
+
+### 3.3.5. XzBuilder
+
+XZ Utils, 参考 `$TOP/toolchain/xz/README`
+
+> XZ Utils provide a general-purpose data-compression library plus
+> command-line tools. The native file format is the .xz format, but
+> also the legacy .lzma format is supported.
+
+
+```python
+XZ_SRC_DIR: Path = TOOLCHAIN_DIR / 'xz'
+```
+
+- src: toolchain/xz
+- output: out/lib/liblzma-linux
+- install: out/lib/liblzma-linux-install
+
+### 3.3.6. LibNcursesBuilder
+
+```python
+LIBNCURSES_SRC_DIR: Path = EXTERNAL_DIR / 'libncurses'
+```
+
+- src: external/libncurses
+- output: out/lib/libncurses-linux
+- install: out/lib/libncurses-linux-install
+
+### 3.3.7. LibEditBuilder
+
+https://www.thrysoee.dk/editline/
+
+> Generic line editing, history, and tokenization functions similar to GNU Readline.
+
+```python
+LIBEDIT_SRC_DIR: Path = EXTERNAL_DIR / 'libedit'
+```
+
+- src: external/libedit
+- output:
+- install
+
+### 3.3.8. runtime
+
+#### 3.3.8.1. DeviceSysrootsBuilder
+
+DeviceSysrootsBuilder 是指交叉工具链 clang 中自带的 runtime sysroot。本身属于 runtime 构建的一部分，虽然本质上构建 sysroot 的主要工作就是从 prebuilt 的 ndk 拷贝部分过来，但这是基础框架，其他 runtime 的库编译完后也是要安装到 sysroot 下的。
+
+和 DeviceSysrootsBuilder 对应，还有一个 HostSysrootsBuilder，但目前只有对 windows 的 clang 才需要构建 host 侧的 sysroot。所以暂时不看了(output_dir 对应的是 `$OUT_DIR/sysroots/x86_64-w64-mingw32`)。
+
+Device 侧 sysroot 分为两套版本，一个是用于 ndk，构建 app，一个是用于构建 aosp（platform，即 platform/prebuilts/clang/host/linux-x86）。
+
+注意后面在构建 runtime 的时候也会用到 ndk 或者 platform 的 sysroot。
+
+`--sysroot=$OUT_DIR/sysroots/ndk/$ARCH`
+- builtin
+
+`--sysroot=$OUT_DIR/sysroots/platform/$ARCH`
+- libunwind
+- platform-libcxxabi
+- compiler-rt
+
+
+之所以分为 ndk 和 platform 两套，有很多原因：
+- 譬如：对于 C++ 头文件，ndk 的 sysroot 中自带有标准的 c++ 头文件，而 platform 编译时，可能使用多种 c++ 头文件，即不是固定的，需要在编译时通过 `-nostdinc++ -isystem <path_to_cpp_headers>`, 参考 configs::cxxflags()。
+- 又譬如，某些 runtime 库（如 libunwind），在 ndk 环境下被使用时要求是隐藏符号，另一份是给 platform 的构建用的需要导出符号。参考 LibUnwindBuilder 的注释。同样，对于 libc++ 的库也有同样的处理要求。
+
+- output_dir: 只针对 AndroidConfig， 参考 AndroidConfig::sysroot(), 为 $OUT_DIR/sysroots, 再根据是 platform 还是 ndk 分为
+  - $OUT_DIR/sysroots/ndk
+  - $OUT_DIR/sysroots/platform
+  然后继续按照 target 的 arch 分 arm/arm64/riscv64/x86/x86_64
+- install_dir : 没什么动作，实际上对 sysroot，output_dir 即 install_dir
+
+
+```python
+def _build_config(self) -> None:
+    config: configs.AndroidConfig = cast(configs.AndroidConfig, self._config)
+    arch = config.target_arch
+    platform = config.platform
+    # 这个是输出的目录，针对 AndroidConfig， 
+	# 假设 platform = true， arch 为 arm
+    # 参考 AndroidConfig::sysroot(), 则对应的 sysroot 路径为 $OUT_DIR/sysroots/platform/arm
+    sysroot = config.sysroot
+    if sysroot.exists():
+        shutil.rmtree(sysroot)
+        sysroot.mkdir(parents=True, exist_ok=True)
+
+    # 源目录（src_sysroot）来自 `$TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot`
+	# toolchain/prebuilts/ndk/r25/ 这个目录对应的仓库是 https://android.googlesource.com/toolchain/prebuilts/ndk/r25
+
+    # sysroot 分两部分，一部分是头文件，一部分是二进制库
+	
+    # 这里先从源目录中复制头文件过来，
+	# `$src_sysroot/usr/include` 中头文件只有一份，包含了所有支持的 target ARCH，
+	# ls -l toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
+	# aarch64-linux-android
+	# arm-linux-androideabi
+	# i686-linux-android
+	# x86_64-linux-android
+	# ......
+	
+	# 所以拷贝的结果就是，不管 config.target_arch 是什么，会把 `$src_sysroot/usr/include` 下所有的 arch 的头文件都复制过来
+    # 参考 $OUT_DIR/sysroots/platform/arm/usr/include 下有 arm-linux-androideabi， 也有 aarch64-linux-android/...
+    # 我比较了一下四个 ARCH 对应的 $OUT_DIR/sysroots/platform/$ARCH/usr/include 都是一样的
+	
+    # Copy the NDK prebuilt's sysroot, but for the platform variant, omit
+    # the STL and android_support headers and libraries.
+	src_sysroot = paths.NDK_BASE / 'toolchains' / 'llvm' / 'prebuilt' / 'linux-x86_64' / 'sysroot'
+
+    # cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include $OUT_DIR/sysroots/platform/arm/usr/include
+	# Copy over usr/include.
+    shutil.copytree(src_sysroot / 'usr' / 'include',
+                    sysroot / 'usr' / 'include', symlinks=True)
+
+    # 拷贝完后，基于 platform 和 ndk 的区别，下面针对 ARCH 为 arm 举例：
+	# 如果 config 中 platform = true 则将 $OUT_DIR/sysroots/platform/arm/usr/include/c++ 目录删掉
+    # 如果是 ndk，则为 ARCH 添加一个 usr/local/include 的目录：拷贝 src 和 target 如下：
+	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/local/include $OUT_DIR/sysroots/ndk/arm/usr/local/include
+	# 所以如果以 ARCH 为 arm 为例，我们 diff $OUT_DIR/sysroots/ndk/arm  $OUT_DIR/sysroots/platform/arm，我们会发现 ndk 的版本下的内容比 platform 下的多
+	# - `usr/include/c++` 整个目录：这个原因前面分析过了
+	# - `usr/local/include` 整个目录：TBD 为啥 ndk 需要这个目录，还不是很清楚，猜测是在使用 ndk 构建一些应用时，include 路径会包含这个路径并 include 这个路径下的文件，但是在 platform 构建时不会涉及。
+	# 
+    if platform:
+       # Remove the STL headers.
+       shutil.rmtree(sysroot / 'usr' / 'include' / 'c++')
+    else:
+       # Add the android_support headers from usr/local/include.
+       shutil.copytree(src_sysroot / 'usr' / 'local' / 'include',
+                       sysroot / 'usr' / 'local' / 'include', symlinks=True)
+
+    # 这里开始复制二进制库
+	# $TOP/toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib 下的库是按照 triple 分的
+	# - aarch64-linux-android
+	# - arm-linux-androideabi
+	# - i686-linux-android
+	# - x86_64-linux-android
+	# 所以这里根据 config.target_arch 复制对应目录下的内容
+	# 以 arm 为例，就是执行如下赋值
+	# cp -rL toolchain/prebuilts/ndk/r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi \
+	#        out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi
+	# Copy over usr/lib/$TRIPLE.
+    src_lib = src_sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
+    dest_lib = sysroot / 'usr' / 'lib' / config.ndk_sysroot_triple
+    shutil.copytree(src_lib, dest_lib, symlinks=True)
+
+    # 复制完后，做如下额外处理：
+	# - 删除 libcompiler_rt-extras.a，TBD 不太清楚原因是什么
+	# - 对于 platform=true 的 config，删除 NDK 的 libc++，
+	#   以 arm 为例，具体就是删除掉
+	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下的 libc++abi.a、libc++_static.a 和 libc++_shared.so
+	#   - out/sysroots/ndk/arm/usr/lib/arm-linux-androideabi 下各个 API-level 子目录下的 libc++.a 和 libc++.so
+	# - 对于 platform=true 的 config，会做一些假文件（stub），具体包括：
+	#   - 在 out 目录下新建一个 platform_stubs/$ARCH, 然后在下面新建一个 libc++.c，里面会手动写入一些空函数
+	#   - 在 out/sysroots/platform/$ARCH/ 下新建 usr/lib 目录，然后基于上面建的 libc++.c，编译链接一个 stub 的 libc++.so 出来。
+	#     编译时设置的 --target，为何是 29 参考 toolchain/llvm_android/configs.py 中的 api_level 函数说明。29 是 API level
+	#     注意，如果我们对比 out/sysroots/platform/$ARCH/usr/lib 和 out/sysroots/ndk/$ARCH/usr/lib，我们还会发现 platfrom 的版本下还会多一个 `libc++abi.so`
+	#     这个文件是 PlatformLibcxxAbiBuilder::install_config 中新建出来的，实际上只是一个 txt 文件
+	# 以上描述对应具体代码如下
+	
+	# Remove the NDK's libcompiler_rt-extras.  For the platform, also remove
+    # the NDK libc++.
+    (dest_lib / 'libcompiler_rt-extras.a').unlink()
+    if platform:
+        (dest_lib / 'libc++abi.a').unlink()
+        (dest_lib / 'libc++_static.a').unlink()
+        (dest_lib / 'libc++_shared.so').unlink()
+        # Each per-API-level directory has libc++.so, libc++.a, and libcompiler_rt-extras.a.
+        for subdir in dest_lib.iterdir():
+            if subdir.is_symlink() or not subdir.is_dir():
+                continue
+            if not re.match(r'\d+$', subdir.name):
+                continue
+            (subdir / 'libcompiler_rt-extras.a').unlink()
+            if platform:
+                (subdir / 'libc++.a').unlink()
+                (subdir / 'libc++.so').unlink()
+        # Verify that there aren't any extra copies somewhere else in the
+        # directory hierarchy.
+        verify_gone = ['libcompiler_rt-extras.a', 'libunwind.a']
+        if platform:
+            verify_gone += [
+                'libc++abi.a',
+                'libc++_static.a',
+                'libc++_shared.so',
+                'libc++.a',
+                'libc++.so',
+            ]
+        for (parent, _, files) in os.walk(sysroot):
+            for f in files:
+                if f in verify_gone:
+                    raise RuntimeError('sysroot file should have been ' +
+                                       f'removed: {os.path.join(parent, f)}')
+
+	if platform:
+        # Create a stub library for the platform's libc++.
+        platform_stubs = paths.OUT_DIR / 'platform_stubs' / config.ndk_arch
+        platform_stubs.mkdir(parents=True, exist_ok=True)
+        libdir = sysroot / 'usr' / 'lib'
+        libdir.mkdir(parents=True, exist_ok=True)
+        with (platform_stubs / 'libc++.c').open('w') as f:
+            f.write(textwrap.dedent("""\
+                void __cxa_atexit() {}
+                void __cxa_demangle() {}
+                void __cxa_finalize() {}
+                void __dynamic_cast() {}
+                void _ZTIN10__cxxabiv117__class_type_infoE() {}
+                void _ZTIN10__cxxabiv120__si_class_type_infoE() {}
+                void _ZTIN10__cxxabiv121__vmi_class_type_infoE() {}
+                void _ZTISt9type_info() {}
+            """))
+
+        utils.check_call([self.toolchain.cc,
+                          f'--target={config.llvm_triple}',
+                          '-fuse-ld=lld', '-nostdlib', '-shared',
+                          '-Wl,-soname,libc++.so',
+                          '-o{}'.format(libdir / 'libc++.so'),
+                          str(platform_stubs / 'libc++.c')])
+```
+
+
+#### 3.3.8.2. BuiltinsBuilder
+
+输入：`$TOP/out/llvm-project/compiler-rt/lib/builtins`
+
+参考 BuiltinsBuilder.config_list()
+
+```python
+    
+    # 在 buildin 的库制作中，下面的描述意思是 buildin 只制作针对 ndk 的版本，
+    # 但注意不是说 platform 构建中不用 buildin，这里的解释意思是 platform 构建中还是
+    # 会用到 buildin，只是 按 ndk 制作的版本 platform 也可以用，所以我们只要做一份就够了。
+    # 所以 target 侧的 builtin 全部都是 platform=False
+    # Only target the NDK, not the platform. The NDK copy is sufficient for the
+    # platform builders, and both NDK+platform builders use the same toolchain,
+    # which can only have a single copy installed into its resource directory.
+    @property
+    def config_list(self) -> List[configs.Config]:
+        result = configs.android_configs(platform=False)
+        result.append(configs.BaremetalAArch64Config())
+        # For arm32 and x86, build a special version of the builtins library
+        # where the symbols are exported, not hidden. This version is needed
+        # to continue exporting builtins from libc.so and libm.so.
+        for arch in [configs.AndroidARMConfig(), configs.AndroidI386Config()]:
+            arch.platform = False
+            arch.extra_config = {'is_exported': True}
+            result.append(arch)
+        # 后面这两个构建的是 host 侧的 builtin
+        result.append(configs.LinuxMuslConfig(hosts.Arch.AARCH64))
+        result.append(configs.LinuxMuslConfig(hosts.Arch.ARM))
+        return result
+```
+
+综上，我们看 log
+
+```
+- INFO:base_builders:Building builtins for Android-ARM (platform=False static=False None)
+- INFO:base_builders:Building builtins for Android-AARCH64 (platform=False static=False None)
+- INFO:base_builders:Building builtins for Android-I386 (platform=False static=False None)
+- INFO:base_builders:Building builtins for Android-X86_64 (platform=False static=False None)
+- INFO:base_builders:Building builtins for Baremetal
+- INFO:base_builders:Building builtins for Android-ARM (platform=False static=False {'is_exported': True})
+- INFO:base_builders:Building builtins for Android-I386 (platform=False static=False {'is_exported': True})
+- INFO:base_builders:Building builtins for Linux / hosts.Arch.AARCH64
+- INFO:base_builders:Building builtins for Linux / hosts.Arch.ARM
+```
+
+输出对应在：
+- out/lib/builtins-<ARCH>-arm-ndk-cxx
+- out/lib/builtins-baremetal
+- out/lib/builtins-arm-ndk-cxx-exported
+- out/lib/builtins-i386-ndk-cxx-exported
+- out/lib/builtins-aarch64-unknown-linux-musl
+- out/lib/builtins-arm-unknown-linux-musleabihf
+
+具体，以 Android-ARM 为例。
+
+```python
+def install_config(self) -> None:
+    # Copy the library into the toolchain resource directory (lib/linux) and
+    # runtimes_ndk_cxx.
+    arch = self._config.target_arch
+	# sarch = "arm"
+    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
+    if isinstance(self._config, configs.LinuxMuslConfig) and arch == hosts.Arch.ARM:
+        sarch = 'armhf'
+	# 生成的文件名为 libclang_rt.builtins-arm-android.a
+	# 或者 libclang_rt.builtins-arm-android-exported.a
+    filename = 'libclang_rt.builtins-' + sarch
+    filename += '-android.a' if self._config.target_os.is_android else '.a'
+    filename_exported = 'libclang_rt.builtins-' + sarch + '-android-exported.a'
+
+	# ninja 构建后生成的文件在 out/lib/builtins-arm-ndk-cxx/lib/linux/libclang_rt.builtins-arm-android.a
+    src_path = self.output_dir / 'lib' / self._config.target_os.crt_dir / filename
+	
+	# 这里的 output_resource_dir 指的路径是形如：out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/
+	# 也就是上面注释说的 "toolchain resource directory (lib/linux)"
+    self.output_resource_dir.mkdir(parents=True, exist_ok=True)
+    
+	if self.is_exported:
+        # 如果指定 exported 则 
+	    # cp \
+	    # out/lib/builtins-arm-ndk-cxx-exported/lib/linux/libclang_rt.builtins-arm-android.a \
+	    # out/install/linux-x86/clang-dev/lib/clang/16.0.1/lib/linux/libclang_rt.builtins-arm-android-exported.a
+
+        # This special copy exports its symbols and is only intended for use
+        # in Bionic's libc.so.
+		shutil.copy2(src_path, self.output_resource_dir / filename_exported)
+    else:
+        shutil.copy2(src_path, self.output_resource_dir / filename)
+        
+		# TBD 这是一种例外处理
+		# Also install to self.resource_dir, if it's different,
+        # for use when building target libraries.
+        if self.resource_dir != self.output_resource_dir:
+            self.resource_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_path, self.resource_dir / filename)
+        
+		# 这里会 cp 到 一份给 ndk 用，即
+		# out/install/linux-x86/clang-dev/runtimes_ndk_cxx/libclang_rt.builtins-arm-android.a
+		# Make a copy for the NDK.
+        if self._config.target_os.is_android:
+            dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_path, dst_dir / filename)
+```
+
+#### 3.3.8.3. LibUnwindBuilder
+
+```python
+    # Build two copies of the builtins library:
+    #  - A copy targeting the NDK with hidden symbols.
+    #  - A copy targeting the platform with exported symbols.
+    # Bionic's libc.so exports the unwinder, so it needs a copy with exported
+    # symbols. Everything else uses the NDK copy.
+    config_list: List[configs.Config] = (
+        configs.android_configs(platform=True) +
+        configs.android_configs(platform=False)
+    )
+```
+
+
+需要注意的是，在 LibUnwindBuilder::cmake_defines 中，`defines['LIBUNWIND_ENABLE_SHARED'] = 'FALSE'`， 这导致不会生成 libunwind.so 只有 libunwind.a 具体原因不知道 TBD
+
+针对所有 ARCH，分两组
+- platform (platform=True static=False None)
+  - output： out/lib/libunwind-<ARCH>-exported
+  - install：out/stage2-install/lib64/clang/<clang-version>/lib/linux/<ARCH>
+
+- ndk (platform=False static=False None)
+  - output： out/lib/libunwind-<ARCH>-ndk-cxx-hermetic
+  - install：out/stage2-install/runtimes_ndk_cxx/$ARCH
+
+output 是覆盖了基类的 output_dir
+
+这里 install 的路径参考 LLVMRuntimeBuilder::install_dir 这个函数 overwrite 了基类的  install_dir， 这会影响 CMAKE_INSTALL_PREFIX 的值
+
+
+#### 3.3.8.4. PlatformLibcxxAbiBuilder
+
+```python
+config_list: List[configs.Config] = configs.android_configs(
+        platform=True, suppress_libcxx_headers=True)
+```
+只针对 platform 制作，suppress_libcxx_headers 起到什么效果，TBD
+
+从其 _build_config() 可以看出，只构建 64 bit 的 AARCH64 和 X86_64,对 32 位的 ARCH 没有做什么，譬如 ARM/I386 , 但例外是 RISCV64 没有(见 `_is_64bit()`) TBD
+
+- (platform=True static=False None) 
+  - output:  out/lib/platform-libcxxabi-ARCH
+  - install: out/stage2-install/lib64/clang/12.0.7/lib/linux/ARCH
+
+#### 3.3.8.5. CompilerRTBuilder
+
+```python
+src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
+```
+即对应 `out/llvm-project/compiler-rt`
+
+有关 configs：
+```python
+	config_list: List[configs.Config] = (
+        configs.android_configs(platform=True) +
+        configs.android_configs(platform=False)
+    )
+```
+
+android_configs 会遍历所有支持的 ARCH，这里再按照 platform 和 非 platform（即 ndk） 方式分，所以共有 8 组
+
+```
+INFO:builder_registry:Building compiler-rt.
+INFO:base_builders:Building compiler-rt for Android-ARM (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-I386 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=True static=False None)
+INFO:base_builders:Building compiler-rt for Android-ARM (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-AARCH64 (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-I386 (platform=False static=False None)
+INFO:base_builders:Building compiler-rt for Android-X86_64 (platform=False static=False None)
+```
+
+cmake 选项方面，platform 和 ndk 版本有如下区别：
+- `--target`：取值为 `<ARCH>-linux-android<API-level>`，其中 `<API-level>` 具体看 configs::api_level(), 针对 platform 和 ndk 的取值会不同，其中 platform 的版本固定取 29，ndk 版本可能取 19 也可能是 21
+- `--sysroot`：platform 会指定为 `out/sysroots/platform/<ARCH>`，ndk 版本会指定为 `out/sysroots/ndk/<ARCH>`。因为 sysroot 本身就是分 platform 和 ndk 两个版本的
+- `-DCMAKE_CXX_FLAGS`: platform 版本比 ndk 版本多如下：
+  ```
+  -nostdinc++
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/prebuilts/clang/host/linux-x86/clang-r458507/include/c++/v1
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/include
+  -isystem /aosp/wangchen/dev-llvm/llvm-toolchain/bionic/libc/kernel/uapi
+  ```
+- `-DCMAKE_INSTALL_PREFIX`: platform 指定 ninja install 时安装到 `out/stage2-install/lib/clang/X.Y.Z`; ndk 版本指定安装到 `out/lib/compiler-rt-<ARCH>-ndk-cxx-install`
+- `-DCMAKE_SYSROOT`: 和 `--sysroot` 的效果一样。
+- `-DANDROID_PLATFORM_LEVEL`: 和 `--target` 的处理原则类似，但作用不同
+- `-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE`: 和 `--target` 的处理原则类似，但作用不同
+- `-DSANITIZER_COMMON_LINK_LIBS`: ndk 版本比 platform 版本多一个 `-landroid_support`
+- `-DCOMPILER_RT_HWASAN_WITH_INTERCEPTORS=OFF`: platform 有这个，ndk 的没有。
+
+这的确会造成 platform 和 ndk 的两种版本生成的结果不同。
+
+针对 config 的安装，以 ARM 为例
+```python
+def install_config(self) -> None:
+	# ninja 构建过程中生成的库
+	# platform 版本的放在 out/lib/compiler-rt-arm/lib/linux/*.a
+	# ndk 版本你的放在    out/lib/compiler-rt-arm-ndk-cxx/lib/linux/*.a
+	# 以上在 log 中都可以看到：搜 "Build files have been written to:"
+
+	# 这里是执行 ninja install
+	# 针对 platform 版本会安装在 out/stage2-install/lib/clang/16.0.1/lib/linux/*.a
+	# 针对 ndk 版本会安装在      out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/*.a
+	# 这是由 cmake 的 configure 过程中的 CMAKE_INSTALL_PREFIX 指定的，platform 和 ndk 的版本该值有区别
+    # Still run `ninja install`.
+    super().install_config()
+
+    # 参考 CompilerRTBuilder::install_dir()
+	# 针对 platform 版本，lib_dir 指向 out/stage2-install/lib/clang/16.0.1/lib/linux/
+	# 针对 ndk 版本，版本，lib_dir 指向 out/lib/compiler-rt-arm-ndk-cxx-install/lib/linux/
+    lib_dir = self.install_dir / 'lib' / 'linux'
+
+    # 这是对 fuzzer 库的额外处理
+	# Install the fuzzer library to the old {arch}/libFuzzer.a path for
+    # backwards compatibility.
+    arch = self._config.target_arch
+    sarch = 'i686' if arch == hosts.Arch.I386 else arch.value
+    static_lib_filename = 'libclang_rt.fuzzer-' + sarch + '-android.a'
+
+    arch_dir = lib_dir / arch.value
+    arch_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(lib_dir / static_lib_filename, arch_dir / 'libFuzzer.a')
+
+    # 针对 ndk 版本会将其复制到 out/stage2-install/runtimes_ndk_cxx
+	# 我理解此时的 self.output_toolchain 就是 out/stage2-install
+    if not self._config.platform:
+        dst_dir = self.output_toolchain.path / 'runtimes_ndk_cxx'
+        shutil.copytree(lib_dir, dst_dir, dirs_exist_ok=True)
+```
+
+综上所述，对每个 ARCH，我们都会对应三个目录，
+- out/lib/compiler-rt-<ARCH>：platform 版本的 output_dir
+- out/stage2-install/lib/clang/16.0.1: platform 版本的 install_dir
+- out/lib/compiler-rt-<ARCH>-ndk-cxx：ndk 版本的 output_dir
+- out/lib/compiler-rt-<ARCH>-ndk-cxx-install: ndk 版本的 install_dir
+
+#### 3.3.8.6. TsanBuilder
+
+```python
+class TsanBuilder(base_builders.LLVMRuntimeBuilder):
+    name: str = 'tsan'
+    src_dir: Path = paths.LLVM_PATH / 'compiler-rt'
+    config_list: List[configs.Config] = configs.android_ndk_tsan_configs()
+```
+
+注意 config 是 android_ndk_tsan_configs，所以是 ndk 相关的
+
+制作过程：
+
+- step 1: cmake -> 创建 out/lib/tsan-aarch64-ndk-cxx 目录
+- step 2: ninja -> 在 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成库文件
+- step 3: ninja install -> 将头文件和 out/lib/tsan-aarch64-ndk-cxx/lib/linux 下生成的库文件安装到 out/lib/tsan-aarch64-ndk-cxx-install/
+- step 4: 将 out/lib/tsan-aarch64-ndk-cxx-install/lib/linux 下的 tsan 库文件手动复制到 out/install/linux-x86/clang-dev/runtimes_ndk_cxx/
+
+其中 step 3 和 step 4 见 TsanBuilder::install_config
+
+#### 3.3.8.7. CompilerRTHostI386Builder
+
+未分析
+
+#### 3.3.8.8. MuslHostRuntimeBuilder
+
+未分析
+
+#### 3.3.8.9. LibOMPBuilder
+
+```python
+	config_list: List[configs.Config] = (
+        configs.android_configs(platform=True, extra_config={'is_shared': False}) +
+        configs.android_configs(platform=False, extra_config={'is_shared': False}) +
+        configs.android_configs(platform=False, extra_config={'is_shared': True})
+    )
+```
+
+#### 3.3.8.10. LldbServerBuilder
+
+未分析
+
+#### 3.3.8.11. SanitizerMapFileBuilder
+
+未分析
+
