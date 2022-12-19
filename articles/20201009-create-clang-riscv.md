@@ -21,9 +21,14 @@
 
 <!-- /TOC -->
 
+修改历史：
+
+- [2022/12/19]: llvm 升级到 15.0.6；增加 lld 的例子
+
 # 1. 参考
 
-- 【参考 1】：[Getting Started with the LLVM System][1]
+- 【参考 1】: [Getting Started with the LLVM System][1]
+- 【参考 2】: [LLD - The LLVM Linker][3]
 
 # 2. 准备工作系统环境
 
@@ -33,7 +38,7 @@
 
 ## 2.2. 软件
 
-本文采用的 LLVM 版本为 14.0.6
+本文采用的 LLVM 版本为 15.0.6
 
 根据 【参考 1】，LLVM 官方要求的编译 LLVM 必需的几项主要软件如下：
 
@@ -49,25 +54,29 @@
 
 # 3. 构造过程
 
+假设我们的工作目录为 `$WS`
+
 ## 3.1. 下载 llvm 的源码
 
 官方源码仓库在 github：<https://github.com/llvm/llvm-project>，国内的用户可以从 gitee 的 mirror <https://gitee.com/mirrors/llvm-project> 下载：
 
 ```bash
+$ cd $WS
 $ git clone https://gitee.com/mirrors/llvm-project.git
 ```
 
-下载后进入源码仓库根目录并检出相应版本，目前最新的正式发布版本是 14.0.6，所以我们选择切换到该版本对应的 tag：llvmorg-14.0.6 上
+下载后进入源码仓库根目录并检出相应版本，目前最新的正式发布版本是 15.0.6，所以我们选择切换到该版本对应的 tag：llvmorg-15.0.6 上
 
 ```bash
 $ cd llvm-project/
-$ git checkout llvmorg-14.0.6 -b llvmorg-14.0.6
+$ git checkout llvmorg-15.0.6 -b llvmorg-15.0.6
 ```
 ## 3.2. 编译前的配置
 
-编译前需要在 llvm 的源码根目录下新建一个 build 目录，然后进入这个目录进行 make，以前官方文档说 `in-tree build is not supported`， 即不支持在 llvm-project 目录下直接编译，否则会失败，但现在最新的文档上这句话没有了，但我们还是按照老习惯操作吧。这个 build 目录官方的正式定义叫 `OBJ_ROOT`，所有 cmake 生成的项目配置文件，以及编译过程中生成的 `.o` 文件和最终的 bin 文件都会存放在这个目录下，不会污染原来的代码仓库。
+llvm 支持 out-of-tree 构建，我们在 `$WS` 下新建一个 build 目录，然后进入这个目录进行 make，这个 build 目录官方的正式定义叫 `OBJ_ROOT`，所有 cmake 生成的项目配置文件，以及编译过程中生成的 `.o` 文件和最终的 bin 文件都会存放在这个目录下，不会污染原来的代码仓库。
 
 ```bash
+$ cd $WS
 $ mkdir build
 $ cd build
 ```
@@ -97,7 +106,7 @@ $ cmake -G <generator> [options] SRC_ROOT
 - options，以 `-D` 开头定义的选项宏，如果超过一个则用空格分隔。这些选项会影响 cmake 生成的构造配置文件并进而影响整个编译构造过程，针对 LLVM 常用的有以下这些，更多选项请参阅 【参考 1】：
 
   - `CMAKE_BUILD_TYPE=type`: 指定生成的应用程序（这里当然指的是 LLVM）的类型，type 包括 Debug、Release、RelWithDebInfo 或者 MinSizeRel。如果不指定缺省为 Debug。
-  - `CMAKE_INSTALL_PREFIX=directory`: 用于指定编译完后安装 LLVM 工具和库的路径，如果不指定，默认安装在 `/usr/local`。
+  - `CMAKE_INSTALL_PREFIX=directory`: 用于指定编译完后安装 LLVM 工具和库的路径，如果不指定，默认安装在 `/usr/local`。但要注意的是如果是默认方式安装，则需要 sudo 权限，这可能是我们不期望的。
   - `LLVM_TARGETS_TO_BUILD`: 用于指定生成的 LLVM 可以支持的体系架构（这里称为 target），LLVM 和 GCC 有个很大的不同点是， GCC 需要为每个特定的体系架构，譬如 `arm/x86` 独立生成一套交叉工具链套件，而 LLVM 是在一个工具链套件中就可以支持多个体系架构。如果不指定，默认会编译所有的 targets，具体的 targets 有哪些，可以看源码 `llvm-project/llvm/CMakeLists.txt` 中 `LLVM_ALL_TARGETS` 的定义。具体制作时可以自己指定需要的 targets，通过以分号（semicolon）分隔方式给出，譬如 `-DLLVM_TARGETS_TO_BUILD="ARM;PowerPC;X86"`。
   - `LLVM_DEFAULT_TARGET_TRIPLE`: 可以通过该选项修改默认的 target 的 triple 组合，不指定默认是 `x86_64-unknown-linux-gnu`。
   - `LLVM_ENABLE_PROJECTS='...'`: LLVM 是整个工具链套件的总称，LLVM 下包括了很多个子项目，譬如 clang, clang-tools-extra, libcxx, libcxxabi, libunwind, lldb, compiler-rt, lld, polly, or debuginfo-tests 等。如果不指定该选项，默认只编译 llvm 这个主框架。如果要选择并指定编译哪些子项目，可以通过分号分隔方式给出，譬如我们在编译 llvm 之外还想编译 Clang, libcxx, 和 libcxxabi, 那么可以写成这样：`-DLLVM_ENABLE_PROJECTS="clang;libcxx;libcxxabi"`。
@@ -107,21 +116,22 @@ $ cmake -G <generator> [options] SRC_ROOT
 ```bash
 $ cmake -G Ninja \
 -DCMAKE_BUILD_TYPE=Release \
--DCMAKE_INSTALL_PREFIX=../../install \
+-DCMAKE_INSTALL_PREFIX=$WS/install \
 -DLLVM_TARGETS_TO_BUILD="RISCV" \
--DLLVM_ENABLE_PROJECTS="clang" \
+-DLLVM_ENABLE_PROJECTS="clang;lld" \
 -DLLVM_USE_LINKER=gold \
 -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-linux-gnu" \
-../llvm
+$WS/llvm-project/llvm
 ```
 
 简单解释一下以上命令的效果就是: 
 - 采用 Ninja 方式编译 LLVM，这需要你在 Ubuntu 里提前采用 apt install ninja；
 - 编译 Release 版本（我们这里只是使用 llvm 工具链，不涉及开发，所以采用 Release 方式可以缩短编译时间和减少对硬盘的消耗，生成的可执行程序执行速度也快）；
-- 编译完成后如果要安装将安装在和 llvm-project 源码树平级的 install 子目录下，确保不会污染 llvm-project 源码目录；
+- 编译完成后如果要安装将安装在和 llvm-project 源码树平级的 install 子目录下，确保不会污染 llvm-project 源码目录，而且安装也不需要 sudo；
 - 只编译 RISCV 的 target；
+- 除了 llvm 外还会生成 clang 和 lld
 - 链接时使用 gold 而不是默认的 gnu-ld，加快链接速度，需要你在 Ubuntu 里提前采用 apt install binutils；
-- 修改默认的 triple 组合为 `riscv64-unknown-linux-gnu`（避免在后面编译时再通过 `--target` 指定）；除了 llvm 外还会生成 clang。
+- 修改默认的 triple 组合为 `riscv64-unknown-linux-gnu`（避免在后面使用我们自己制作的 clang 执行编译时再通过 `--target` 指定）。
 
 ## 3.3. 执行编译和安装
 
@@ -133,7 +143,7 @@ $ ninja install
 简单检查一下安装的结果
 
 ```bash
-$ ls ../../install/ -l
+$ ls $WS/install/ -l
 total 20
 drwxrwxr-x 2 u u 4096 10月  9 11:37 bin
 drwxrwxr-x 7 u u 4096 10月  9 11:37 include
@@ -142,13 +152,15 @@ drwxrwxr-x 2 u u 4096 10月  9 11:37 libexec
 drwxrwxr-x 7 u u 4096 10月  9 11:37 share
 ```
 
-检查一下生成的 clang 的版本：
+检查一下生成的 clang 和 lld 的版本：
 ```bash
-$ ../install/bin/clang -v
-clang version 14.0.6 (https://gitee.com/mirrors/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+$ $WS/install/bin/clang -v
+clang version 15.0.6 (https://gitee.com/mirrors/llvm-project.git 088f33605d8a61ff519c580a71b1dd57d16a03f8)
 Target: riscv64-unknown-linux-gnu
 Thread model: posix
 InstalledDir: ......
+$ $WS/install/bin/ld.lld -v
+LLD 15.0.6 (compatible with GNU linkers)
 ```
 
 为了后面直接在命令行中输入 clang 运行编译器， 将安装 clang 工具所在路径添加到 PATH 环境变量中，这里不再啰嗦。
@@ -162,20 +174,22 @@ InstalledDir: ......
 
 int main(int argc, char *argv[])
 {
- printf("Hello, world!\n");
- return 0;
+    printf("Hello, world!\n");
+    return 0;
 }
 ```
 
-受限于 LLVM 自身的 C 库不完善以及 lld 链接器尚未实现 linker relaxation，所以我们目前在使用 clang 时仍然需要借用 GNU 的 C 库和链接器来生成 RISC-V 的可执行程序（如果是本地 X86 则不用这么麻烦）。
+受限于 LLVM 自身的 C 库不完善，所以我们目前在使用 clang 时仍然需要借用 GNU 的 C 库来生成 RISC-V 的可执行程序（如果是本地 X86 则不用这么麻烦）。
 
-运行 clang 编译程序，通过 `--sysroot` 选项来指定 gnu 工具链的 sysroot，通过 `--gcc-toolchain` 来指定 gcc 工具链的位置。
+运行 clang 编译程序，通过 `--sysroot` 选项来指定 gnu 工具链的 sysroot 所在位置，通过 `--gcc-toolchain` 来告诉 clang 去哪里寻找链接时的 crt 库文件，譬如 crtbeginT.o、crtend.o、libgcc.a 和 libgcc_eh.a 等。
 
-这里假设使用在 [《制作交叉工具链 riscv-gnu-toolchain》][2] 一文中制作的 GNU GCC。为方便测试，我们采用静态链接的方式生成可执行程序。
+这里假设使用在 [《制作交叉工具链 riscv-gnu-toolchain》][2] 一文中制作的 GNU GCC。假设 GCC 的安装目录是 `$GCC/install`，同时为方便测试，我们采用静态链接的方式生成可执行程序。
 
 ```bash
-$ clang --gcc-toolchain=$WS/install --sysroot=$WS/install/sysroot/ -static test.c
+$ clang --gcc-toolchain=$GCC/install --sysroot=$GCC/install/sysroot/ -fuse-ld=lld -static test.c
 ```
+
+如果想仔细看一下编译链接的详细信息，也可以加上 `-v` 选项。
 
 简单检查一下生成的可执行文件格式是否正确：
 
@@ -193,3 +207,4 @@ Hello, world!
 
 [1]: https://llvm.org/docs/GettingStarted.html
 [2]: ./20220721-riscv-gcc.md
+[3]: https://lld.llvm.org/
