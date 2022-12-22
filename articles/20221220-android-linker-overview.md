@@ -61,7 +61,6 @@ load 和 link 的具体实现在代码中对应的就是 `find_libraries()` 这�
 限于篇幅，`find_libraries()` 这个函数的总结我会另起一篇。
 
 
-[1]:./20221220-andorid-linker-entry.md
 [2]:https://en.wikipedia.org/wiki/Dynamic_linker
 [3]:https://en.wikipedia.org/wiki/Dynamic_loading
 
