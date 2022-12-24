@@ -1,6 +1,6 @@
 ![](./diagrams/android-riscv.png)
 
-文章标题：**Android Dynamic Linker 流程总览**
+文章标题：**Android Dynamic Linker 初始化流程总览**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
@@ -13,7 +13,7 @@ linker 的具体代码在 `<AOSP>/bionic/linker` 下。下文以 `<AOSP>` 指代
 
 有关 Android linker 的入口函数的介绍，参考笔记 [《Android Dynamic Linker 的入口》][1]。在这篇文字中我们知道 `_start` 函数实际上没干啥，就是调用了 `__linker_init` 这个函数，这个函数定义在 `<AOSP>/bionic/linker/linker_main.cpp`。
 
-linker 作为一个动态链接应用程序执行过程中启动阶段的一个过渡过程，最终还是会将执行权交给用户编写的 main，所以 linker 的所有工作其实就在 `__linker_init` 这个函数中一次性完成了。当 `__linker_init` 执行结束（无论成功还是失败）后，linker 的使命也就完成了。
+linker 作为一个动态链接应用程序执行过程中启动阶段的一个过渡过程，最终还是会将执行权交给用户编写的 main，所以 linker 的所有工作其实就在 `__linker_init` 这个函数中一次性完成了。当 Android Dynamic Linker 初始化执行结束（无论成功还是失败）后，linker 的使命也就完成了。
 
 本文先从整体上总结一下 linker （即 `__linker_init` 函数）做了些啥。
 

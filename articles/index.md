@@ -40,6 +40,7 @@
 - [深入理解 Android NDK][51]
 - [Android Dynamic Linker 的入口][52]
 - [Android Linker 总览][53]
+- [Android Dynamic Linker 初始化流程总览][54]
 
 ## 编程语言与编译技术
 
@@ -121,3 +122,4 @@
 [51]: ./20221214-what-is-ndk.md
 [52]: ./20221220-andorid-linker-entry.md
 [53]: ./20221220-android-linker-overview.md
+[54]: ./20221222-android-dynamic-linker-overview.md
