@@ -53,7 +53,7 @@ extern "C" ElfW(Addr) __linker_init(void* raw_args) {
 
     对于 static 函数和变量，比较好处理，因为针对 so 内部的 static 符号，编译器会生成相对 PC 的 offset 访问指令，不涉及运行时的 relocation。我们可以发现 `<AOSP>/bionic/linker` 下代码中大量使用了 static 方式。
 
-    对于必须使用的非静态函数，android 采用的方法是：在编译源文件时使用了 `-ffunction-sections -fdata-sections` 这样的编译选项，在编译生成的 `.o` 目标文件中，会将每个函数或数据段，放在各种单独独立的 section 中；生成 `.a` 后在链接生成 linker 时，采用了 `-Bstatic -Wl,--gc-sections` 这样形式的选项，指示链接器仅将需要的函数级别的指令摘出来和主程序的目标文件进行静态链接（普通的 `-static` 只能做到 .o 级别摘取），这样不仅避免了运行期的 relocation，也大大缩小了 linker 的体积。
+    对于必须使用非静态函数的场景，譬如 `__linker_init()` 中会调用 `__libc_init_main_thread_early()` 这些函数。android 采用的方法是：在编译源文件时使用了 `-ffunction-sections -fdata-sections` 这样的编译选项，在编译生成的 `.o` 目标文件中，会将每个函数或数据段，放在各种单独独立的 section 中；生成 `.a`，然后在调用 lld 使用 `-shared`选项链接生成 linker 这个 so 时，采用了 `-Bstatic -Wl,--gc-sections` 这样形式的选项，指示链接器仅将需要的函数级别的指令摘出来和主程序的目标文件进行静态链接（普通静态链接时只能做到对 `.a` 文件进行 object 文件级别摘取），这样不仅避免了运行期的 relocation，也大大缩小了 linker 的体积。
 
     针对非静态的全局变量访问，仍然会生成 GOT。`__linker_init` 需要解决的符号重定位问题主要就是指的这里，在没有 `fixing the linker's own relocations` 之前，GOT 中对应的变量地址都是非法的，访问这些全局符号会 `generate a segfault`。此外需要注意的是 Android 为了缩小 so 的体积，采用了一个自己定义的专为 relocation 优化的 section type：`SHT_RELR`。值是 19， 定义在 `<AOSP>/bionic/libc/include/elf.h`，不为 GNU 的 binutils 所识别。使用时需要注意一下，具体了解，可以看 [Proposal for a new section type SHT_RELR][2]。
 
