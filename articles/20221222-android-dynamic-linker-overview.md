@@ -61,7 +61,12 @@ extern "C" ElfW(Addr) __linker_init(void* raw_args) {
 
 - 第二阶段也就是在解决了 `linker's own relocations` 之后会调用 `__linker_init_post_relocation()`，从函数名字上可以看出来这个函数就是在解决了 relocation 之后（post）再进一步执行一些初始化工作。这个函数内部还以调用 `linker_main` 函数为界分为两个子阶段。
 
-针对第一阶段和第二阶段详细的代码分析，我打算另外分别写一篇总结，就不在本文里赘述了。
+针对第一阶段和第二阶段详细的代码分析，会另外分别写一篇总结，见下，就不在本文里赘述了。
+
+- [《Android Dynamic Linker 初始化流程的第一阶段处理》][3]
+- 第二阶段：TBD
+
 
 [1]:./20221220-andorid-linker-entry.md
 [2]:https://groups.google.com/d/msg/generic-abi/bX460iggiKg/Pi9aSwwABgAJ
+[3]:./20221226-android-linker-init-1st.md
