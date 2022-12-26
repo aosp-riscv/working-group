@@ -11,6 +11,8 @@ linker 的具体代码在 `<AOSP>/bionic/linker` 下。下文以 `<AOSP>` 指代
 
 在笔记 [《Android Dynamic Linker 的入口》][1]中我们知道当我们在 Android 上执行一个动态链接的应用程序时，操作系统会首先加载 dynamic linker 并跳转到 dynamic linker 的入口函数 `_start()` 处开始执行，这个函数实际上没干啥，直接再次调用 `__linker_init()` 这个函数。在笔记 [《Android Dynamic Linker 初始化流程总览》][2] 中我们整体分析了 `__linker_init()` 这个函数，在最终跳转到应用程序的真正入口 `main()` 之前，该函数执行了一些初始化工作，这些初始化工作分为两个阶段，本文重点分析第一个阶段，其实也就是 `__linker_init()` 这个函数` 本身。我们直接对着代码做注解。
 
+# `__linker_init()` 函数代码注解
+
 这个函数前有一段重要的注释。解释了第一阶段的工作重点，就是在进入第二阶段之前要解决 linker 自身的 relocation 问题。有关这部分的技术背景分析我们在笔记 [《Android Dynamic Linker 初始化流程总览》][2] 中已经总结了，请参考。
 
 ```cpp

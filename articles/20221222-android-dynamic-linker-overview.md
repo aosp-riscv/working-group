@@ -64,9 +64,11 @@ extern "C" ElfW(Addr) __linker_init(void* raw_args) {
 针对第一阶段和第二阶段详细的代码分析，会另外分别写一篇总结，见下，就不在本文里赘述了。
 
 - [《Android Dynamic Linker 初始化流程的第一阶段处理》][3]
-- 第二阶段：TBD
+- [《Android Dynamic Linker 初始化流程的第二阶段处理》][4]
 
 
 [1]:./20221220-andorid-linker-entry.md
 [2]:https://groups.google.com/d/msg/generic-abi/bX460iggiKg/Pi9aSwwABgAJ
 [3]:./20221226-android-linker-init-1st.md
+[4]:./20221226-android-linker-init-2nd.md
+

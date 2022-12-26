@@ -42,6 +42,7 @@
 - [Android Linker 总览][53]
 - [Android Dynamic Linker 初始化流程总览][54]
 - [Android Dynamic Linker 初始化流程的第一阶段处理][55]
+- [Android Dynamic Linker 初始化流程的第二阶段处理][56]
 
 ## 编程语言与编译技术
 
@@ -125,3 +126,4 @@
 [53]: ./20221220-android-linker-overview.md
 [54]: ./20221222-android-dynamic-linker-overview.md
 [55]: ./20221226-android-linker-init-1st.md
+[56]: ./20221226-android-linker-init-2nd.md
