@@ -1,5 +1,9 @@
 Project(aosp-riscv) progress log (time in reverse order).
 
+- 2022-12-30 status update
+
+  From this month, monthly status update is moved to <https://github.com/isrc-cas/tarsier-monthly>.
+
 - 2022-11-30 status update
 
   - Google AOSP upstream: 
