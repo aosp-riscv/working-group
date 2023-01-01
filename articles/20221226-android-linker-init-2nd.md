@@ -11,7 +11,7 @@ linker 的具体代码在 `<AOSP>/bionic/linker` 下。下文以 `<AOSP>` 指代
 
 在笔记 [《Android Dynamic Linker 的入口》][1]中我们知道当我们在 Android 上执行一个动态链接的应用程序时，操作系统会首先加载 dynamic linker 并跳转到 dynamic linker 的入口函数 `_start()` 处开始执行，这个函数实际上没干啥，直接再次调用 `__linker_init()` 这个函数。在笔记 [《Android Dynamic Linker 初始化流程总览》][2] 中我们整体分析了 `__linker_init()` 这个函数，在最终跳转到应用程序的真正入口 `main()` 之前，该函数执行了一些初始化工作，这些初始化工作分为两个阶段，第一个阶段总结在笔记 [《Android Dynamic Linker 初始化流程的第一阶段处理》][4]，而本文重点分析第二个阶段。
 
-第二个阶段的入口是 `__linker_init_post_relocation()` 函数，我们对着代码来看一下它究竟做了些什么。
+第一个阶段 linker 重点是解决了自身的 relocation 问题，到了第二阶段 linker 已经可以引用外部全局的符号了。第二个阶段的入口是 `__linker_init_post_relocation()` 函数，我们对着代码来看一下它究竟做了些什么。
 
 # `__linker_init_post_relocation()` 函数代码注解
 
@@ -153,9 +153,20 @@ __linker_init_post_relocation(KernelArgumentBlock& args, soinfo& tmp_linker_so) 
 }
 ```
 
+综上所述，`__linker_init_post_relocation()` 函数作为第二阶段的前半段，主要做了如下工作：
+
+- 继续 thread 的部分初始化工作，这部分我们暂不展开。
+- 对 libc 的全局变量进行初始化。
+- 执行 libc 的 init 函数
+- 判断走 linker 的哪三种方式，case1、case2 还是 case3，其中 case2 只是打印帮助就退出了
+- 其他的方式最终会执行 `linker_main()`，为此做好准备，主要是在堆上拷贝 `tmp_linker_so` 构造了一个新的 soinfo，然后添加到 solist 和 sonext 链表中。
+- 调用 `linker_main()` 函数，进入第二阶段的下半段，这部分也可以认为是 linker 的最核心的部分，就是加载程序依赖的 so 并完成所有的动态重定位。
+
 # `linker_main()` 函数代码注解
 
 这个函数相对比较长，我这里就只挑我感兴趣的部分注解，其他部分读者可以自行分析。
+
+值得注意的是，我们打开 linker 的 log 后，能看到的 log 内容主要都是从 `linker_main` 函数开始输出的，这是因为之前 linker 自身的 resolution 还未完成以及一些 log 相关的全局变量都还没有初始化完成。
 
 ```cpp
 static ElfW(Addr) linker_main(KernelArgumentBlock& args, const char* exe_to_load) {
