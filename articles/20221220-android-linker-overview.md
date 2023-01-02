@@ -92,11 +92,12 @@ load 和 link 的具体实现在代码中对应的就是 `find_libraries()` 这�
 
 `android_dlopen_ext()` 是 Android 上自己对 POSIX API `dlopen()` 的扩充。
 
-注意从代码组织上，`do_dlopen()` 及其以后的函数都是定义在 `<AOSP>/bionic/linker/linker.cpp`， `__loader_` 开头的函数则定义在 `<AOSP>/bionic/linker/dlfcn.cpp`，`android_dlopen_ext()` 和 `dlopen()` 则定义在 `<AOSP>/bionic/libdl` 下，所以在 Android 里，libdl 的实现主体实际上是在 linker 中，之所以还要提供一个 libdl，完全是为了兼容 POSIX 标准。
+注意从代码组织上，`do_dlopen()` 及其以后的函数都是定义在 `<AOSP>/bionic/linker/linker.cpp`， `__loader_` 开头的函数则定义在 `<AOSP>/bionic/linker/dlfcn.cpp`，`android_dlopen_ext()` 和 `dlopen()` 则定义在 `<AOSP>/bionic/libdl` 下，所以在 Android 里，libdl 的实现主体实际上是在 linker 中，之所以还要提供一个 libdl，完全是为了兼容 POSIX 标准，即保证传统代码编译时命令行中 `-ldl` 能够继续有效。
 
-限于篇幅，`find_libraries()` 这个函数的总结我会另起一篇。
+限于篇幅，`find_libraries()` 这个函数的总结我会另起一篇，具体请参考 [《Android Dynamic Linker 之 find_libraries()》][4]。
 
 
 [2]:https://en.wikipedia.org/wiki/Dynamic_linker
 [3]:https://en.wikipedia.org/wiki/Dynamic_loading
+[4]:./20230102-android-linker-findlibrary.md
 

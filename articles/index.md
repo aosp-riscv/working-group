@@ -44,6 +44,7 @@
 - [Android Dynamic Linker 初始化流程的第一阶段处理][55]
 - [Android Dynamic Linker 初始化流程的第二阶段处理][56]
 - [Android Dynamic Linker 的日志分析][57]
+- [Android Dynamic Linker 之 find_libraries()][58]
 
 ## 编程语言与编译技术
 
@@ -73,59 +74,60 @@
 - [尝试运行第一个支持 RISC-V 的 QEMU 版本（v2.12.0）][14]
 
 
-[1]: ./20200911-platform-version.md
-[2]: ./20200915-android-linux-version.md
-[3]: ./20200929-build-riscv-android-kernel.md
-[4]: ./20201009-create-clang-riscv.md
-[5]: ./20201120-first-rv-android-mini-system.md
-[6]: ./20201215-opensrc-on-gitee.md
-[7]: ./20201230-android-build-sum.md
-[8]: ./20210111-soong-process.md
-[9]: ./20211026-lunch.md
-[10]: ./20211102-codeanalysis-soong_ui.md
-[11]: ./20220226-case-prebuilt-elf-files.md
-[12]: ./20220315-howto-add-lunch-entry.md
-[13]: ./20220402-understand-how-ndk-built.md
-[14]: ./20220406-qemu-riscv-2.12.md
-[15]: ./20220412-howto-gdb-android-emulator.md
-[16]: ./20220509-renderscipt-adaptation-analysis-in-android12-riscv64-porting.md
-[17]: ./20220511-aosp-riscv-setjmp.md
-[18]: ./20220615-introduce-bazel-for-aosp.md
-[19]: ./20220621-ifunc.md
-[20]: ./20220623-ifunc-bionic.md
-[21]: ./20220705-build-the-cts.md
-[22]: ./20220717-call-stack.md
-[23]: ./20220719-stack-unwinding.md
-[24]: ./20220719-stackuw-fp.md
-[25]: ./20220721-riscv-gcc.md
-[26]: ./20220721-stackuw-cfi.md
-[27]: ./20220816-signal-frame.md
-[28]: ./20220819-libunwind.md
-[29]: ./20220829-ptrace.md
-[30]: https://zhuanlan.zhihu.com/p/258394849
-[31]: https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html
-[32]: https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/
-[33]: ./20220905-aosp-build-system.md
-[34]: ./20220908-add-app-in-aosp.md
-[35]: ./20220915-andorid-init-language.md
-[36]: ./20220916-android-early-boot-sequence.md
-[37]: ./20220923-vndk.md
-[38]: ./20221008-symbol-version.md
-[40]: ./android-review/20221013.md
-[41]: ./android-review/20221028.md
-[42]: ./20221029-kobject-kset.md
-[43]: ./20221101-write-lkm.md
-[44]: ./20221101-sysfs.md
-[45]: ./20221102-bus-device-driver.md
-[46]: ./android-review/20221111.md
-[47]: ./android-review/20221125.md
-[48]: ./20221206-android-llvm-build-system.md
-[49]: ./android-review/20221209.md
-[50]: ./android-review/20221223.md
-[51]: ./20221214-what-is-ndk.md
-[52]: ./20221220-andorid-linker-entry.md
-[53]: ./20221220-android-linker-overview.md
-[54]: ./20221222-android-dynamic-linker-overview.md
-[55]: ./20221226-android-linker-init-1st.md
-[56]: ./20221226-android-linker-init-2nd.md
-[57]: ./20230101-android-linker-log.md
+[1]:./20200911-platform-version.md
+[2]:./20200915-android-linux-version.md
+[3]:./20200929-build-riscv-android-kernel.md
+[4]:./20201009-create-clang-riscv.md
+[5]:./20201120-first-rv-android-mini-system.md
+[6]:./20201215-opensrc-on-gitee.md
+[7]:./20201230-android-build-sum.md
+[8]:./20210111-soong-process.md
+[9]:./20211026-lunch.md
+[10]:./20211102-codeanalysis-soong_ui.md
+[11]:./20220226-case-prebuilt-elf-files.md
+[12]:./20220315-howto-add-lunch-entry.md
+[13]:./20220402-understand-how-ndk-built.md
+[14]:./20220406-qemu-riscv-2.12.md
+[15]:./20220412-howto-gdb-android-emulator.md
+[16]:./20220509-renderscipt-adaptation-analysis-in-android12-riscv64-porting.md
+[17]:./20220511-aosp-riscv-setjmp.md
+[18]:./20220615-introduce-bazel-for-aosp.md
+[19]:./20220621-ifunc.md
+[20]:./20220623-ifunc-bionic.md
+[21]:./20220705-build-the-cts.md
+[22]:./20220717-call-stack.md
+[23]:./20220719-stack-unwinding.md
+[24]:./20220719-stackuw-fp.md
+[25]:./20220721-riscv-gcc.md
+[26]:./20220721-stackuw-cfi.md
+[27]:./20220816-signal-frame.md
+[28]:./20220819-libunwind.md
+[29]:./20220829-ptrace.md
+[30]:https://zhuanlan.zhihu.com/p/258394849
+[31]:https://plctlab.github.io/aosp/create-a-minimal-android-system-for-riscv.html
+[32]:https://abopen.com/news/risc-v-gets-an-early-minimal-android-10-port-courtesy-of-plct-lab/
+[33]:./20220905-aosp-build-system.md
+[34]:./20220908-add-app-in-aosp.md
+[35]:./20220915-andorid-init-language.md
+[36]:./20220916-android-early-boot-sequence.md
+[37]:./20220923-vndk.md
+[38]:./20221008-symbol-version.md
+[40]:./android-review/20221013.md
+[41]:./android-review/20221028.md
+[42]:./20221029-kobject-kset.md
+[43]:./20221101-write-lkm.md
+[44]:./20221101-sysfs.md
+[45]:./20221102-bus-device-driver.md
+[46]:./android-review/20221111.md
+[47]:./android-review/20221125.md
+[48]:./20221206-android-llvm-build-system.md
+[49]:./android-review/20221209.md
+[50]:./android-review/20221223.md
+[51]:./20221214-what-is-ndk.md
+[52]:./20221220-andorid-linker-entry.md
+[53]:./20221220-android-linker-overview.md
+[54]:./20221222-android-dynamic-linker-overview.md
+[55]:./20221226-android-linker-init-1st.md
+[56]:./20221226-android-linker-init-2nd.md
+[57]:./20230101-android-linker-log.md
+[58]:./20230102-android-linker-findlibrary.md
