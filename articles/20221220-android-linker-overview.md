@@ -26,13 +26,49 @@ linker 的具体代码在 `<AOSP>/bionic/linker` 下。下文以 `<AOSP>` 指代
 
 有关加载库的搜索。ELF 中 `.dynamic` section 中的 `DT_NEED` 表项记录的只是文件名，没有包含完整路径，那么在哪里找到这些文件呢？另外，dlopen 函数参数指定要加载的库文件可以是绝对路径，也可以是不带路径的文件名，同样存在如何查找的问题。
 
-Linker 解决定位动态库的基本思路是：Linker 会按照一定的顺序查找一些指定的目录下是否存在指定的库文件。同时 Android 的 linker 在 Android N 版本上还引入了一个命名空间的概念，使库文件的查找变得稍微复杂一下，但是基本的查找原则是一致的。这里先介绍引入命名空间之前的查找规则，有关命名空间的概念，限于篇幅会另外起一篇文字总结。
+Linker 解决定位动态库的基本思路是：Linker 会按照一定的顺序查找一些指定的目录下是否存在指定的库文件。同时 Android 的 linker 在 Android N 版本上还引入了一个命名空间的概念，使库文件的查找变得稍微复杂一下，但是基本的查找原则是一致的。有关命名空间的概念，限于篇幅会另外起一篇文字总结 FIXME。
 
-Linker 按照顺序在指定的一些目录中查找依赖的库文件，这个顺序受运行时的环境变量、编译时的参数，以及 linker 内部实现影响。查找顺序的规则如下。
+Linker 按照顺序在指定的一些目录中查找依赖的库文件，这个顺序受运行时的环境变量、编译时的参数，以及 linker 内部实现影响。查找顺序的规则如下。具体可以参考代码 `<AOSP>/bionic/linker/linker.cpp` 文件中的 `open_library()` 函数，摘录如下：
 
-- 如果环境变量 `LD_LIBRARY_PATH=/path/to/dir1/:/path/to/dir2/` 被设置，则首先根据该环境变量在指定的目录中顺序查找；
-- 如果库文件编译时使用了 `-rpath=/path/to/dir1:/path/to/dir2`, 则在 rpath 参数指定的目录中查找。rpath 指定的路径保存在 ELF 文件的动态段中的 RUNTPATH 表项中：
-- 最后在 linker 指定的默认路径中查找。不同的操作系统或者不同的 linker 实现，有不同的配置。Android 10 系统上如果没有配置命名空间规则(实际都会配置，这里只是举个简单例子），则默认的查找路径如下：/system/lib64:/odm/lib64:/vendor/lib64
+```cpp
+static int open_library(android_namespace_t* ns,
+                        ZipArchiveCache* zip_archive_cache,
+                        const char* name, soinfo *needed_by,
+                        off64_t* file_offset, std::string* realpath) {
+  TRACE("[ opening %s from namespace %s ]", name, ns->get_name());
+
+  // If the name contains a slash, we should attempt to open it directly and not search the paths.
+  if (strchr(name, '/') != nullptr) {
+    return open_library_at_path(zip_archive_cache, name, file_offset, realpath);
+  }
+
+  // LD_LIBRARY_PATH has the highest priority. We don't have to check accessibility when searching
+  // the namespace's path lists, because anything found on a namespace path list should always be
+  // accessible.
+  int fd = open_library_on_paths(zip_archive_cache, name, file_offset, ns->get_ld_library_paths(), realpath);
+
+  // Try the DT_RUNPATH, and verify that the library is accessible.
+  if (fd == -1 && needed_by != nullptr) {
+    fd = open_library_on_paths(zip_archive_cache, name, file_offset, needed_by->get_dt_runpath(), realpath);
+    if (fd != -1 && !ns->is_accessible(*realpath)) {
+      close(fd);
+      fd = -1;
+    }
+  }
+
+  // Finally search the namespace's main search path list.
+  if (fd == -1) {
+    fd = open_library_on_paths(zip_archive_cache, name, file_offset, ns->get_default_library_paths(), realpath);
+  }
+
+  return fd;
+}
+```
+
+- 如果给出的文件名中包含 "/"，则认为是一个包含路径的文件名，则直接尝试按照这个全路径名加载 so
+- 首先（"the highest priority"） 查看环境变量 `LD_LIBRARY_PATH=/path/to/dir1/:/path/to/dir2/` 是否被设置，如果设置了则首先根据该环境变量在指定的目录中顺序查找；
+- 其次如果库文件编译时使用了 `-rpath=/path/to/dir1:/path/to/dir2`, 则在 rpath 参数指定的目录中查找。rpath 指定的路径保存在 ELF 文件的 .dynamic section 中的 `DT_RUNPATH` 表项中：
+- 最后在 linker 指定的默认路径中查找。Android 系统上将这一步改进为基于 namespace 机制。如果系统没有配置 namespace(实际都会配置，这里只是举个简单例子），则默认的查找路径为 kDefaultLdPaths，这个常量定义在 `<AOSP>/bionic/linker/linker.cpp` 为：`"/system/lib64:/odm/lib64:/vendor/lib64"`。
 
 被依赖的库文件，也可能依赖其他的库文件，Linker 在加载时按照 BFS 顺序，加载这些库文件到进程的内存地址空间。
 
