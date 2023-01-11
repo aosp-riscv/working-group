@@ -1,6 +1,6 @@
 ![](./diagrams/android.png)
 
-文章标题：**笔记：AOSP 不翻墙搭建 build 环境**
+文章标题：**笔记：利用国内 mirror 搭建 AOSP 的 build 环境**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
@@ -27,7 +27,7 @@
 
 注意，Google 官方的 android 网站 URL 前缀凡是 <https://source.android.com/> 的国内大陆无法直接访问，可以替换为 <https://source.android.google.cn/>。
 
-同样官方下载网站 <https://android.googlesource.com/> 我们也是无法直接访问的，还好我们有国内的镜像，这篇笔记文章综合以上参考资料简单总结一下如果利用国内镜像在不翻墙前提下搭建一个 AOSP 的构建环境，因为经常要搭建环境，记下来方便快速查看。
+同样官方下载网站 <https://android.googlesource.com/> 我们也是无法直接访问的，还好我们有国内的镜像，这篇笔记文章综合以上参考资料简单总结一下如果利用国内镜像搭建一个 AOSP 的构建环境，因为经常要搭建环境，记下来方便快速查看。
 
 # 2. 硬件要求
 

@@ -56,7 +56,7 @@ Codename:	focal
 
 # 5. 安装 Cuttlefish 运行环境
 
-基本上参考 [2] 中 “Launch Cuttlefish” 章节第 1 步的描述。国内不翻墙情况下执行这些命令时需要有些调整，对调整，增加的命令，我嵌入了注释：
+基本上参考 [2] 中 “Launch Cuttlefish” 章节第 1 步的描述。国内情况下执行这些命令时需要有些调整，对调整，增加的命令，我嵌入了注释：
 
 ```bash
 sudo apt install -y git devscripts config-package-dev debhelper-compat golang curl
@@ -81,7 +81,7 @@ sudo reboot
 
 参考 [2] 中 “Launch Cuttlefish” 章节第 2 步 ~ 第 7 步的描述，从 Android Continuous Integration 网站下载每日构建的镜像。
 
-FIXME: 这个必须翻墙。我后面研究一下如何自己构建后再补充上来
+FIXME: 这个必须访问境外 Google 网站。我后面研究一下如何自己构建后再补充上来。
 
 # 7. 运行 Cuttlefish
 
