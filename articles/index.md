@@ -46,6 +46,8 @@
 - [Android Dynamic Linker 初始化流程的第二阶段处理][56]
 - [Android Dynamic Linker 的日志分析][57]
 - [Android Dynamic Linker 之 find_libraries()][58]
+- [笔记：AOSP 不翻墙搭建 build 环境][60]
+- [笔记：搭建 Cuttlefish 运行环境][61]
 
 ## 编程语言与编译技术
 
@@ -133,3 +135,5 @@
 [57]:./20230101-android-linker-log.md
 [58]:./20230102-android-linker-findlibrary.md
 [59]:./android-review/20230106.md
+[60]:./20230111-aosp-build.md
+[61]:./20230111-cuttlefish-setup.md
