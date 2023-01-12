@@ -218,7 +218,7 @@ NDK 中的 sysroot 目录在 `<NDK>/toolchains/llvm/prebuilt/linux-x86_64/sysroo
 
   大部分的库文件按照 API-level 组织在下一级子目录中。除此之外是也有一些库文件是单独放在 triple 下。
 
-  看一个 API-level 的例子如下，一部分是 CRT object 文件。此外大部分是 `.so` 文件。有两个特殊的文件需要注意一下，一个是 `libc++.a`，一个是 `libc++.so`，这两个文件并不是库文件，而是 [implicit linker scripts 文件][7]。实际是文本文件，可以用 cat 命令查看其内容。其中 `libc++.a` 的内容是 `INPUT(-lc++_static -lc++abi)`, `libc++.so` 的内容是 `INPUT(-lc++_shared)`。所以当我们在 clang 命令行中链接这两个库的时候，实际上会去链接上一级目录，即 triple 目录下的 `libc++_static.a`、`libc++abi.a` 或者是 `libc++_shared.so`。有关这些库文件的总结在下文中。
+  看一个针对 triple 为 arm-linux-androideabi，API-level 为 29 的例子如下，一部分是 CRT object 文件。此外大部分是 `.so` 文件。有两个特殊的文件需要注意一下，一个是 `libc++.a`，一个是 `libc++.so`，这两个文件并不是库文件，而是 [implicit linker scripts 文件][7]。实际是文本文件，可以用 cat 命令查看其内容。其中 `libc++.a` 的内容是 `INPUT(-lc++_static -lc++abi)`, `libc++.so` 的内容是 `INPUT(-lc++_shared)`。所以当我们在 clang 命令行中链接这两个库的时候，实际上会去链接上一级目录，即 triple 目录下的 `libc++_static.a`、`libc++abi.a` 或者是 `libc++_shared.so`。针对 libc++ 库的总结见下文。
 
   ```bash
   $ ls toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/29/ -l
@@ -257,19 +257,21 @@ NDK 中的 sysroot 目录在 `<NDK>/toolchains/llvm/prebuilt/linux-x86_64/sysroo
 
   总的来说，NDK 包含的库文件分两类：
 
-  - 动态库（shared libraries），文件后缀为 `.so`。作为动态链接的库文件，根据其是否使用系统提供的版本，分为两类：
+  - 动态库（shared libraries），文件后缀为 `.so`。作为动态链接的库文件，根据实际运行的目标系统是否会提供 `.so`，分为两类：
 
-    如果使用系统提供的动态库文件，则应用程序打包时不需要提供这个动态库文件，应用程序在运行期间会加载目标系统上的动态库并进行符号链接。那么就要考虑一个符号兼容性的问题。举个例子，一个 app 是基于动态链接系统库 X.so 的 A 版本开发测试，在实际部署时目标系统上的 X.so 是 B 版本，如果 B 版本比较老，其支持的 API 可能比 A 版本的少，那么 app 运行如果调用了新的 B 版本中不支持的 API 就会导致程序异常。为了解决这个问题，我们看到 NDK 中大部分的 so 文件都是按照 API-level 分的。编译链接时前面也说过我们会在调用 clang/clang++ 传入 `--target` 选项时除了给出 triple 信息（这绝决定了 cross compile 的 ARCH 问题），还需要带上 API level 后缀，这样链接器就会检查 API 的版本信息，提前检查发现错误。
+    **系统提供了 `.so` 文件**。Android 系统在手机上会默认支持安装这些 `.so`，我们看到的 NDK 上 sysroot 下的这些 `.so` 文件绝大部分 Android 系统都会提供。所以应用程序打包时并不需要提供这个动态库文件，应用程序在运行期间会通过 dynamic linker 动态加载目标系统上的 `.so` 并完成符号重定位。NDK 的之所以提供了 `<SYSROOT>/usr/include/<triple>/<API-level>` 下的 `.so` 文件，仅仅是因为在我们基于 NDK 编译链接动态链接应用程序时，链接器（即 lld）需要了解符号的信息来实现symbol resolution。
+	
+	当我们使用系统提供的 `.so` 文件时需要考虑一个符号兼容性的问题。举个例子，假设我们在本地编译链接一个应用程序 app 时是基于动态链接系统库 `X.so` 的 A 版本开发测试的，而在实际部署时目标系统上的 `X.so` 可能是 B 版本，如果 B 版本比较老，其支持的 API 可能比 A 版本的少，那么 app 运行如果调用了新的 B 版本中不支持的 API 就会导致程序异常。为了解决这个问题，我们看到 NDK 中大部分的 so 文件都是按照 API-level 分的。编译链接时前面也说过我们会在调用 clang/clang++ 传入 `--target` 选项时除了给出 triple 信息（这决定了 cross compile 的 ARCH 问题），还需要带上 API level 后缀，这样链接器就会检查 API 的版本信息，提前检查发现错误。而从应用程序的角度出发，也要明确自己可以支持的 platform 的最小 API-level（minSdkVersion）和最大的 API level（maxSdkVersion）等信息。
 
-	同时我们也要了解到，在 `<SYSROOT>/usr/include/<triple>/<API-level>` 下的 `.so` 文件（除了 `libc++.so`）按照 [Build System Maintainers Guide][3] 的说法实际上都是一些 "system stub libraries"。这些 "system stub libraries" 只提供了函数 API 的描述信息，但函数体实际上都实现为空。这是因为在我们基于 NDK 编译链接时，实际上链接器只需要了解符号的信息，而并不需要像静态链接那样获取函数的实际实现指令。更详细的描述可以阅读 [Bionic and libc’s stub implementations][5]。
+	随着 API-level 的增多，NDK 又需要为几乎主流的每个 API-level 都提供一套 `.so`，这势必会导致 NDK 的体积迅速膨胀。但好在我们链接动态链接应用程序时，链接器（即 lld）仅需要了解符号的信息解决 symbol resolution，并不需要解决和 `.so` 有关的 symbol relocation 问题，所以按照 [Build System Maintainers Guide][3] 的说法实际上 NDK 只需要提供一些 "system stub libraries"。这些 "system stub libraries" 只定义的函数实际上都实现为空函数，这大大压缩了 NDK 的体积。更详细的描述可以阅读 [Bionic and libc’s stub implementations][5]。
 
-	NDK 的 sysroot 中也有一些动态链接库文件不是 "system stub libraries"，但不多，只有 `libc++_shared.so`。有关这个库的介绍，见下文，现在我们只要知道在 Android 系统中并没有自带 `libc++_shared.so` 这个动态链接库，所以 NDK 针对每个 triple 提供了一份。这也意味着我们在打包 apk 的时候需要将这个 `libc++_shared.so` 一起打包发布。
+	NDK 的 sysroot 中也有一些动态链接库文件 **系统并不负责提供**。针对这类 `.so`，NDK 不会以 "system stub libraries" 方式提供，但这些库不多，只有 `libc++_shared.so`。有关这个库的介绍，见下文 “NDK 提供的库和 API” 中有关 “C++ 库” 的介绍，现在我们只要知道在目标机器的 Android 系统中并没有自带 `libc++_shared.so` 这个动态链接库，所以 NDK 针对每个 triple 提供了一份（**注意是每个 triple 一份，即采用当前最新的版本**）。这也意味着我们在打包 apk 的时候需要将这个 `libc++_shared.so` 一起打包发布。
 
-	所以对于 NDK 中的动态库，我们也可以认为有两类，一类是正常的 so，需要随 apk 一起打包发布，还有一类是 "system stub libraries"，它们只是提供作为连接时解析符号用，并不包含实际实现指令，所以是不需要打包进 apk 的，目标系统上会提供这些 "system stub libraries" 对应的实际 "system libraries"。
+	总结一下，对于 NDK 中的动态链接库（ so ），我们可以认为有两类，一类是正常的 so，需要随 apk 一起打包发布，还有一类是 "system stub libraries"，它们只是提供作为链接时用，并不包含实际实现指令，所以是不需要打包进 apk 的，目标系统上会提供这些 "system stub libraries" 对应的实际 "system libraries"。
 
-  - 静态库（static libraries），文件后缀为 `.a`，编译链接时直接和 app 链接。和动态库不同，首先它不按照 API-level 分，一般只提供一个，我理解这是首先这些静态库都是基础库（除了内核系统调用不会再依赖其他的库），在 API 上是严格确保后向兼容的，所以 NDK 只要提供对应着当前 NDK 已知的最高版本的 API level 的一份静态库就好了，不需要按 API level 分别提供，其次因为是要实际静态链接，所以 `.a` 文件不存在 stub 的问题。
+  - 静态库（static libraries），文件后缀为 `.a`，编译链接时直接和 app 链接。和动态库不同，首先它不按照 API-level 分，一般只提供一个，我理解这是首先这些静态库都是基础库（除了内核系统调用不会再依赖其他的库），在 API 上是严格确保后向兼容的，所以 NDK 只要提供对应着当前 NDK 已知的最高版本的 API level 的一份静态库就好了，不需要按 API level 分别提供，其次因为是静态链接，所以 `.a` 文件也不存在 stub 的问题。
 
-  所以综上所述，按照 [Bionic and libc’s stub implementations][5] 上 Libraries 章节的说法，`The NDK contains three types of libraries`。
+  综上所述，按照 [Build System Maintainers Guide][3] 上 Libraries 章节的说法，`The NDK contains three types of libraries`。实际上就是说的上面这个道理。
 
 # 3. NDK 提供的库和 API
 
@@ -462,18 +464,9 @@ google 官网给出的这个库的官网在 <http://www.zlib.net/manual.html>
 
 > `libneuralnetworks`，provides apps with hardware acceleration for on-device machine learning operations.
 
-
-
-
-
-
-
-
-
-
 [1]:https://developer.android.google.cn/ndk/guides
 [2]:https://developer.android.com/ndk/guides/stable_apis
-[3]:https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md
+[3]:https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md#libraries
 [4]:https://issuetracker.google.com/70838247
 [5]:https://stackoverflow.com/questions/39108778/bionic-and-libc-s-stub-implementations
 [6]:https://developer.android.google.cn/ndk/guides/cpp-support
