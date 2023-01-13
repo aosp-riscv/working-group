@@ -114,7 +114,7 @@ curl -OC - https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/aosp-latest.tar
 # 解压，解压得到 AOSP 工程目录
 tar xf aosp-latest.tar
 # 进入 AOSP 工程目录，这时 ls 的话什么也看不到，因为只有一个隐藏的 .repo 目录
-cd AOSP
+cd aosp
 # 正常同步一遍即可得到完整目录
 repo sync 
 ```
