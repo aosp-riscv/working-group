@@ -49,6 +49,7 @@
 - [Android Dynamic Linker 之 find_libraries()][58]
 - [笔记：利用国内 mirror 搭建 AOSP 的 build 环境][60]
 - [笔记：搭建 Cuttlefish 运行环境][61]
+- [笔记：基于 Cuttlefish 调试 Android 内核][63]
 
 ## 编程语言与编译技术
 
@@ -139,3 +140,4 @@
 [60]:./20230111-aosp-build.md
 [61]:./20230111-cuttlefish-setup.md
 [62]:./android-review/20230120.md
+[63]:./20230115-cuttlefish-kernel-dev.md

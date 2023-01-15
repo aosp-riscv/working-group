@@ -79,9 +79,9 @@ sudo reboot
 
 # 6. 下载 CuttleFish 镜像
 
-参考 [2] 中 “Launch Cuttlefish” 章节第 2 步 ~ 第 7 步的描述，从 Android Continuous Integration 网站下载每日构建的镜像。
+参考 [2] 中 “Launch Cuttlefish” 章节第 2 步 ~ 第 7 步的描述，从 [Android CI(Continuous Integration)][6] 网站下载每日构建的镜像。
 
-FIXME: 这个必须访问境外 Google 网站。我后面研究一下如何自己构建后再补充上来。
+通过 [Android CI][6] 下载镜像必须访问境外 Google 网站，并不是很方便。我们其实也可以自己取 AOSP 的源码构建这些镜像，具体可以参考另一篇 [《笔记：基于 Cuttlefish 调试 Android 内核》][7] 中有关 “在 AOSP 中运行 Cuttlefish” 的介绍。
 
 # 7. 运行 Cuttlefish
 
@@ -162,3 +162,5 @@ cuttlefish 支持 webview 访问的端口是 8443。所以：
 [3]:https://2net.co.uk/blog/cuttlefish-android12.html
 [4]:https://nathanchance.dev/posts/building-using-cuttlefish/
 [5]:https://coderfan.net/vmware-ubuntu20-cuttlefish-run-android12.html
+[6]:https://ci.android.com/
+[7]:./20230115-cuttlefish-kernel-dev.md
