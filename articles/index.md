@@ -1,6 +1,26 @@
-# 文章分类索引
+**文章分类索引**
 
-## android-review 进展
+<!-- TOC -->
+
+- [Android RISC-V 移植进展](#android-risc-v-移植进展)
+- [安卓（Android）](#安卓android)
+	- [General](#general)
+	- [Build System](#build-system)
+	- [Bionic](#bionic)
+		- [linker](#linker)
+		- [Misc](#misc)
+	- [Toolchain](#toolchain)
+	- [Kernel](#kernel)
+	- [Emulator](#emulator)
+	- [NDK](#ndk)
+	- [System](#system)
+- [编程语言与编译技术](#编程语言与编译技术)
+- [Linux](#linux)
+- [开发工具](#开发工具)
+
+<!-- /TOC -->
+
+## Android RISC-V 移植进展
 
 - [第一期：2022-09-30 ~ 2022-10-14][40]
 - [第二期：2022-10-13 ~ 2022-10-28][41]
@@ -13,43 +33,72 @@
 
 ## 安卓（Android）
 
+### General
+
 - [AOSP 的版本管理][1]
 - [AOSP 内核的版本管理][2]
-- [编译一个 RISC-V 的 Android 内核][3]
 - [第一个 RISC-V 上的“Android 最小系统”][5]
 - [Create a minimal Android system for RISC-V][31]
 - [RISC-V Gets an Early, Minimal Android 10 Port Courtesy of PLCT Lab, Gareth Halfacree - https://abopen.com/, 20201127][32]
 - [AOSP-RISCV 的开源仓库在 Gitee 上新建了镜像][6]
+- [AOSP 12 移植 RISCV64 过程中针对 RenderScript 的适配方案分析][16]
+- [搭建 CTS 环境][21]
+
+### Build System
+
+- [笔记：利用国内 mirror 搭建 AOSP 的 build 环境][60]
 - [AOSP Build 背后涉及的相关知识汇总][7]
 - [AOSP Soong 创建过程详解][8]
 - [envsetup.sh 中的 lunch 函数分析][9]
 - [代码走读：对 soong_ui 的深入理解][10]
-- [Case analysis:prebuilt-elf-files][11]
 - [如何为 AOSP 的 lunch 新增一个菜单项][12]
-- [Android NDK 的构建分析][13]
-- [GDB 调试 Android 模拟器][15]
-- [AOSP 12 移植 RISCV64 过程中针对 RenderScript 的适配方案分析][16]
-- [AOSP RISC-V 移植工作中 setjmp 相关函数实现总结][17]
 - [Bazel 和 AOSP 介绍][18]
-- [BIONIC 中对 IFUNC 的支持][20]
-- [搭建 CTS 环境][21]
 - [Andorid Build System 研究心得][33]
 - [为 AOSP 添加一个 module][34]
-- [学习笔记：Android Init Language][35]
-- [学习笔记：Android Early Init Boot Sequence][36]
-- [学习笔记: VNDK 基本概念][37]
-- [代码笔记：Android LLVM toolchain 构建系统][48]
-- [深入理解 Android NDK][51]
-- [Android Dynamic Linker 的入口][52]
+
+### Bionic
+
+#### linker
+
 - [Android Linker 总览][53]
+- [Android Dynamic Linker 的入口][52]
 - [Android Dynamic Linker 初始化流程总览][54]
 - [Android Dynamic Linker 初始化流程的第一阶段处理][55]
 - [Android Dynamic Linker 初始化流程的第二阶段处理][56]
 - [Android Dynamic Linker 的日志分析][57]
 - [Android Dynamic Linker 之 find_libraries()][58]
-- [笔记：利用国内 mirror 搭建 AOSP 的 build 环境][60]
+
+#### Misc
+
+- [Case analysis:prebuilt-elf-files][11]
+- [AOSP RISC-V 移植工作中 setjmp 相关函数实现总结][17]
+- [BIONIC 中对 IFUNC 的支持][20]
+
+### Toolchain
+
+- [代码笔记：Android LLVM toolchain 构建系统][48]
+
+### Kernel
+
+- [编译一个 RISC-V 的 Android 内核][3]
+
+### Emulator
+
+- [GDB 调试 Android 模拟器][15]
 - [笔记：搭建 Cuttlefish 运行环境][61]
 - [笔记：基于 Cuttlefish 调试 Android 内核][63]
+
+### NDK
+
+- [Android NDK 的构建分析][13]
+- [学习笔记: VNDK 基本概念][37]
+- [深入理解 Android NDK][51]
+
+### System
+
+- [学习笔记：Android Init Language][35]
+- [学习笔记：Android Early Init Boot Sequence][36]
+
 
 ## 编程语言与编译技术
 
@@ -62,7 +111,6 @@
 - [Stack Unwinding 之基于 Call Frame Information][26]
 - [用于栈回溯的一些库][28]
 - [学习笔记: Symbol Versioning 基本使用][38]
-
 
 ## Linux
 
