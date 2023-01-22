@@ -44,7 +44,7 @@ $ m -j
 
 如果我们想调用 cuttlefish 运行我们的 AOSP，在 <AOSP> 路径下直接执行 `launch_cvd --daemon` 即可启动当前编译的 AOSP。其他 adb 和 WebUI 的访问方式和[《搭建 Cuttlefish 运行环境》][2] 中的一样。
 
-在这种运行环境下，如果要查看 Cuttlefish 的 log，可以如下访问：
+注意在这种运行环境下执行 Cuttlefish，和我们在 [《搭建 Cuttlefish 运行环境》][2] 中不同的是：`cuttlefish_runtime` 的信息（包括 log）是生成在当前用户的目录下 （`~`）。所以如果要查看 Cuttlefish 的 log，需要按照如下方式访问：
 
 ```bash
 $ vi ~/cuttlefish_runtime/kernel.log
