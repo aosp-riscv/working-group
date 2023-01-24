@@ -165,9 +165,17 @@ The following files contain useful debugging information:
 ```
 
 log 文件中：
-- `launcher.log`：log files from launch_cvd
+- `launcher.log`：log files from `launch_cvd`, 注意这个 log 并不只包含 `launch_cvd` 本身的 log，本身的 log 直接输出在 stdout。
 - `kernel.log`：console log, including messages from boot loader and kernel
 - `logcat`：Android logcat
+
+如果想控制 log 的显示层级，可以使用 `ANDROID_LOG_TAGS` 这个环境变量。譬如我们想只看 Info （包含）以上的 log level 的信息，则可以在启动 cuttlefish 时加上这个环境变量如下：
+
+```bash
+$ ANDROID_LOG_TAGS='*:i' HOME=$PWD ./bin/launch_cvd --daemon
+```
+
+具体用法参考 [Filter log output][8]。
 
 # 9. 通过 console 和 Cuttlefish 进行交互
 
@@ -245,3 +253,4 @@ Cuttlefish 支持 webview 访问的端口是 8443。所以：
 [5]:https://coderfan.net/vmware-ubuntu20-cuttlefish-run-android12.html
 [6]:https://ci.android.com/
 [7]:./20230115-cuttlefish-kernel-dev.md
+[8]:https://developer.android.com/studio/command-line/logcat#filteringOutput
