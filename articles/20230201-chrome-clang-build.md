@@ -6,6 +6,17 @@
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
 最近开始移植 Chrome 到 android for riscv64 的工作。期间发现 Chromium 的项目采用的 clang 是自己维护的，但是还无法支持 riscv64 for android。所以移植工作的第一步就是要尝试为 Chromium Clang 加上对 riscv64 for android 的支持。为此特意研究了一下 Chromium Clang 的构建相关内容，笔记整理如下。
+<!-- TOC -->
+
+- [1. 参考文档](#1-参考文档)
+- [2. 搭建 Chromium for Android 的构建环境](#2-搭建-chromium-for-android-的构建环境)
+- [3. 构建 Clang for Chromium](#3-构建-clang-for-chromium)
+- [4. 构建脚本分析](#4-构建脚本分析)
+	- [4.1. `build.py` 代码分析](#41-buildpy-代码分析)
+	- [4.2. `package.py` 代码分析](#42-packagepy-代码分析)
+	- [4.3. `update.py` 代码分析](#43-updatepy-代码分析)
+
+<!-- /TOC -->
 
 # 1. 参考文档 
 
@@ -29,7 +40,7 @@
 
 注意本文相关代码基于 Chromium 的版本是 `109.0.5414.87`
 
-# 搭建 Chromium for Android 的构建环境
+# 2. 搭建 Chromium for Android 的构建环境
 
 基本上就是参考的 [1]，只是简单将我自己的操作步骤列出来。
 
@@ -59,7 +70,7 @@ gclient runhooks
 
 注意运行 `install-build-deps.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
 
-# 构建 Clang for Chromium
+# 3. 构建 Clang for Chromium
 
 注意在构建 Clang for Chromium 时，仅按照上一节搭建的代码环境是不够的，特别我实验发现构建过程中会报和 fuchsia 相关的 sdk 找不到或者相关文件不存在的问题。我目前理解从 Clang for Chromium 的角度来看，其 Clang 要支持构建出来的 Chrome 运行在各种 os 上，包括 linux/android/fuchsia。所以为了顺利地构建上，我们需要把 fuchsia 相关的依赖包也装上。
 
@@ -84,7 +95,7 @@ target_os = ["android", "fuchsia"]
 
 注意，似乎 `target_os` 并不需要加上 `"linux"`，暂时不太清楚原因，可能 "android" 本身也是属于 "linux" 的一个分支，所以有了 "android"，至少对构建 Clang for Chromium 是没有问题了。
 
-现在我们可以执行脚本构建了。我们推荐执行 `package.py` 而不是 `build.py`，因为 `package.py` 内部封装了调用 `build.py`，而且会将我们需要的可执行文件和库结果提取出来打包方便我们部署。
+现在我们可以执行脚本构建了。我们推荐执行 `package.py` 而不是 `build.py`，因为 `package.py` 不仅内部封装了调用 `build.py` 以及相关的调用参数，而且会创建日志文件以及将我们需要的可执行文件和库结果提取出来打包方便我们部署。
 
 假设 pwd 为上面的 `~/chromium/src`
 ```bash
@@ -116,8 +127,19 @@ $ ls *.t*z -l
 
 其中 `clang-llvmorg-*.tar.xz` 或者 `clang-llvmorg-*.tgz` 就是我们要的 Clang 的压缩包，也是我们通过执行 `update.py` 下载的文件。
 
+值得注意的是：我发现将这里打包的 tar 中的文件和我们执行 runhooks （hook 中会调用 `update.py`）后创建的 `<SRC>/third_party/llvm-build/Release+Asserts/` 下的内容进行比较，发现 tar 中的文件会少一些。列举如下：
 
-# 构建脚本分析
+```
+Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-bcanalyzer
+Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-cxxfilt
+Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-dwarfdump
+Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-objdump
+Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-otool
+```
+
+我理解可能 hooks 中还在 Release+Asserts 下多创建了这些文件，具体有什么用，需要再看看，目前至少要理解我们 build 出来的 clang 的 tar 包中和 runhooks 后的 "Release+Asserts" 下的文件内容并不是完全一致的。这个后面可能需要注意一下。
+
+# 4. 构建脚本分析
 
 Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比较重要的：
 
@@ -129,7 +151,7 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 
 以下对这些代码的分析基于 `109.0.5414.87` 的 Chromium 的版本。分析内容以 `###` 开头的注释方式嵌入。
 
-## `build.py` 代码分析
+## 4.1. `build.py` 代码分析
 
 
 脚本执行过程中会涉及以下目录, 为方便理解，这里根据我的实验环境给出实际的展开形式
@@ -306,7 +328,7 @@ def main():
   return 0
 ```
 
-## `package.py` 代码分析
+## 4.2. `package.py` 代码分析
 
 重点分析其 `main()` 函数。
 
@@ -361,15 +383,6 @@ def main():
   ......
 
   ### 把 <pdir> 这个目录压缩成 `<pdir>.tar.xz` 和 `<pdir>.tgz` 然后尝试 upload
-  ### 需要注意的是，我将这里打包的 tar 中的文件和我们执行 runhooks （hook 中会调用 
-  ### `update.py`）后创建的 `<SRC>/third_party/llvm-build/Release+Asserts/` 下的内容，
-  ### 发现 tar 中的文件会少一些
-  ### Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-bcanalyzer
-  ### Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-cxxfilt
-  ### Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-dwarfdump
-  ### Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-objdump
-  ### Only in ../chromium/src/third_party/llvm-build.bak/Release+Asserts/bin/: llvm-otool
-  ### 这个后面可能需要注意一下。
   # Create main archive.
   ......
 
@@ -410,7 +423,7 @@ def main():
   # FIXME: Warn if the file already exists on the server.
 ```
 
-## `update.py` 代码分析
+## 4.3. `update.py` 代码分析
 
 update 的处理比较简单，可以重点看一下文件的注释部分，摘录如下：
 
