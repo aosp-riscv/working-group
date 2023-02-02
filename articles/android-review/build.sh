@@ -11,6 +11,7 @@ ISSUE_STRING="\
 2022-12-08 ~ 2022-12-23;\
 2022-12-22 ~ 2023-01-06;\
 2023-01-05 ~ 2023-01-20;\
+2023-01-19 ~ 2023-02-03;\
 "
 
 IFS=';' read -ra ISSUE_ARRAY <<< "$ISSUE_STRING"
@@ -24,3 +25,4 @@ done
 
 mv aosp-riscv-*.html ../../../unicornx.github.io/android-review/
 
+cp ./template.md ./${ARGS[2]}.md

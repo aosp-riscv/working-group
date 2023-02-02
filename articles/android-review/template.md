@@ -1,5 +1,5 @@
 
-本周期（2022/10/28 ~ 2022/11/10）RISCV 相关 merge PR 汇总参考 [这里][1]。
+本周期（2023-01-19 ~ 2023-02-03）RISCV 相关 merge PR 汇总参考 [这里][1]。
 
 Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 PR，所以我们在 <https://android-review.googlesource.com/> 开始看到相关的修改。
 
@@ -8,13 +8,15 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 <!-- TOC -->
 
 - [1. Build System](#1-build-system)
-- [2. Bionic](#2-bionic)
+- [2. Toolchain](#2-toolchain)
 - [3. 内核（linux）](#3-内核linux)
-- [4. Toolchain](#4-toolchain)
+- [4. Bionic](#4-bionic)
 - [5. System](#5-system)
-- [6. Framework](#6-framework)
-- [7. 模拟器部分](#7-模拟器部分)
-- [8. 未归类的其他](#8-未归类的其他)
+- [6. ART](#6-art)
+- [7. Framework](#7-framework)
+- [8. 模拟器部分](#8-模拟器部分)
+- [9. XTS(CTS/VTS)](#9-xtsctsvts)
+- [10. 未归类的其他](#10-未归类的其他)
 
 <!-- /TOC -->
 
@@ -22,17 +24,15 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 
 - N/A
 
-# 2. Bionic
+# 2. Toolchain
 
 - N/A
 
 # 3. 内核（linux）
 
-具体涉及 PR 包括：
-
 - N/A
 
-# 4. Toolchain
+# 4. Bionic
 
 - N/A
 
@@ -40,18 +40,25 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 
 - N/A
 
-# 6. Framework
+# 6. ART
 
 - N/A
 
-# 7. 模拟器部分
+# 7. Framework
 
 - N/A
 
-# 8. 未归类的其他
+# 8. 模拟器部分
 
 - N/A
 
+# 9. XTS(CTS/VTS)
 
+- N/A
 
-[1]: https://unicornx.github.io/android-review/aosp-riscv-2022-10-28.html
+# 10. 未归类的其他
+
+- N/A
+
+[1]: https://unicornx.github.io/android-review/aosp-riscv-2023-02-03.html
+
