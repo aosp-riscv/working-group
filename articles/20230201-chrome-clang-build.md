@@ -385,7 +385,7 @@ def main():
   ### (5) 对第（4）步的结果 runtimes_triples_args 做进一步的处理，
   ### 从代码中我们可以了解到该版本的 Chromium 一共支持以下这些 triples，构建 Clang for 
   ### Chromium 时需要针对这些 triple 制作对应的 runtime/builtin 库文件，并安装到 Clang 
-  ## 工具的各自对应的目录下去
+  ### 工具的各自对应的目录下去
   ### GNU Linux:
   ### - i386-unknown-linux-gnu        : lib/clang/16.0.0/lib/i386-unknown-linux-gnu/
   ### - x86_64-unknown-linux-gnu      : lib/clang/16.0.0/lib/x86_64-unknown-linux-gnu/
@@ -399,8 +399,8 @@ def main():
   ### Fuchsia
   ### - aarch64-unknown-fuchsia : lib/clang/16.0.0/lib/aarch64-unknown-fuchsia/
   ### - x86_64-unknown-fuchsia  : lib/clang/16.0.0/lib/x86_64-unknown-fuchsia/
-  ### 具体 cmake 的参数语法参考以下注释，有点不太明白的是，为何（3）和（5）之间要插入一个
-  ### （4），或者为啥不把（3）挪到（4）后面和（5）一起？
+  ### 具体 cmake 的参数语法参考以下注释，有点不太明白的是，为何（3）和（5）之间要插入一个（4），
+  ### 或者为啥不把（3）挪到（4）后面和（5）一起？
   # Convert FOO=BAR CMake flags per triple into
   # -DBUILTINS_$triple_FOO=BAR/-DRUNTIMES_$triple_FOO=BAR and build up
   # -DLLVM_BUILTIN_TARGETS/-DLLVM_RUNTIME_TARGETS.
