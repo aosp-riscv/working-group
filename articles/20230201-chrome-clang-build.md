@@ -98,6 +98,20 @@ target_os = ["android", "fuchsia"]
 现在我们可以执行脚本构建了。我们推荐执行 `package.py` 而不是 `build.py`，因为 `package.py` 不仅内部封装了调用 `build.py` 以及相关的调用参数，而且会创建日志文件以及将我们需要的可执行文件和库结果提取出来打包方便我们部署。
 
 假设 pwd 为上面的 `~/chromium/src`
+
+注意，如果整个流程完整正确地结束，脚本会自动删除生成的日志文件，所以如果一定要查看日志文件，需要 hack 一下代码，修改 `~/chromium/src/tools/clang/scripts/package.py`，找到脚本会删除日志的地方，把删除的动作注释掉，例子如下：
+```python
+  # Upload build log next to it.
+  os.rename('buildlog.txt', pdir + '-buildlog.txt')
+  MaybeUpload(args.upload,
+              pdir + '-buildlog.txt',
+              gcs_platform,
+              extra_gsutil_args=['-z', 'txt'])
+  #os.remove(pdir + '-buildlog.txt')
+```
+
+现在可以执行打包和构建的脚本了：
+
 ```bash
 ./tools/clang/scripts/package.py
 ```
@@ -163,7 +177,19 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 - `LLVM_BOOTSTRAP_INSTALL_DIR` = `src/third_party/llvm-bootstrap-install`
 - `LLVM_INSTRUMENTED_DIR`      = `src/third_party/llvm-instrumented`
 - `LLVM_PROFDATA_FILE`         = `src/third_party/llvm-instrumented/profdata.prof`
-- `LLVM_BUILD_TOOLS_DIR`       = `src/third_party/llvm/../llvm-build-tools` = `src/third_party/llvm-build-tools`
+- `LLVM_BUILD_TOOLS_DIR`       = `src/third_party/llvm/../llvm-build-tools` = `src/third_party/llvm-build-tools` 这是一个 build.py 执行过程中创建的目录，用来存放 build 过程中下载下来的一些用来辅助构建的工具，譬如：
+  ```bash
+  $ ls third_party/llvm-build-tools -l
+  total 32
+  drwxrwxr-x  6 wangchen wangchen 4096 Jan 30 21:13 cmake-3.23.0-linux-x86_64
+  drwxr-xr-x  8 wangchen wangchen 4096 Feb 25  2020 debian_bullseye_amd64_sysroot
+  drwxr-xr-x  7 wangchen wangchen 4096 Feb 25  2020 debian_bullseye_arm64_sysroot
+  drwxr-xr-x  7 wangchen wangchen 4096 Feb 25  2020 debian_bullseye_arm_sysroot
+  drwxr-xr-x  7 wangchen wangchen 4096 Feb 25  2020 debian_bullseye_i386_sysroot
+  drwxrwxr-x  9 wangchen wangchen 4096 Feb  3 08:46 gcc-10.2.0-bionic
+  drwxrwxr-x 18 wangchen wangchen 4096 Feb  3 08:47 libxml2-v2.9.12
+  drwxrwxr-x  4 wangchen wangchen 4096 Jan 31 16:28 pinned-clang
+  ```
 - `ANDROID_NDK_DIR`            = `src/third_party/android_ndk`
 - `FUCHSIA_SDK_DIR`            = `src/third_party/fuchsia-sdk/sdk`
 - `PINNED_CLANG_DIR`           = `src/third_party/llvm-build-tools/pinned-clang`
@@ -196,8 +222,11 @@ def main():
     return 0
 
   ### 开始设置 **基本的** cmake 的 configurations, 保存在 base_cmake_args 中
-  ### 此过程中涉及如下关键的配置
-  ### - cc/cxx: 编译 clang 的 c/c++ 编译器，如果没有指定使用 gcc（`--gcc-toolchain`）
+  ### 之所以叫 **基本的**，是因为整个构建过程会执行好几遍编译（具体描述见下），每一遍编译的配
+  ### 置都会在这个 base_cmake_args 上进行相应的修改，而 base_cmake_args 定义了这几次编译中
+  ### 相对 common 的部分。
+  ### common 部分包含如下关键的配置:
+  ### - cc/cxx: 编译 clang 的 c/c++ 编译器，可以指定使用 gcc（`--gcc-toolchain`），不指定
   ###   则会下载一个 chrome team 预先做好的 clang，称之为 "Pinned Clang", 放在 PINNED_CLANG_DIR 下
   ### - lld: 只有在 Windows 上编译 clang 过程中才会涉及需要显式指定链接器，其他情况默认会在调
   ###   用 gcc 或者 "Pinned Clang"（即所谓的 compiler driver）时通过传入 "-fuse-ld=lld"
@@ -225,8 +254,56 @@ def main():
   ### BOOTSTRAP Clang 的 cmake configuration 会重新设置，在 base_cmake_args 上进行
   ### 修改，保存在 bootstrap_args 中，注意后加的配置选项如果和 base_cmake_args 重名的会
   ### 覆盖原有定义而不是追加
+  ### 直接运行 package.py 得到的 log 显示 bootstrap 的 cmake 配置如下：
+  ### cmake -GNinja
+  ### -DCMAKE_BUILD_TYPE=Release
+  ### -DLLVM_ENABLE_ASSERTIONS=OFF
+  ### '-DLLVM_ENABLE_PROJECTS=clang;lld;clang-tools-extra'
+  ### -DLLVM_ENABLE_RUNTIMES=compiler-rt
+  ### '-DLLVM_TARGETS_TO_BUILD=AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86'
+  ### -DLLVM_ENABLE_PIC=ON
+  ### -DLLVM_ENABLE_UNWIND_TABLES=OFF
+  ### -DLLVM_ENABLE_TERMINFO=OFF
+  ### -DLLVM_ENABLE_Z3_SOLVER=OFF
+  ### -DCLANG_PLUGIN_SUPPORT=OFF
+  ### -DCLANG_ENABLE_STATIC_ANALYZER=OFF
+  ### -DCLANG_ENABLE_ARCMT=OFF
+  ### '-DBUG_REPORT_URL=https://crbug.com and run tools/clang/scripts/process_crashreports.py (only works inside Google) which will upload a report'
+  ### -DLLVM_INCLUDE_GO_TESTS=OFF
+  ### -DLLVM_ENABLE_DIA_SDK=OFF
+  ### -DLLVM_ENABLE_LLD=ON
+  ### -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
+  ### -DLLVM_ENABLE_CURL=OFF
+  ### -DLIBCLANG_BUILD_STATIC=ON
+  ### -DLLVM_STATIC_LINK_CXX_STDLIB=ON
+  ### -DCMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot
+  ### -DLLVM_ENABLE_LIBXML2=FORCE_ON
+  ### -DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/include/libxml2
+  ### -DLIBXML2_LIBRARIES=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/lib/libxml2.a
+  ### -DLLVM_TARGETS_TO_BUILD=X86
+  ### '-DLLVM_ENABLE_PROJECTS=clang;lld'
+  ### -DLLVM_ENABLE_RUNTIMES=compiler-rt
+  ### -DCMAKE_INSTALL_PREFIX=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install
+  ### '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
+  ### '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
+  ### -DCMAKE_EXE_LINKER_FLAGS=
+  ### -DCMAKE_SHARED_LINKER_FLAGS=
+  ### -DCMAKE_MODULE_LINKER_FLAGS=
+  ### -DLLVM_ENABLE_ASSERTIONS=ON
+  ### -DCOMPILER_RT_BUILD_CRT=ON
+  ### -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+  ### -DCOMPILER_RT_BUILD_MEMPROF=OFF
+  ### -DCOMPILER_RT_BUILD_ORC=OFF
+  ### -DCOMPILER_RT_BUILD_PROFILE=ON
+  ### -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+  ### -DCOMPILER_RT_BUILD_XRAY=OFF
+  ### '-DCOMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi'
+  ### -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON
+  ### -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang
+  ### -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang++
+  ### /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm/llvm
   ### 所以我们会发现譬如 BOOTSTRAP Clang 只会针对 x86 一个 tareget，enabled project 也
-  ### 只有 clang 和 lld；runtime 也只会针对 darwin 系统并且指定了 pgo 下才会构建。
+  ### 只有 clang 和 lld；runtime 会构建，但只会生成 crt/builtin/profile 几个有限的。
   ### 注意构建成功后会修改 cc 和 cxx 为 LLVM_BOOTSTRAP_INSTALL_DIR 下的 clang/clang++ 
   ### 这就是为第二阶段做准备了
   if args.bootstrap:
@@ -245,6 +322,19 @@ def main():
   ### 这个 INSTRUMENTED Clang 完全是为了 PGO 的 training 所使用，还不是最终的 FINAL Clang
   ### INSTRUMENTED Clang 的 build 目录在 LLVM_INSTRUMENTED_DIR
   ### INSTRUMENTED Clang 不涉及 install
+  ### 直接运行 package.py 得到的 log 显示针对 INSTRUMENTED Clang 的 cmake 配置如下：
+  ### 在 base_cmake_args 的基础上覆盖或者追加如下配置
+  ### -DLLVM_ENABLE_PROJECTS=clang
+  ### '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
+  ### '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
+  ### -DCMAKE_EXE_LINKER_FLAGS=
+  ### -DCMAKE_SHARED_LINKER_FLAGS=
+  ### -DCMAKE_MODULE_LINKER_FLAGS=
+  ### -DLLVM_BUILD_INSTRUMENTED=IR
+  ### -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang
+  ### -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang++
+  ### 这些配置选项中最关键的就是 DLLVM_BUILD_INSTRUMENTED，这个指定了本次编译的特殊处理，
+  ### 编译过程和结果只会构建 X86 的 clang，不会有 builtin 和 runtime
   if args.pgo:
     print('Building instrumented compiler')
     ......
@@ -292,11 +382,28 @@ def main():
         # Disable Regalloc model generation since it is unused
         '-DLLVM_RAEVICT_MODEL_PATH=none'
     ]
-  ### (5) 对第（4）步的结果 runtimes_triples_args 做进一步的处理，参考注释
-  ###     有点不太明白的是，为何（3）和（5）之间要插入一个（4）
-  ### Convert FOO=BAR CMake flags per triple into
-  ### -DBUILTINS_$triple_FOO=BAR/-DRUNTIMES_$triple_FOO=BAR and build up
-  ### -DLLVM_BUILTIN_TARGETS/-DLLVM_RUNTIME_TARGETS.
+  ### (5) 对第（4）步的结果 runtimes_triples_args 做进一步的处理，
+  ### 从代码中我们可以了解到该版本的 Chromium 一共支持以下这些 triples，构建 Clang for 
+  ### Chromium 时需要针对这些 triple 制作对应的 runtime/builtin 库文件，并安装到 Clang 
+  ## 工具的各自对应的目录下去
+  ### GNU Linux:
+  ### - i386-unknown-linux-gnu        : lib/clang/16.0.0/lib/i386-unknown-linux-gnu/
+  ### - x86_64-unknown-linux-gnu      : lib/clang/16.0.0/lib/x86_64-unknown-linux-gnu/
+  ### - armv7-unknown-linux-gnueabihf : lib/clang/16.0.0/lib/armv7-unknown-linux-gnueabihf/
+  ### - aarch64-unknown-linux-gnu     : lib/clang/16.0.0/lib/aarch64-unknown-linux-gnu/
+  ### Android
+  ### - aarch64-linux-android21 : lib/clang/16.0.0/lib/linux/libclang_rt.*-aarch64-android.[so|a]
+  ### - armv7-linux-android19   : lib/clang/16.0.0/lib/linux/libclang_rt.*-arm-android.[so|a]
+  ### - i686-linux-android19    : lib/clang/16.0.0/lib/linux/libclang_rt.*-i686-android.[so|a]
+  ### - x86_64-linux-android21  : lib/clang/16.0.0/lib/linux/libclang_rt.*-x86_64-android.[so|a]
+  ### Fuchsia
+  ### - aarch64-unknown-fuchsia : lib/clang/16.0.0/lib/aarch64-unknown-fuchsia/
+  ### - x86_64-unknown-fuchsia  : lib/clang/16.0.0/lib/x86_64-unknown-fuchsia/
+  ### 具体 cmake 的参数语法参考以下注释，有点不太明白的是，为何（3）和（5）之间要插入一个
+  ### （4），或者为啥不把（3）挪到（4）后面和（5）一起？
+  # Convert FOO=BAR CMake flags per triple into
+  # -DBUILTINS_$triple_FOO=BAR/-DRUNTIMES_$triple_FOO=BAR and build up
+  # -DLLVM_BUILTIN_TARGETS/-DLLVM_RUNTIME_TARGETS.
   ......
   ### 此时可以对 Final Clang 执行真正的 cmake 和 ninja
   RunCommand(['cmake'] + cmake_args + [os.path.join(LLVM_DIR, 'llvm')],
