@@ -38,6 +38,12 @@
   and run refactoring tools based on clang's libraries.
 ```
 
+- [4] [RFC: Time to drop legacy runtime paths?][4]
+- [5] [Handling version numbers in per-target runtime directories][5]
+- [6] [[CMake] Multi-target builtins build][6]
+- [7] [[CMake] Support multi-target runtimes build][7]
+- [8] [Compiling cross-toolchains with CMake and runtimes build][8]
+
 注意本文相关代码基于 Chromium 的版本是 `109.0.5414.87`
 
 # 2. 搭建 Chromium for Android 的构建环境
@@ -363,11 +369,12 @@ def main():
   ### （2）设置缺省的 LLVM_DEFAULT_TARGET_TRIPLE，这里主要是根据执行构建的主机系统设置。
   ###      其中我们关注的是针对 linux 系统，支持了 aarch64/riscv64/x86_64
   ......
-  ### （3）构建一个数组 runtimes_triples_args，这个数组的每个成员形如：
+  ### （3）为 cross-building builtins/runtimes 做设置。这里使用了 multi-target 的 build
+  ###      方式，即定义 LLVM_BUILTIN_TARGETS/DLLVM_RUNTIME_TARGETS。具体见 “参考6/7/8”
+  ###     代码实现是先构建一个数组 runtimes_triples_args，这个数组的每个成员形如：
   ###     (triple, list of CMake vars without '-D').
   ###     举一个成员的例子：('i386-unknown-linux-gnu', ['CMAKE_SYSROOT=xxx', 'LLVM_INCLUDE_TESTS=OFF'])
   ###     这个 runtimes_triples_args 数组会在第（5）步被进一步解析
-  ###     值得注意的是，针对 android 的部分
   ......
   ### （4）Embed MLGO inliner model 处理，因为在 linux 系统上构建时其默认值为 default，所
   ###     以如果我们没有特殊指定这里会从 chrome 网站上下载一个 an official model which
@@ -399,6 +406,9 @@ def main():
   ### Fuchsia
   ### - aarch64-unknown-fuchsia : lib/clang/16.0.0/lib/aarch64-unknown-fuchsia/
   ### - x86_64-unknown-fuchsia  : lib/clang/16.0.0/lib/x86_64-unknown-fuchsia/
+  ### 需要注意的是针对 GNU/Fuchsia 和 Android，runtime 库的存放路径规则并不一样。具体见
+  ### “参考 4” 和 “参考 5”，原因是针对这些不同的 os environment，构建是采用了不同的
+  ### LLVM_ENABLE_PER_TARGET_RUNTIME_DIR 设定。
   ### 具体 cmake 的参数语法参考以下注释，有点不太明白的是，为何（3）和（5）之间要插入一个（4），
   ### 或者为啥不把（3）挪到（4）后面和（5）一起？
   # Convert FOO=BAR CMake flags per triple into
@@ -576,3 +586,8 @@ expected_stamp = ','.join([PACKAGE_VERSION] + target_os)
 [1]:https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/android_build_instructions.md
 [2]:https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/clang.md
 [3]:https://chromium.googlesource.com/chromium/src/+/main/docs/fuchsia/build_instructions.md
+[4]:https://discourse.llvm.org/t/rfc-time-to-drop-legacy-runtime-paths/64628
+[5]:https://discourse.llvm.org/t/handling-version-numbers-in-per-target-runtime-directories/62717
+[6]:https://reviews.llvm.org/D26652
+[7]:https://reviews.llvm.org/D32816
+[8]:https://llvm.org/devmtg/2017-10/slides/Hosek-Compiling%20cross-toolchains%20with%20CMake%20and%20runtimes%20build.pdf
