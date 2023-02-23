@@ -1,19 +1,24 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage:"
-    echo "  build_html.sh <date_after> <date_before>"
+    echo "Usage:"
+    echo "  build_html.sh <date_after> <date_before> <output_file>"
     echo "  Run this script to create the URLs to get PR list between the date"
+    echo "  and wrtie the URLs strings into the specified output file."
     echo "  after <date_after> and before <date_before>."
-	echo "  - <date_after>: The date after the given date, inclusive. Must be in the format YYYY-MM-DD".
-    echo "  - <date_before>: The date before the given date, inclusive. Must be in the format YYYY-MM-DD".
-	echo
-    echo "  Example: ./build_html.sh 2022-01-31 2022-02-10"
-	echo "  Which means you want to search the records in the range [2022/2/1, 2022/2/9]."
-	echo
+    echo "  - <date_after>: The date after the given date, inclusive."
+    echo "                  Must be in the format YYYY-MM-DD."
+    echo "  - <date_before>: The date before the given date, inclusive."
+    echo "                   Must be in the format YYYY-MM-DD."
+    echo "  - <output_file>: The file to be output."
+    echo
+    echo "  Example: ./build_html.sh 2022-01-31 2022-02-10 output.html"
+    echo "  Which means you want to search the records in the range [2022/2/1, 2022/2/9],"
+    echo "  and print the URLs strings into the output.html."
+    echo
 }
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 3 ]; then
     usage
 	exit 1
 fi
@@ -21,10 +26,7 @@ fi
 # FIXME: date format has not been checked
 DATE_AFTER=$1
 DATE_BEFORE=$2
-
-OUTPUT=./aosp-riscv-$DATE_BEFORE.html
-rm -f $OUTPUT
-touch $OUTPUT
+OUTPUT=$3
 
 println() {  
     echo "$1" >> $OUTPUT

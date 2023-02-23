@@ -1,6 +1,3 @@
-
-本周期（2023-01-19 ~ 2023-02-03）RISCV 相关 merge PR 汇总参考 [这里][1]。
-
 Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 PR，所以我们在 <https://android-review.googlesource.com/> 开始看到相关的修改。
 
 本周期的修改总结主要集中在下面几个地方：
