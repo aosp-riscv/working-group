@@ -101,7 +101,7 @@ sudo reboot
 
 ![](./diagrams/20230111-cuttlefish-setup/chrome-to-curl.png)
 
-参考上图：在 chrome 或者 edge 里进入到上面这个界面后按 F12 打开调试窗口，选择 ”网络“ tab 页，然后在右键弹出菜单中选择 “复制” -> “复制为 cURL（bash）”，登录到控制终端将命令黏贴到 bash 终端上，注意后面加上一个 “--output <filename>“ , 然后回车就可以通过命令行下载文件了。
+参考上图：在 Chrome 或者 Edge 里进入到上面图片中左边的这个界面后按 F12 打开调试窗口，选择 "网络" tab 页，然后在右键弹出菜单中选择 "复制" -> "复制为 cURL（bash）"，登录到控制终端将命令黏贴到 bash 终端上，注意后面加上一个 "--output FILENAME" , 然后回车就可以通过命令行下载文件了，下载后的文件名就是你指定的 "FILENAME"。
 
 另外需要注意的是：通过 [Android CI][6] 下载镜像必须访问境外 Google 网站，并不是很方便。我们其实也可以自己取 AOSP 的源码构建这些镜像，具体可以参考另一篇 [《笔记：基于 Cuttlefish 调试 Android 内核》][7] 中有关 “在 AOSP 中运行 Cuttlefish” 的介绍。
 
