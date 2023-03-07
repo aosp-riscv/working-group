@@ -44,7 +44,7 @@
 - [7] [[CMake] Support multi-target runtimes build][7]
 - [8] [Compiling cross-toolchains with CMake and runtimes build][8]
 
-注意本文相关代码基于 Chromium 的版本是 `109.0.5414.87`
+**注意** 本文相关代码基于 Chromium 的版本是 `109.0.5414.87`。
 
 # 2. 搭建 Chromium for Android 的构建环境
 
@@ -313,8 +313,9 @@ def main():
   ### 注意构建成功后会修改 cc 和 cxx 为 LLVM_BOOTSTRAP_INSTALL_DIR 下的 clang/clang++ 
   ### 这就是为第二阶段做准备了
   if args.bootstrap:
+    print('Building bootstrap compiler')
     ........
-	RunCommand(['cmake'] + bootstrap_args + [os.path.join(LLVM_DIR, 'llvm')],
+    RunCommand(['cmake'] + bootstrap_args + [os.path.join(LLVM_DIR, 'llvm')],
                msvc_arch='x64')
     RunCommand(['ninja'], msvc_arch='x64')
     if args.run_tests:
@@ -347,14 +348,13 @@ def main():
     print('Instrumented compiler built.')
 
     ### 执行 train，生成的结果就是 LLVM_PROFDATA_FILE，
-	### 该文件会在构建 FINAL clang 时作为 `-DLLVM_PROFDATA_FILE=` 的值
+    ### 该文件会在构建 FINAL clang 时作为 `-DLLVM_PROFDATA_FILE=` 的值
     print('Profile generated.')
 
   ### 一些和 deployment 有关的操作 TBD
   ......
 
   print('Building final compiler.')
-
   ### 开始构建 FINAL Clang
   ### 
   ### FINAL Clang 的 build 目录是 LLVM_BUILD_DIR，chdir 的操作在后面 RunCommand 的时候做的
@@ -362,25 +362,54 @@ def main():
   ### FINAL Clang 的 cmake configuration 会重新设置，在 base_cmake_args 上进行
   ### 修改，保存在 cmake_args 中
   ### cmake_args 的设置按照比较大的几块，可以认为分好几个部分，简单总结如下
-  ### （1）基础部分: 主要是重新设置了 cflags/cxxflags/ldflags 等。值得注意的是这里添加了
-  ###      LLVM_EXTERNAL_PROJECTS/LLVM_EXTERNAL_CHROMETOOLS_SOURCE_DIR，这应该就是
-  ###      随 clang 一起构建的专门针对 chrome 的一些 plugin
-  ......
-  ### （2）设置缺省的 LLVM_DEFAULT_TARGET_TRIPLE，这里主要是根据执行构建的主机系统设置。
-  ###      其中我们关注的是针对 linux 系统，支持了 aarch64/riscv64/x86_64
-  ......
-  ### （3）为 cross-building builtins/runtimes 做设置。这里使用了 multi-target 的 build
-  ###      方式，即定义 LLVM_BUILTIN_TARGETS/DLLVM_RUNTIME_TARGETS。具体见 “参考6/7/8”
+  ### (1) 基础部分: 主要是重新设置了 cflags/cxxflags/ldflags 等。值得注意的是这里添加了
+  ###     LLVM_EXTERNAL_PROJECTS/LLVM_EXTERNAL_CHROMETOOLS_SOURCE_DIR，这应该就是
+  ###     随 clang 一起构建的专门针对 chrome 的一些 plugin
+  cmake_args = base_cmake_args + [
+    ......
+  ### (2) 设置缺省的 LLVM_DEFAULT_TARGET_TRIPLE, 这里主要是根据执行构建的主机系统设置。
+  ###     支持的操作系统有 darwin/linux/win32。
+  ###     其中我们关注的是针对 linux 系统，目前缺省支持的主机处理器架构是 x86_64，此外还支
+  ###     持在 aarch64 或者 riscv64 的 host 上进行构建。
+  if sys.platform == 'darwin':
+    ......
+  elif sys.platform.startswith('linux'):
+    ......
+  elif sys.platform == 'win32':
+    ......
+  ### (3) 为 cross-building builtins/runtimes 做设置。这里使用了 multi-target 的 build
+  ###     方式，即定义 LLVM_BUILTIN_TARGETS/DLLVM_RUNTIME_TARGETS。具体见 “参考6/7/8”
   ###     代码实现是先构建一个数组 runtimes_triples_args，这个数组的每个成员形如：
   ###     (triple, list of CMake vars without '-D').
   ###     举一个成员的例子：('i386-unknown-linux-gnu', ['CMAKE_SYSROOT=xxx', 'LLVM_INCLUDE_TESTS=OFF'])
   ###     这个 runtimes_triples_args 数组会在第（5）步被进一步解析
-  ......
-  ### （4）Embed MLGO inliner model 处理，因为在 linux 系统上构建时其默认值为 default，所
+  # List of (triple, list of CMake vars without '-D').
+  runtimes_triples_args = []
+
+  if sys.platform.startswith('linux'):
+    ......
+  elif sys.platform == 'win32':
+    ......
+  elif sys.platform == 'darwin':
+    ......
+
+  if args.with_android:
+    ### api_level 会被设置到 ANDROID_NATIVE_API_LEVEL 这个配置变量中，而这个变量只是
+    ### ANDROID_PLATFORM 的别名，参考 https://developer.android.com/ndk/guides/cmake
+    ### ANDROID_PLATFORM
+    ### Specifies the minimum API level supported by the application or library.
+    ### This value corresponds to the application's minSdkVersion.
+    ### 这个 api_level 值会和构建 clang for android 所依赖的 android ndk 中 sysroot 下
+    ### 支持的数字最小的那个 api level 目录对应，如果不存在则构建 clang 会报错。
+    ......
+
+  if args.with_fuchsia:
+    ......
+  ### (4) Embed MLGO inliner model 处理，因为在 linux 系统上构建时其默认值为 default，所
   ###     以如果我们没有特殊指定这里会从 chrome 网站上下载一个 an official model which
   ###     was trained for Chrome on Android
   if args.with_ml_inliner_model:
-	......
+    ......
     print('Embedding MLGO inliner model at %s using Tensorflow at %s' %
           (model_path, tf_path))
     cmake_args += [
@@ -389,10 +418,10 @@ def main():
         # Disable Regalloc model generation since it is unused
         '-DLLVM_RAEVICT_MODEL_PATH=none'
     ]
-  ### (5) 对第（4）步的结果 runtimes_triples_args 做进一步的处理，
-  ### 从代码中我们可以了解到该版本的 Chromium 一共支持以下这些 triples，构建 Clang for 
-  ### Chromium 时需要针对这些 triple 制作对应的 runtime/builtin 库文件，并安装到 Clang 
-  ### 工具的各自对应的目录下去
+  ### (5) 对第 (3) 步的结果 runtimes_triples_args 做进一步的处理，
+  ### 构建 Clang for Chromium 时需要针对 target 上的 triple 制作对应的 runtime/builtin
+  ### 库文件，并安装到 Clang 工具的各自对应的目录下去
+  ### 下面是一些 triples 的例子以及其对应创建的 runtime/builtin 库文件所在的工具链下的路径
   ### GNU Linux:
   ### - i386-unknown-linux-gnu        : lib/clang/16.0.0/lib/i386-unknown-linux-gnu/
   ### - x86_64-unknown-linux-gnu      : lib/clang/16.0.0/lib/x86_64-unknown-linux-gnu/
@@ -409,8 +438,8 @@ def main():
   ### 需要注意的是针对 GNU/Fuchsia 和 Android，runtime 库的存放路径规则并不一样。具体见
   ### “参考 4” 和 “参考 5”，原因是针对这些不同的 os environment，构建是采用了不同的
   ### LLVM_ENABLE_PER_TARGET_RUNTIME_DIR 设定。
-  ### 具体 cmake 的参数语法参考以下注释，有点不太明白的是，为何（3）和（5）之间要插入一个（4），
-  ### 或者为啥不把（3）挪到（4）后面和（5）一起？
+  ### 具体 cmake 的参数语法参考以下注释
+  ### 有点不太明白的是，为何 (3) 和 (5) 之间要插入一个 (4)，或者为啥不把 (3) 挪到 (4) 后面和 (5) 一起？
   # Convert FOO=BAR CMake flags per triple into
   # -DBUILTINS_$triple_FOO=BAR/-DRUNTIMES_$triple_FOO=BAR and build up
   # -DLLVM_BUILTIN_TARGETS/-DLLVM_RUNTIME_TARGETS.
