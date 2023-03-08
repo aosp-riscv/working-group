@@ -8,6 +8,10 @@
 <!-- TOC -->
 
 - [下载 Chrome 代码。](#下载-chrome-代码)
+	- [Install depot_tools](#install-depot_tools)
+	- [Get the code](#get-the-code)
+	- [Apply the patches](#apply-the-patches)
+	- [Switch Android NDK](#switch-android-ndk)
 - [构建 Chrome](#构建-chrome)
 - [开发 Clang for Chrome](#开发-clang-for-chrome)
 
@@ -18,6 +22,12 @@
 目前我们的开发主仓库是 <https://github.com/aosp-riscv/chromium>, 开发的集成分支是 `riscv64_109.0.5414.87_dev`。
 
 可以采用如下步骤搭建 chromium 的开发环境，假设我们的工作目录是 `$WS`。
+
+## Install depot_tools
+
+“Install depot_tools” 的步骤省略，具体参考 [Checking out and building Chromium for Android][2]。
+
+## Get the code
 
 注意，以下步骤特别是涉及的子仓库修改可能随着开发的进展不断补充和完善。
 
@@ -33,6 +43,8 @@ gclient sync
 注意运行 `install-build-deps.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
 
 最后一步 `gclient sync` 除了会根据我们 checkout 出来的版本进一步同步一些依赖仓库外，还会在最后执行 hooks（类似于单独执行 `gclient runhooks`）。
+
+## Apply the patches
 
 我们目前开发的代码基线是 `109.0.5414.87`。以上步骤完成后我们还需要在以上版本基础上打上我们的修改补丁。具体步骤如下：
 
@@ -59,6 +71,8 @@ git remote add aosp-riscv git@github.com:aosp-riscv/angle.git
 git fetch aosp-riscv 
 git checkout riscv64_109.0.5414.87_dev 
 ```
+
+## Switch Android NDK
 
 此外，构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以除了打以上补丁，我们还需要采用一个自己临时制作的 NDK 来替换它。具体方法如下：
 
@@ -89,7 +103,7 @@ ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/pre
 
 # 构建 Chrome
 
-为了方便开发，在我们 aosp-riscv 的 chromium 仓库的 `riscv64_109.0.5414.87_dev` 分支上提供了一个简单的 Makefile。可以直接使用：
+为了方便开发，在我们 aosp-riscv 的 chromium 仓库的 `riscv64_109.0.5414.87_dev` 分支上提供了一个简单的 `Makefile`。可以直接使用：
 
 假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。
 
@@ -106,3 +120,4 @@ make ninja
 构建 Clang for Chrome 时需要注意还要下载一些 fuchia 相关的依赖，具体参考 [《笔记：Clang for Chromium 构建分析》][1] 的 "3. 构建 Clang for Chromium"。
 
 [1]:../../articles/20230201-chrome-clang-build.md
+[2]:https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/android_build_instructions.md
