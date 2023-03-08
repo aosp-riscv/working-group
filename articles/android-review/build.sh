@@ -2,8 +2,9 @@
 # Currently only support running this under the same dir as this script
 
 # Update these vars as per tracking period
-ISSUE_NO="11"
-ISSUE_STRING="2023-02-16 ~ 2023-03-03"
+ISSUE_NO="12"
+# this Thursday ~ next next Friday
+ISSUE_STRING="2023-03-02 ~ 2023-03-17"
 
 # Update files in unicornx.github.io
 GITHUB_IO=../../../unicornx.github.io
