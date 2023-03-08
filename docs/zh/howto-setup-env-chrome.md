@@ -8,55 +8,97 @@
 <!-- TOC -->
 
 - [下载 Chrome 代码。](#下载-chrome-代码)
-- [Android NDK](#android-ndk)
+- [构建 Chrome](#构建-chrome)
 - [开发 Clang for Chrome](#开发-clang-for-chrome)
 
 <!-- /TOC -->
 
 # 下载 Chrome 代码。
 
-目前我们的开发主仓库是 `https://github.com/aosp-riscv/chromium`, 开发的集成分支是 `riscv64_109.0.5414.87_dev`。
+目前我们的开发主仓库是 <https://github.com/aosp-riscv/chromium>, 开发的集成分支是 `riscv64_109.0.5414.87_dev`。
 
-假设我们的工作目录是 `$WS`
-```
+可以采用如下步骤搭建 chromium 的开发环境，假设我们的工作目录是 `$WS`。
+
+注意，以下步骤特别是涉及的子仓库修改可能随着开发的进展不断补充和完善。
+
+```shell
 mkdir $WS/chromium && cd $WS/chromium
 fetch --nohooks android
 cd src
+git checkout 109.0.5414.87
+build/install-build-deps.sh --android
+gclient sync
+```
+
+注意运行 `install-build-deps.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
+
+最后一步 `gclient sync` 除了会根据我们 checkout 出来的版本进一步同步一些依赖仓库外，还会在最后执行 hooks（类似于单独执行 `gclient runhooks`）。
+
+我们目前开发的代码基线是 `109.0.5414.87`。以上步骤完成后我们还需要在以上版本基础上打上我们的修改补丁。具体步骤如下：
+
+注意：目前我们采用切换到 aosp-riscv 仓库的开发分支的方式给对应仓库打补丁。以后也可以考虑和 <https://github.com/starfive-tech/riscv-nwjs-patch> 一样采用 patch 方式提供。
+
+```shell
+cd $WS/chromium/src
 git remote add aosp-riscv git@github.com:aosp-riscv/chromium.git
 git fetch aosp-riscv
 git checkout riscv64_109.0.5414.87_dev
-build/install-build-deps.sh --android
-gclient runhooks
+
+cd $WS/chromium/src/third_party/ffmpeg/
+git remote add aosp-riscv git@github.com:aosp-riscv/ffmpeg.git
+git fetch aosp-riscv 
+git checkout riscv64_109.0.5414.87_dev 
+
+cd $WS/chromium/src/v8
+git remote add aosp-riscv git@github.com:aosp-riscv/v8.git
+git fetch aosp-riscv
+git checkout riscv64_109.0.5414.87_dev 
+
+cd $WS/chromium/src/third_party/angle/
+git remote add aosp-riscv git@github.com:aosp-riscv/angle.git
+git fetch aosp-riscv 
+git checkout riscv64_109.0.5414.87_dev 
+```
+
+此外，构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以除了打以上补丁，我们还需要采用一个自己临时制作的 NDK 来替换它。具体方法如下：
+
+```shell
+cd $WS/wangchen/dev-chrome/chromium/src/third_party
+git clone git@github.com:aosp-riscv/android-ndk-ci.git
+mv android_ndk android_ndk.chrome
+ln -s ./android-ndk-ci/ ./android_ndk
+```
+
+**注意**：进一步操作之前还需要修改 ndk 中两个符号链接。
+
+- $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+- $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+
+需要将以上两个符号链接指向实际的我们构建用的 llvm/clang 工具链的下的 bin/lib 目录。目前在 android-ndk-ci 仓库中我们木有存放 llvm/clang 工具链的内容，因为有些文件的 size 太大，超出了 github 的容量限制。所以 llvm/clang 工具链我们是单独提供的。当然也可以从源码开始自己制作一份（具体见本文的 “开发 Clang for Chrome” 章节介绍）。
+
+假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。执行以下命令：
+
+```shell
+rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+ln -s $MY_CLANG/bin $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
 ```
 
 这样就取到我们的开发代码了，你可以在此基础上继续创建你自己的开发分支。
 
+# 构建 Chrome
 
-# Android NDK
+为了方便开发，在我们 aosp-riscv 的 chromium 仓库的 `riscv64_109.0.5414.87_dev` 分支上提供了一个简单的 Makefile。可以直接使用：
 
-构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以我们采用一个自己临时制作的 NDK。具体方法如下：
+假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。
 
+然后就可以执行如下命令
+```shell
+make distclean
+make gn CLANG=$MY_CLANG
+make ninja
 ```
-cd $WS/chromium/src/third_party
-git clone git@github.com:aosp-riscv/android-ndk-ci.git
-git clone git@github.com:aosp-riscv/riscv64-linux-android.git
-```
-
-`android-ndk-ci` 这个仓库下载下来后还要修改一个符号链接，因为我们对于 riscv64 的 sysroot 实际使用的是另一个仓库 `riscv64-linux-android`，这个仓库 fork 自 <https://android.googlesource.com/toolchain/prebuilts/sysroot/platform/riscv64-linux-android>，目前在其基础上补充了一些 libc++/libc++abi 的库，这些库 Google 暂未提供，但是构建 Clang 的 runtime 库时需要。
-
-```
-cd android-ndk-ci/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/
-rm riscv64-linux-android
-ln -s $WS/chromium/src/third_party/riscv64-linux-android/usr/lib/riscv64-linux-android/ riscv64-linux-android 
-```
-
-最后我们将 Chrome 原先自带的 `android_ndk` 目录替换为我们自己的 ndk
-```
-cd $WS/chromium/src/third_party
-mv android_ndk android_ndk.bak
-ln -s ./android-ndk-ci ./android_ndk
-```
-
 
 # 开发 Clang for Chrome
 

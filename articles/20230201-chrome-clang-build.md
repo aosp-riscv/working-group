@@ -69,9 +69,9 @@ Codename:	focal
 mkdir ~/chromium && cd ~/chromium
 fetch --nohooks android
 cd src
-git checkout 109.0.5414.87 -b dev-109.0.5414.87
+git checkout 109.0.5414.87
 build/install-build-deps.sh --android
-gclient runhooks
+gclient sync
 ```
 
 注意运行 `install-build-deps.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
@@ -97,7 +97,7 @@ solutions = [
 target_os = ["android", "fuchsia"]
 ```
 
-然后运行 `gclient sync` 命令即可。
+然后再运行 `gclient sync` 命令即可。
 
 注意，似乎 `target_os` 并不需要加上 `"linux"`，暂时不太清楚原因，可能 "android" 本身也是属于 "linux" 的一个分支，所以有了 "android"，至少对构建 Clang for Chromium 是没有问题了。
 
