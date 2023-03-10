@@ -13,6 +13,7 @@
 	- [Apply the patches](#apply-the-patches)
 	- [Switch Android NDK](#switch-android-ndk)
 - [构建 Chrome](#构建-chrome)
+- [构建 WebView](#构建-webview)
 - [开发 Clang for Chrome](#开发-clang-for-chrome)
 
 <!-- /TOC -->
@@ -109,10 +110,29 @@ ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/pre
 
 然后就可以执行如下命令
 ```shell
+cd $WS/chromium/src
 make distclean
 make gn CLANG=$MY_CLANG
 make ninja
 ```
+
+执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `ChromePublic.apk`。
+
+# 构建 WebView
+
+和构建 Chrome 类似，假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。
+
+然后就可以执行如下命令
+```shell
+cd $WS/chromium/src
+make distclean
+make gn CLANG=$MY_CLANG
+make ninja T=trichrome_webview_apk
+```
+
+因为我们目前针对 riscv64 的移植目标系统 API level 最小是 29，所以这里我们构建目标设置为 `trichrome_webview_apk`，具体参考 [WebView Build Instructions][3]。
+
+执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `TrichromeWebView64.apk` 和 `TrichromeLibrary64.apk`。
 
 # 开发 Clang for Chrome
 
@@ -121,3 +141,4 @@ make ninja
 
 [1]:../../articles/20230201-chrome-clang-build.md
 [2]:https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/android_build_instructions.md
+[3]:https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/build-instructions.md
