@@ -49,7 +49,9 @@ gclient sync
 
 我们目前开发的代码基线是 `109.0.5414.87`。以上步骤完成后我们还需要在以上版本基础上打上我们的修改补丁。具体步骤如下：
 
-注意：目前我们采用切换到 aosp-riscv 仓库的开发分支的方式给对应仓库打补丁。以后也可以考虑和 <https://github.com/starfive-tech/riscv-nwjs-patch> 一样采用 patch 方式提供。
+**注意**：目前我们采用切换到 aosp-riscv 仓库的开发分支的方式给对应仓库打补丁。采用该方式需要注意的一个问题是，如果在执行以下操作后再运行 `gclient sync` 则相关 checkout 的分支信息会丢失，需要重新手动再 checkout 一次。
+
+FIXME: 以后可以考虑和 <https://github.com/starfive-tech/riscv-nwjs-patch> 一样采用 patch 方式提供。
 
 ```shell
 cd $WS/chromium/src
