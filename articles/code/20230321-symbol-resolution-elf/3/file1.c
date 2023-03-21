@@ -1,0 +1,1 @@
+int mysym = 0;
