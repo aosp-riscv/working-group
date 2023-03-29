@@ -128,7 +128,9 @@ VIRTUAL_DEVICE_BOOT_COMPLETED
 如果我们仔细看一下 `cf` 目录，发现运行 Cuttlefish 后会出现几个新的子目录：
 
 - `cuttlefish`：实际创建的子目录，其他几个子目录都是指向这个子目录下的符号链接。
-- `cuttlefish_assembly`：指向 `cf/cuttlefish/assembly` 的符号链接，下面是很么具体还不是很清楚 FIXME
+- `cuttlefish_assembly`：指向 `cf/cuttlefish/assembly` 的符号链接，下面是 `assemble_cvd` 运行过程中创建出来的一些文件（有关 `assemble_cvd` 又是什么，不是本文的重点，我们这里只要知道这个程序会被 `launch_cvd` 调用执行），其中比较重要的包括两个文件
+  - `assemble_cvd.log`: `assemble_cvd` 运行产生的日志。
+  - `cuttlefish_config.json`: cuttlefish 运行环境的当前配置信息，各种运行参数，可以和我们运行 `launch_cvd` 时输入的命令行选项对照起来看。
 - `cuttlefish_runtime`: 指向 `cf/cuttlefish/instances/cvd-1` 的符号链接。
 - `cuttlefish_runtime.1`：指向 `cf/cuttlefish/instances/cvd-1` 的符号链接。我理解可能 Cuttlefish 支持同时运行多个 virtual device 的实例，所以如果是这样可能会出现 `cvd-2`、`cvd-3`、......
 
@@ -164,18 +166,18 @@ The following files contain useful debugging information:
   Instance environment: /home/u/ws/cf/.cuttlefish.sh
 ```
 
-log 文件中：
-- `launcher.log`：log files from `launch_cvd`, 注意这个 log 并不只包含 `launch_cvd` 本身的 log，本身的 log 直接输出在 stdout。
-- `kernel.log`：console log, including messages from boot loader and kernel
-- `logcat`：Android logcat
+这些 log 文件存放的路径看山区有点乱，但实际上最新的 cuttlefish 版本已经把它们都归档到 `/home/u/ws/cf/cuttlefish/instances/cvd-1/logs/` 这个目录下了，主要包括：
+- `launcher.log`：log files from `launch_cvd`, 这个 log 的内容时前面提到的 `assemble_cvd.log` 的超集，所以如果我们想了解 `launch_cvd` 的执行过程，更多是看这个文件。
+- `kernel.log`：我们在 console 上可以看到的所有的 log, 包括从 OpenSBI -> U-Boot -> Linux kernel
+- `logcat`：Android logcat 能接收到的日志信息
 
-如果想控制 log 的显示层级，可以使用 `ANDROID_LOG_TAGS` 这个环境变量。譬如我们想只看 Info （包含）以上的 log level 的信息，则可以在启动 cuttlefish 时加上这个环境变量如下：
+另外这里也列出了 `cuttlefish_config.json`，注意到这是 cvd-1 实例下的，但似乎没发现和前面提到的 `cf/cuttlefish/assembly` 下的 `cuttlefish_config.json` 有多大差别，可能我们这里还没有涉及到吧，建议对明确的 cvd-1 实例，还是看这里列出的这份会更准确。
+
+如果想控制 log 的显示层级，可以使用 `ANDROID_LOG_TAGS` 这个环境变量。譬如我们想只看 Info （包含）以上的 log level 的信息，则可以在启动 cuttlefish 时加上这个环境变量如下，具体用法参考 [Filter log output][8]：
 
 ```bash
 $ ANDROID_LOG_TAGS='*:i' HOME=$PWD ./bin/launch_cvd --daemon
 ```
-
-具体用法参考 [Filter log output][8]。
 
 # 9. 通过 console 和 Cuttlefish 进行交互
 
