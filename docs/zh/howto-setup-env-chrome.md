@@ -74,35 +74,49 @@ git remote add aosp-riscv git@github.com:aosp-riscv/angle.git
 git fetch aosp-riscv 
 git checkout riscv64_109.0.5414.87_dev 
 ```
+这样就取到我们的开发代码了，你可以在此基础上继续创建你自己的开发分支。
 
 ## Switch Android NDK
 
-此外，构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以除了打以上补丁，我们还需要采用一个自己临时制作的 NDK 来替换它。具体方法如下：
+此外，构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以除了打以上补丁，我们还需要采用一个自己临时制作的 NDK 来替换它。
 
-```shell
-cd $WS/wangchen/dev-chrome/chromium/src/third_party
-git clone git@github.com:aosp-riscv/android-ndk-ci.git
-mv android_ndk android_ndk.chrome
-ln -s ./android-ndk-ci/ ./android_ndk
-```
+当前阶段，我们提供了两套 **临时** 的 NDK：
 
-**注意**：进一步操作之前还需要修改 ndk 中两个符号链接。
+- **"版本 A"**: <https://github.com/aosp-riscv/toolchain-prebuilts-ndk-r23>: 基于 <https://github.com/riscv-android-src/toolchain-prebuilts-ndk-r23> 修改后的版本，如果希望在 aosp12 for riscv64 的开发板上运行可以选用这个 NDK。
 
-- $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-- $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+  切换方法如下：
+  ```shell
+  cd $WS/chromium/src/third_party
+  git clone git@github.com:aosp-riscv/toolchain-prebuilts-ndk-r23.git
+  mv android_ndk android_ndk.chrome
+  ln -s ./toolchain-prebuilts-ndk-r23/ ./android_ndk
+  ```
 
-需要将以上两个符号链接指向实际的我们构建用的 llvm/clang 工具链的下的 bin/lib 目录。目前在 android-ndk-ci 仓库中我们木有存放 llvm/clang 工具链的内容，因为有些文件的 size 太大，超出了 github 的容量限制。所以 llvm/clang 工具链我们是单独提供的。当然也可以从源码开始自己制作一份（具体见本文的 “开发 Clang for Chrome” 章节介绍）。
+- **"版本 B"**: <https://github.com/aosp-riscv/android-ndk-ci>: 基于 Google upstream 的 <https://ci.android.com/builds/branches/aosp-master-ndk/grid> (linux) 版本制作的 ndk，临时测试使用。
 
-假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。执行以下命令：
+  切换方法如下：
 
-```shell
-rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-ln -s $MY_CLANG/bin $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
-ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
-```
+  ```shell
+  cd $WS/chromium/src/third_party
+  git clone git@github.com:aosp-riscv/android-ndk-ci.git
+  mv android_ndk android_ndk.chrome
+  ln -s ./android-ndk-ci/ ./android_ndk
+  ```
+  **注意**：针对 "版本 B"，进一步操作之前还需要修改 ndk 中两个符号链接。
 
-这样就取到我们的开发代码了，你可以在此基础上继续创建你自己的开发分支。
+  - `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin`
+  - `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib`
+
+  需要将以上两个符号链接指向实际的我们构建用的 llvm/clang 工具链的下的 bin/lib 目录。目前在 android-ndk-ci 仓库中我们没有存放 llvm/clang 工具链的内容，因为有些文件的 size 太大，超出了 github 的容量限制。所以 llvm/clang 工具链我们是单独提供的。当然也可以从源码开始自己制作一份（具体见本文的 “开发 Clang for Chrome” 章节介绍）。
+
+  假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。执行以下命令：
+
+  ```shell
+  rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+  ln -s $MY_CLANG/bin $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+  rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+  ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+  ```
 
 # 构建 Chrome
 
@@ -118,13 +132,24 @@ make gn CLANG=$MY_CLANG
 make ninja
 ```
 
-执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `ChromePublic.apk`。
+没有指定 T，默认 target 为 `chrome_public_apk`，执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `ChromePublic.apk`。
+
+我们也可以构建 Content Shell APK For Android，可以执行如下命令：
+```shell
+cd $WS/chromium/src
+make distclean
+make gn CLANG=$MY_CLANG
+make ninja T=content_shell_apk
+```
+当然也可以在构建 `chrome_public_apk` 的基础上再编译 `content_shell_apk`，不用从头重新编译。执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `ContentShell.apk`。
+
 
 # 构建 WebView
 
 和构建 Chrome 类似，假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。
 
-然后就可以执行如下命令
+如果我们目前针对 riscv64 的移植目标系统 API level 是 29+，则构建目标设置为 `trichrome_webview_apk`，执行命令如下：
+
 ```shell
 cd $WS/chromium/src
 make distclean
@@ -132,9 +157,11 @@ make gn CLANG=$MY_CLANG
 make ninja T=trichrome_webview_apk
 ```
 
-因为我们目前针对 riscv64 的移植目标系统 API level 最小是 29，所以这里我们构建目标设置为 `trichrome_webview_apk`，具体参考 [WebView Build Instructions][3]。
-
 执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `TrichromeWebView64.apk` 和 `TrichromeLibrary64.apk`。
+
+如果我们针对 riscv64 的移植目标系统 API level 是 (24-28)，则可以将构建目标设置为 `monochrome_public_apk`。具体参考 [WebView Build Instructions][3]。执行完成后在 `$WS/chromium/src/out/riscv64/apks/` 下会生成 `MonochromePublic64.apk`。
+
+目前暂时不支持 `system_webview_apk`。
 
 # 开发 Clang for Chrome
 
