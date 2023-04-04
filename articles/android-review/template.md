@@ -57,5 +57,4 @@ Google 于 10 月 1 日宣布正式开始对 AOSP 项目接收 RISC-V 的提交 
 
 - N/A
 
-[1]: https://unicornx.github.io/android-review/aosp-riscv-2023-02-03.html
 
