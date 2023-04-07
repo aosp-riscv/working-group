@@ -1,4 +1,4 @@
-![](./diagrams/linker-loader.png)
+![](./diagrams/android-riscv.png)
 
 文章标题：**介绍一个方便 riscv for aosp 测试的开发环境**
 
