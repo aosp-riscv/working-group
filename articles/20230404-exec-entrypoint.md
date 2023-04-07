@@ -10,6 +10,7 @@
 - [参考文档](#参考文档)
 - [Linux 内核中应用程序的入口](#linux-内核中应用程序的入口)
 - [C 库（CRT）对入口的处理](#c-库crt对入口的处理)
+- [一个例子](#一个例子)
 
 <!-- /TOC -->
 
@@ -21,6 +22,7 @@
 
 本文代码：
 - musl：v1.2.3
+- bionic: commit 80e5ee7e23ebc278c9bf51ce950f38eb773de956
 - linux: v6.2
 
 # Linux 内核中应用程序的入口
@@ -145,9 +147,26 @@ void _start_c(long *p)
 }
 ```
 
-为加深印象，我们利用以上的知识为基础，编写一个用户态的程序，查看一下程序 main 传进来的 arg/envp/auxv，并利用 gdb 调试查看一下现场的 process stack 的实际情况是否和我们打印的一致。
+再看一下 bionic 的静态链接的 crt 入口 `crtbegin_static.o`，对应的源码是 `libc/arch-common/bionic/crtbegin.c`。
 
-代码参考 [`hello.c`][16], 参考 [《musl 交叉调试说明》][17] 搭建交叉调试环境。顺便提一下，glibc/musl 为了方便用户获取 auxv，都提供了一个叫做 `getauxval()` 的函数，但注意这个函数不是 POSIX 标准定义的。
+```cpp
+#define PRE ".text; .global _start; .type _start,%function; _start:"
+#define POST "; .size _start, .-_start"
+
+#if defined(__aarch64__)
+......
+#elif defined(__riscv)
+__asm__(PRE "li fp,0; li ra,0; mv a0,sp; tail _start_main" POST);
+#elif defined(__x86_64__)
+......
+#endif
+```
+
+其中 `PRE` 这个宏中定义了 `_start` 这个符号，和 musl 类似，接下来的 `mv a0,sp` 就是为接下来的跳转 `tail _start_main` 准备了第一个入参，传入了用户栈的 sp。
+
+# 一个例子
+
+为加深印象，我们利用以上的知识为基础，编写一个用户态的程序，查看一下程序 main 传进来的 arg/envp/auxv，并利用 gdb 调试查看一下现场的 process stack 的实际情况是否和我们打印的一致。代码参考 [`hello.c`][16]。这个例子使用了 musl 作为 c 库。参考 [《musl 交叉调试说明》][17] 搭建交叉调试环境。顺便提一下，glibc/musl/bionic 为了方便用户获取 auxv，都提供了一个叫做 `getauxval()` 的函数，但注意这个函数不是 POSIX 标准定义的。
 
 先编译后执行一下看看打印的结果, `--help` 纯粹是为了验证命令行参数对 argc 和 argv 的影响，并无实际意义。
 ```shell
