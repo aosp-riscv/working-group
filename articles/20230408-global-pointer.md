@@ -34,7 +34,7 @@
 >   This relaxation type can relax a sequence of the load address of a symbol or load/store with a
 >   symbol reference into global-pointer-relative instruction.
 
-也就是说通过利用 gp 来帮助 linker 对一些基于符号（symbol）加载地址（load address）和访问内存（load/store）的指令序列进行优化，可以压缩指令的条数。
+也就是说通过利用 gp 来帮助 linker 对一些基于符号（symbol）加载地址（load address）和访问内存（load/store）的指令序列进行优化，可以压缩指令的条数。relaxation 这个特性默认是 enabeld，如果想关闭可以对 gcc 加上 `-Wl,--no-relax`。
 
 举个例子理解一下，基于 musl + riscv gnu tools，有关 musl 的构建可以参考 [《musl 构建说明》][4]：
 
@@ -107,7 +107,7 @@ $ riscv64-unknown-linux-gnu-objdump -dSr a.out
 
 啰里啰唆讲了一大堆，虽然看上去是要我们写程序（program）时自己去初始化这个 gp 寄存器，但实际上这个动作都是由 c 库帮助我们去完成的，ISA 规范中也提了最好是在 `_start` 中做，就是比较晦涩没有明说是 c 库，可是舍我其谁呢。
 
-参考一下 musl 的代码，看一下 riscv64 的 [`crt_arch.h`][15]:
+参考一下 musl 的代码，看一下 riscv64 的 [`crt_arch.h`][5]:
 
 ```cpp
 __asm__(
@@ -125,7 +125,7 @@ START ":\n"
 ......
 ```
 
-可以看到 `lla gp, __global_pointer$` 就是在对 gp 进行赋值，注意这里使用了 lla 这个 pseudoinstruction。参考 [Ref 1] 的 Table 25.2 如下：
+可以看到 `lla gp, __global_pointer$` 就是在对 gp 进行赋值，注意这里使用了 `lla` 这个 pseudoinstruction。参考 [Ref 1] 的 Table 25.2 如下：
 
 ![][6]
 
@@ -135,8 +135,8 @@ auipc gp, %pcrel_hi(__global_pointer$)
 addi gp, gp, %pcrel_lo(1b)
 ```
 
-另外注意在初始化 gp 指令的操作中必须要通知 linker 不要做 relaxation，避免 linker 将这两条指令优化成 （`mv
- gp, gp`）。所以我们会看到 musl 代码中给 lla 指令加上了 `.option norelax` 的 directive。
+另外注意在初始化 gp 指令的操作中必须要通知 linker 不要做 relaxation，避免 linker 将这两条指令优化成 `mv
+ gp, gp`。所以我们会看到 musl 代码中给 `lla` 指令加上了 `.option norelax` 的 directive。
 
 还剩下最后一个问题就是 `__global_pointer$` 这个符号定义在什么地方？其值怎么决定？
 
@@ -165,6 +165,8 @@ LLVM 的 lld 和 GNU ld 不同，不支持导出默认的 Linker Script 的内�
                          STV_DEFAULT);
     }
 ```
+
+上面代码中 `0x800` 意味着只有在 gp 值的 `+/- 2 KiB` 范围内的内存访问才可以得到优化，原因是像 lw 那样的指令中的 immediate 字段部分的值可以接受的是一个 signed 12 bit 的数值。所以说这种优化有一定的局限性，一开始主要是为了一些 MCU 类型的小型嵌入式应用优化提出来的。
 
 
 
