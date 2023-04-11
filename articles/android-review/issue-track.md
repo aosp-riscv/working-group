@@ -28,7 +28,7 @@
 - [lld: investigate state of linker relaxation][20]
 - [llvm: missing libunwind support][18]
 - [llvm: prebuilts for hwasan support][16]
-- [clang: check that the global clang driver's riscv64 default flags make sense for Android][9]
+- [clang: check that the global clang drivers riscv64 default flags make sense for Android][9]
 
 # 内核部分：
 - [kernel: missing hardware breakpoint support][75]
@@ -37,7 +37,7 @@
 - [kernel: address space layout randomization][54]
 - [kernel: crypto optimization][53]
 - [kernel: HAVE_EFFICIENT_UNALIGNED_ACCESS][27]
-- [system/core/init/: more ASLR bits when we have Kconfig support for more][1]
+- [`system/core/init/`: more ASLR bits when we have Kconfig support for more][1]
 
 
 # ART
@@ -49,10 +49,10 @@
 主要修改 T-head 已经提交并且合并完毕。我们可以参与的工作包括优化，以及执行 unit-test 并解决可能的 bug。
 
 - [bionic: switch over last builtins in libm once new clang lands][11]
-- [bionic/: assembler versions of the mem* and str* functions using the V extension][7]
-- [bionic/tests/sys_ptrace_test.cpp: add an instruction that writes more than 64 bits][5]
-- [bionic/: should we have vdso support for cache flushing and/or <sys/cacheflush.h>? (probably not?)][4]
-- [bionic/: implement TLSDESC (not yet in psabi)][3]
+- [bionic: assembler versions of the mem* and str* functions using the V extension][7]
+- [`bionic/tests/sys_ptrace_test.cpp`: add an instruction that writes more than 64 bits][5]
+- [bionic: should we have vdso support for cache flushing and-or `<sys/cacheflush.h>` (probably not)][4]
+- [bionic: implement TLSDESC (not yet in psabi)][3]
 
 # Emulator（cuttlefilsh）：
 
@@ -101,7 +101,7 @@
 - [hardware: better atomics][44]
 - [security: hardware cfi ("landing pads") support][15]
 - [security: hardware shadow call stack support][14]
-- [what's the ifunc story? hwcap.h][8]
+- [whats the ifunc story, hwcap.h][8]
 
 
 # 其他(未分类)
@@ -169,6 +169,7 @@
 [21]:https://github.com/google/android-riscv64/issues/21
 [20]:https://github.com/google/android-riscv64/issues/20
 
+[18]:https://github.com/google/android-riscv64/issues/18
 [17]:https://github.com/google/android-riscv64/issues/17
 [16]:https://github.com/google/android-riscv64/issues/16
 [15]:https://github.com/google/android-riscv64/issues/15
@@ -177,12 +178,12 @@
 
 [11]:https://github.com/google/android-riscv64/issues/11
 [10]:https://github.com/google/android-riscv64/issues/10
-[9] :https://github.com/google/android-riscv64/issues/9
-[8] :https://github.com/google/android-riscv64/issues/8
-[7] :https://github.com/google/android-riscv64/issues/7
+[9]:https://github.com/google/android-riscv64/issues/9
+[8]:https://github.com/google/android-riscv64/issues/8
+[7]:https://github.com/google/android-riscv64/issues/7
 
-[5] :https://github.com/google/android-riscv64/issues/5
-[4] :https://github.com/google/android-riscv64/issues/4
-[3] :https://github.com/google/android-riscv64/issues/3
-[2] :https://github.com/google/android-riscv64/issues/2
-[1] :https://github.com/google/android-riscv64/issues/1
+[5]:https://github.com/google/android-riscv64/issues/5
+[4]:https://github.com/google/android-riscv64/issues/4
+[3]:https://github.com/google/android-riscv64/issues/3
+[2]:https://github.com/google/android-riscv64/issues/2
+[1]:https://github.com/google/android-riscv64/issues/1
