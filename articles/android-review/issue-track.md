@@ -7,37 +7,54 @@
 
 可以用 llvm/toolchain 标签进行过滤。如果要介入需要在 llvm/clang 上有深厚的积累。
 
-- [compiler must-haves for RISCV-android][81]
-- [clang compiler should emit atomic sequences that are compatible with hboehm's suggested new instructions][73]
-- [reserve a register in the clang compiler driver's defaults for android [llvm]][72]
-- [once V and Zb* are working in cuttlefish, add them to the clang driver's defaults for android [llvm]][71]
-- [llvm function multi-versioning][69]
-- [Binary analysis of aosp to compare Aarch64 vs RISC-V][68]
-- [Comparative analysis of compiler statistics between Aarch64 and RISC-V][67]
-- [crash with RISC-V scalable vectorization and kernel address sanitizer #61096][64]
-- [need support '.option arch' directive (https://reviews.llvm.org/D123515) to enable linux 6.3 Zbb optimizations?][63]
-- [Enable -msave-restore at -Oz][62]
-- [Fix ABI and mcpu/march for LTO][61]
-- [Fix platform:Android bugs in llvm-project][58]
-- [Fix RISC-V bugs in llvm upstream][57]
-- [ship libomp.a and libomp.so][51] in runtime_ndk_xxx for prebuilt clang
-- [ship libFuzzer.a][50] in runtime_ndk_xxx for prebuilt clang
-- [llvm: function alignment][46]
-- [Investigate the current state of Auto-vectorization for RISC-V targets][23]
-- [llvm: make LTO work ][22]
-- [lld: investigate state of linker relaxation][20]
-- [llvm: missing libunwind support][18]
-- [llvm: prebuilts for hwasan support][16]
-- [clang: check that the global clang drivers riscv64 default flags make sense for Android][9]
+- **CLOSED**[#82 clang driver changes that must happen before even an initial NDK][82]: Duplicated with [81][81]
+- [#81 compiler must-haves for RISCV-android][81]
+- **CLOSED**[#77 [Investigation] Verify if binary is built with SCS reserved register.][77]
+- **CLOSED**[#76 Enable -msave-restore for binary size][76] 
+  
+  `-msave-restore` 的作用是利用通用的公共函数实现 prologue 和 epilouge。好处是可以优化 code size，但坏处是会带来性能上的损失。可以参考一篇介绍 [淺談 RISCV 裡的 save-restore call](https://hackmd.io/@5iODz6_2TQWOK-sMRViU2Q/S1BCrnprv)。目前的讨论结果是现在针对 riscv，优化 code size 远没有优化执行 performace 来的急迫，所以这被认为是一个低优先级的问题，暂时不研究。
+  
+  TBD，issue 讨论中 asb 提到了 [RVA23 Profile](https://github.com/riscv/riscv-profiles/blob/main/rva23-profile.adoc): `RVA23 is intended to be a major release of the RISC-V Application Processor Profiles.` 上面列举了一款 64-bit 的 application processor 上至少必须支持的 RISC-V 的扩展标准，值得继续研究。
+
+- **CLOSED**[#74 investigate if llvm requires any changes to make LR/SC sequence sequentially consistent][74]: Duplicated with [73][73].
+- [#73 clang compiler should emit atomic sequences that are compatible with hboehm's suggested new instructions][73]
+- [#72 reserve a register in the clang compiler driver's defaults for android [llvm]][72]
+- [#71 once V and Zb* are working in cuttlefish, add them to the clang driver's defaults for android [llvm]][71]
+- [#69 llvm function multi-versioning][69]
+- [#68 Binary analysis of aosp to compare Aarch64 vs RISC-V][68]
+- [#67 Comparative analysis of compiler statistics between Aarch64 and RISC-V][67]
+- [#64 crash with RISC-V scalable vectorization and kernel address sanitizer #61096][64]
+- [#63 need support '.option arch' directive (https://reviews.llvm.org/D123515) to enable linux 6.3 Zbb optimizations?][63]
+- [#62 Enable -msave-restore at -Oz][62]
+- [#61 Fix ABI and mcpu/march for LTO][61]
+- [#58 Fix platform:Android bugs in llvm-project][58]
+- **CLOSED**[#57 Fix RISC-V bugs in llvm upstream][57]
+
+  这个问题有关 emulated TLS 在 RISC-V 上的实现。目前看上去 LLVM 主线对 RISC-V 已经支持了 emulated TLS
+  
+  TBD：需要及时总结一下 TLS 在 RISC-V 上实现，以及 emulated TLS 的相关内容。
+
+- [#51 ship libomp.a and libomp.so][51] in runtime_ndk_xxx for prebuilt clang
+- [#50 ship libFuzzer.a][50] in runtime_ndk_xxx for prebuilt clang
+- **CLOSED**[#47 llvm: fix emutls for risc-v (probably not?)][47]: 仍然是 emutls 的问题，参考 [57][57]
+- [#46 llvm: function alignment][46]
+- [#23 Investigate the current state of Auto-vectorization for RISC-V targets][23]
+- [#22 llvm: make LTO work ][22]
+- [#20 lld: investigate state of linker relaxation][20]
+- **CLOSED**[#19 llvm: make sure "[RISCV] Allow mismatched SmallDataLimit and use Min for conflicting values" gets merged][19]:已解决
+- [#18 llvm: missing libunwind support][18]
+- [#16 llvm: prebuilts for hwasan support][16]
+- [#9 clang: check that the global clang drivers riscv64 default flags make sense for Android][9]
 
 # 内核部分：
-- [kernel: missing hardware breakpoint support][75]
-- [kernel: software CFI][56]
-- [kernel: software shadow call stack][55]
-- [kernel: address space layout randomization][54]
-- [kernel: crypto optimization][53]
-- [kernel: HAVE_EFFICIENT_UNALIGNED_ACCESS][27]
-- [`system/core/init/`: more ASLR bits when we have Kconfig support for more][1]
+- **CLOSED** [#79 kernel: CONFIG_SMP][79]
+- [#75 kernel: missing hardware breakpoint support][75]
+- [#56 kernel: software CFI][56]
+- [#55 kernel: software shadow call stack][55]
+- [#54 kernel: address space layout randomization][54]
+- [#53 kernel: crypto optimization][53]
+- [#27 kernel: HAVE_EFFICIENT_UNALIGNED_ACCESS][27]
+- [#1 `system/core/init/`: more ASLR bits when we have Kconfig support for more][1]
 
 
 # ART
@@ -48,44 +65,54 @@
 
 主要修改 T-head 已经提交并且合并完毕。我们可以参与的工作包括优化，以及执行 unit-test 并解决可能的 bug。
 
-- [bionic: switch over last builtins in libm once new clang lands][11]
-- [bionic: assembler versions of the mem* and str* functions using the V extension][7]
-- [`bionic/tests/sys_ptrace_test.cpp`: add an instruction that writes more than 64 bits][5]
-- [bionic: should we have vdso support for cache flushing and-or `<sys/cacheflush.h>` (probably not)][4]
-- [bionic: implement TLSDESC (not yet in psabi)][3]
+- **CLOSED** [#52 security: software shadow call stack support][52]
 
-# Emulator（cuttlefilsh）：
+  软件实现 Shadow Call Stack。目前 bionic 中的实现是模仿 AARCH64 的，但后面有可能要切换为采用 gp。
 
-对 riscv 的支持 Google 那有人在做，最新的消息是还没有完成，目前只能启动到 uboot，无法进入 kernel。具体还要研究，而且对于我们来说 cuttlefish 以前没有看过，需要一段时间学习。
+  TBD：需要总结一下 SCS
 
-- [cuttlefish: get riscv64 cuttlefish up and running][25]
+- **CLOSED**[#12 llvm: should sqrt/sqrtf and the lrint/lrintf/llrint/llrintf family be builtins?][12]: 已解决
+  
+  TBD：可能需要再看一下 bionic 部分的修改并总结一下。
 
+- **CLOSED**[#11 bionic: switch over last builtins in libm once new clang lands][11]: 已解决
+
+  TBD：可能需要再看一下 bionic 部分的修改并总结一下。
+
+- [#7 bionic: assembler versions of the mem* and str* functions using the V extension][7]
+- **CLOSED**[#6 bionic: assembler versions of the __mem*_chk functions?][6]: 已解决
+
+  TBD：可能需要再看一下 bionic 部分的修改并总结一下。
+
+- [#5 `bionic/tests/sys_ptrace_test.cpp`: add an instruction that writes more than 64 bits][5]
+- [#4 bionic: should we have vdso support for cache flushing and-or `<sys/cacheflush.h>` (probably not)][4]
+- [#3 bionic: implement TLSDESC (not yet in psabi)][3]
 
 # 库 Optimization
 
-优先级不高（6），但以前没有做过，而且如何测试是个问题。
+优先级不高，但以前没有做过，而且如何测试是个问题。
 
-- [external/libaom: optimization][66]
-- [frameworks/av: optimization][59]
-- [external/zlib optimization][49]
-- [external/lzma: optimization (probably not?)][43]
-- [external/XNNPACK: optimization][42]
-- [external/renderscript-intrinsics-replacement-toolkit/: optimization][41]
-- [external/freetype: optimization (?)][40]
-- [external/skia: optimization][39]
-- [external/libyuv: optimization][38]
-- [external/libpng: optimization][37]
-- [external/boringssl: optimization][36]
-- [external/libjpeg-turbo: optimization][35]
-- [external/libmpeg2: optimization][34]
-- [external/libhevc/: optimization][33]
-- [external/libavc/: optimization][32]
-- [external/libopus/: do we need optimization? (probably not?)][31]
-- [external/libopus/][30]
-- [external/flac/: need V optimization][29]
-- [external/libvpx: missing optimized assembler][17]
-- [external/aac: inline assembler (clz, saturating arithmetic)][13]
-- [external/scudo/: optimize CRC32 when we have useful instructions][2]
+- [#66 external/libaom: optimization][66]
+- [#59 frameworks/av: optimization][59]
+- [#49 external/zlib optimization][49]
+- **CLOSED**[#43 external/lzma: optimization (probably not?)][43]: 无需优化，cancelled
+- [#42 external/XNNPACK: optimization][42]
+- [#41 external/renderscript-intrinsics-replacement-toolkit/: optimization][41]
+- [#40 external/freetype: optimization (?)][40]
+- [#39 external/skia: optimization][39]
+- [#38 external/libyuv: optimization][38]
+- [#37 external/libpng: optimization][37]
+- [#36 external/boringssl: optimization][36]
+- [#35 external/libjpeg-turbo: optimization][35]
+- [#34 external/libmpeg2: optimization][34]
+- [#33 external/libhevc/: optimization][33]
+- [#32 external/libavc/: optimization][32]
+- [#31 external/libopus/: do we need optimization? (probably not?)][31]
+- [#30 external/libopus/][30]
+- [#29 external/flac/: need V optimization][29]
+- [#17 external/libvpx: missing optimized assembler][17]
+- [#13 external/aac: inline assembler (clz, saturating arithmetic)][13]
+- [#2 external/scudo/: optimize CRC32 when we have useful instructions][2]
 
 # 支持 Studio
 
@@ -106,15 +133,24 @@
 
 # 其他(未分类)
 
-- [CTS test to ensure that core features are homogenous][70]
-- [simpleperf][48]
-- [renderscript: go from deprecation to removal][24] 历史代码清理
-- [bazel: microdroid will need bazel support for riscv64][10]
+- [#70 CTS test to ensure that core features are homogenous][70]
+- **CLOSED**[#65 build: vNDK not packaged for RISC-V builds][65] 已经解决，具体看 comments。
 
+  TBD：一些涉及 ld.config.txt 的处理还要看看，这个 topic 没有仔细总结过。
 
+- [#48 simpleperf][48]
+- **CLOSED**[#25 cuttlefish: get riscv64 cuttlefish up and running][25]:已经可以运行 cf slim。还缺 V 和 Zb* 扩展支持，但我觉得如果需要跟踪可以另外开一个 issue track。而且对这些扩展的支持是不是输入底层 QEMU 的事情？
+- [#24 renderscript: go from deprecation to removal][24] 历史代码清理
+- [#10 bazel: microdroid will need bazel support for riscv64][10]
+
+[82]:https://github.com/google/android-riscv64/issues/82
 [81]:https://github.com/google/android-riscv64/issues/81
+[79]:https://github.com/google/android-riscv64/issues/79
 [78]:https://github.com/google/android-riscv64/issues/78
+[77]:https://github.com/google/android-riscv64/issues/77
+[76]:https://github.com/google/android-riscv64/issues/76
 [75]:https://github.com/google/android-riscv64/issues/75
+[74]:https://github.com/google/android-riscv64/issues/74
 [73]:https://github.com/google/android-riscv64/issues/73
 [72]:https://github.com/google/android-riscv64/issues/72
 [71]:https://github.com/google/android-riscv64/issues/71
@@ -123,6 +159,7 @@
 [68]:https://github.com/google/android-riscv64/issues/68
 [67]:https://github.com/google/android-riscv64/issues/67
 [66]:https://github.com/google/android-riscv64/issues/66
+[65]:https://github.com/google/android-riscv64/issues/65
 [64]:https://github.com/google/android-riscv64/issues/64
 [63]:https://github.com/google/android-riscv64/issues/63
 [62]:https://github.com/google/android-riscv64/issues/62
@@ -135,12 +172,12 @@
 [55]:https://github.com/google/android-riscv64/issues/55
 [54]:https://github.com/google/android-riscv64/issues/54
 [53]:https://github.com/google/android-riscv64/issues/53
-
+[52]:https://github.com/google/android-riscv64/issues/52
 [51]:https://github.com/google/android-riscv64/issues/51
 [50]:https://github.com/google/android-riscv64/issues/50
 [49]:https://github.com/google/android-riscv64/issues/49
 [48]:https://github.com/google/android-riscv64/issues/48
-
+[47]:https://github.com/google/android-riscv64/issues/47
 [46]:https://github.com/google/android-riscv64/issues/46
 [45]:https://github.com/google/android-riscv64/issues/45
 [44]:https://github.com/google/android-riscv64/issues/44
@@ -168,20 +205,20 @@
 [22]:https://github.com/google/android-riscv64/issues/22
 [21]:https://github.com/google/android-riscv64/issues/21
 [20]:https://github.com/google/android-riscv64/issues/20
-
+[19]:https://github.com/google/android-riscv64/issues/19
 [18]:https://github.com/google/android-riscv64/issues/18
 [17]:https://github.com/google/android-riscv64/issues/17
 [16]:https://github.com/google/android-riscv64/issues/16
 [15]:https://github.com/google/android-riscv64/issues/15
 [14]:https://github.com/google/android-riscv64/issues/14
 [13]:https://github.com/google/android-riscv64/issues/13
-
+[12]:https://github.com/google/android-riscv64/issues/12
 [11]:https://github.com/google/android-riscv64/issues/11
 [10]:https://github.com/google/android-riscv64/issues/10
 [9]:https://github.com/google/android-riscv64/issues/9
 [8]:https://github.com/google/android-riscv64/issues/8
 [7]:https://github.com/google/android-riscv64/issues/7
-
+[6]:https://github.com/google/android-riscv64/issues/5
 [5]:https://github.com/google/android-riscv64/issues/5
 [4]:https://github.com/google/android-riscv64/issues/4
 [3]:https://github.com/google/android-riscv64/issues/3
