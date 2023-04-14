@@ -74,7 +74,7 @@ build/install-build-deps-android.sh
 gclient sync
 ```
 
-注意运行 `install-build-deps.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
+注意运行 `install-build-deps-android.sh` 需要 sudo，其内部实际上就是在执行 `apt install`。
 
 # 3. 构建 Clang for Chromium
 
