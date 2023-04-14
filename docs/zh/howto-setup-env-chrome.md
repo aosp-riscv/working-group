@@ -37,7 +37,7 @@ mkdir $WS/chromium && cd $WS/chromium
 fetch --nohooks android
 cd src
 git checkout 109.0.5414.87
-build/install-build-deps.sh --android
+build/install-build-deps-android.sh
 gclient sync
 ```
 
