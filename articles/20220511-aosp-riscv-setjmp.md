@@ -143,7 +143,6 @@ man 手册上的说明详细地解释了 `setjmp()/longjmp()` 行为，摘录如
 ```
 
 而 `jmp_buf` 的结构体定义可以参阅 [`libc/include/setjmp.h`][2]
-<https://github.com/riscv-android-src/platform-bionic/blob/riscv64-android-12.0.0_dev/libc/include/setjmp.h>
 
 ```cpp
 
