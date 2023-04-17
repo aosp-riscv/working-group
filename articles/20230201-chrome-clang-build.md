@@ -204,7 +204,7 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 
 - **"PINNED CLANG"**: 一个 chrome team 预先做好的 clang，用来构建 "BOOTSTRAP" Clang。我们也可以通过 `--gcc-toolchain` 指定使用 gcc。总而言之，为隔绝不同用户 host 的影响，我们不会使用 host 上自带的 clang/gcc。
 - **"BOOTSTRAP CLANG"**: 最终生成的 clang 这里称之为 "FINAL CLANG"，整个构建的过程可以分为两大步，先用 "PINNED CLANG" 做一个基本的 "BOOTSTRAP CLANG"，这个 clang 比较简单，譬如不会涉及 runtime libraries 的制作等。然后再用 "BOOTSTRAP CLANG" 制作 "FINAL CLANG"。
-- **"INSTRUMENTED CLANG"**: 如果命令行中指定了 `--pgo`，会在构建 "FINAL CLANG" 之前先构建一个所谓的 "INSTRUMENTED CLANG"，这个 "INSTRUMENTED CLANG" 完全是为了 PGO 的 training 所使用。
+- **"INSTRUMENTED CLANG"**: 如果命令行中指定了 `--pgo`，会在构建 "FINAL CLANG" 之前先用 "BOOTSTRAP CLANG" 构建一个所谓的 "INSTRUMENTED CLANG"，这个 "INSTRUMENTED CLANG" 完全是为了 PGO 的 training 所使用。
 - **"FINAL CLANG"**: 这是我们最终生成的 clang。构建结果在 `third_party/llvm-build/Release+Asserts/` 中。`package.py` 脚本打包的也是针对这个 "FINAL CLANG"。
 
 
