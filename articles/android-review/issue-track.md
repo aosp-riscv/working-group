@@ -47,7 +47,7 @@
 - [#9 clang: check that the global clang drivers riscv64 default flags make sense for Android][9]
 
 # 内核部分：
-- **CLOSED** [#79 kernel: CONFIG_SMP][79]
+- **CLOSED**[#79 kernel: CONFIG_SMP][79]
 - [#75 kernel: missing hardware breakpoint support][75]
 - [#56 kernel: software CFI][56]
 - [#55 kernel: software shadow call stack][55]
@@ -65,7 +65,7 @@
 
 主要修改 T-head 已经提交并且合并完毕。我们可以参与的工作包括优化，以及执行 unit-test 并解决可能的 bug。
 
-- **CLOSED** [#52 security: software shadow call stack support][52]
+- **CLOSED**[#52 security: software shadow call stack support][52]
 
   软件实现 Shadow Call Stack。目前 bionic 中的实现是模仿 AARCH64 的，但后面有可能要切换为采用 gp。
 
@@ -122,6 +122,7 @@
 
 # Specification 相关
 
+- [#83 Define ptrdiff_t and size_t][83]
 - [Fix default usage of reserved register][78]
 - [Investigate the status of SLP vectorizer][60]
 - [security: enable software CFI][45]
@@ -143,6 +144,7 @@
 - [#24 renderscript: go from deprecation to removal][24] 历史代码清理
 - [#10 bazel: microdroid will need bazel support for riscv64][10]
 
+[83]:https://github.com/google/android-riscv64/issues/83
 [82]:https://github.com/google/android-riscv64/issues/82
 [81]:https://github.com/google/android-riscv64/issues/81
 [79]:https://github.com/google/android-riscv64/issues/79
