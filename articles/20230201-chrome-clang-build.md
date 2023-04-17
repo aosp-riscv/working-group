@@ -200,6 +200,14 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 - `FUCHSIA_SDK_DIR`            = `src/third_party/fuchsia-sdk/sdk`
 - `PINNED_CLANG_DIR`           = `src/third_party/llvm-build-tools/pinned-clang`
 
+这里涉及几个概念先提一下，有个大概印象，下面还会详细描述：
+
+- **"PINNED CLANG"**: 一个 chrome team 预先做好的 clang，用来构建 "BOOTSTRAP" Clang。我们也可以通过 `--gcc-toolchain` 指定使用 gcc。总而言之，为隔绝不同用户 host 的影响，我们不会使用 host 上自带的 clang/gcc。
+- **"BOOTSTRAP CLANG"**: 最终生成的 clang 这里称之为 "FINAL CLANG"，整个构建的过程可以分为两大步，先用 "PINNED CLANG" 做一个基本的 "BOOTSTRAP CLANG"，这个 clang 比较简单，譬如不会涉及 runtime libraries 的制作等。然后再用 "BOOTSTRAP CLANG" 制作 "FINAL CLANG"。
+- **"INSTRUMENTED CLANG"**: 如果命令行中指定了 `--pgo`，会在构建 "FINAL CLANG" 之前先构建一个所谓的 "INSTRUMENTED CLANG"，这个 "INSTRUMENTED CLANG" 完全是为了 PGO 的 training 所使用。
+- **"FINAL CLANG"**: 这是我们最终生成的 clang。构建结果在 `third_party/llvm-build/Release+Asserts/` 中。`package.py` 脚本打包的也是针对这个 "FINAL CLANG"。
+
+
 重点分析其 `main()` 函数。
 
 ```python
@@ -209,8 +217,8 @@ def main():
 
   ### 对 parse 后的命令参数进行分析和初步的处理
   ### 其中比较重要的动作包括:
-  ### 如果没有指定 --skip-checkout，这也是常规情况下会 clone llvm 的源码到 LLVM_DIR 
-  ### 并 checkout 到特定的版本，默认为 CLANG_REVISION，以上关注 CheckoutLLVM 这个函数
+  ### 如果没有指定 `--skip-checkout`，默认情况下会 clone llvm 的源码到 LLVM_DIR
+  ### 并 checkout 到特定的版本，默认为 CLANG_REVISION，以上动作可以见 CheckoutLLVM 这个函数
   ### 在这个阶段的最后会打印 "Locally building clang <PACKAGE_VERSION>"
   ### 并创建一个空的 STAMP_FILE，默认指向 src/third_party/llvm-build/Release+Asserts/cr_build_revision
   ### 并创建一个空的 FORCE_HEAD_REVISION_FILE，默认指向 src/third_party/llvm-build/force_head_revision
