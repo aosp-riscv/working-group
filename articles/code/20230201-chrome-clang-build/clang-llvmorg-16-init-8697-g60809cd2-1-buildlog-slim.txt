@@ -1,0 +1,303 @@
+Starting build
+Checking out LLVM monorepo llvmorg-16-init-8697-g60809cd2 into /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm
+......
+Locally building clang llvmorg-16-init-8697-g60809cd2-1...
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-llvmorg-16-init-3375-gfed71b04-1.tar.xz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/tools/gcc-10.2.0-bionic.tgz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/2028cdaf24259d23adcff95393b8cc4f0eef714b/debian_bullseye_amd64_sysroot.tar.xz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/a033618b5e092c86e96d62d3c43f7363df6cebe7/debian_bullseye_i386_sysroot.tar.xz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/0b9a3c54d2d5f6b1a428369aaa8d7ba7b227f701/debian_bullseye_arm_sysroot.tar.xz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/0e28d9832614729bb5b731161ff96cb4d516f345/debian_bullseye_arm64_sysroot.tar.xz .......... Done.
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/tools/libxml2-v2.9.12.tar.gz .......... Done.
+Running cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_C14N=OFF -DLIBXML2_WITH_CATALOG=OFF -DLIBXML2_WITH_DEBUG=OFF -DLIBXML2_WITH_DOCB=OFF -DLIBXML2_WITH_FTP=OFF -DLIBXML2_WITH_HTML=OFF -DLIBXML2_WITH_HTTP=OFF -DLIBXML2_WITH_ICONV=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_ISO8859X=OFF -DLIBXML2_WITH_LEGACY=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_MEM_DEBUG=OFF -DLIBXML2_WITH_MODULES=OFF -DLIBXML2_WITH_OUTPUT=ON -DLIBXML2_WITH_PATTERN=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_PUSH=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_READER=OFF -DLIBXML2_WITH_REGEXPS=OFF -DLIBXML2_WITH_RUN_DEBUG=OFF -DLIBXML2_WITH_SAX1=OFF -DLIBXML2_WITH_SCHEMAS=OFF -DLIBXML2_WITH_SCHEMATRON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_THREADS=ON -DLIBXML2_WITH_THREAD_ALLOC=OFF -DLIBXML2_WITH_TREE=ON -DLIBXML2_WITH_VALID=OFF -DLIBXML2_WITH_WRITER=OFF -DLIBXML2_WITH_XINCLUDE=OFF -DLIBXML2_WITH_XPATH=OFF -DLIBXML2_WITH_XPTR=OFF -DLIBXML2_WITH_ZLIB=OFF ..
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build
+Running ninja install
+......
+Building bootstrap compiler
+Running cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=OFF '-DLLVM_ENABLE_PROJECTS=clang;lld;clang-tools-extra' -DLLVM_ENABLE_RUNTIMES=compiler-rt '-DLLVM_TARGETS_TO_BUILD=AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86' -DLLVM_ENABLE_PIC=ON -DLLVM_ENABLE_UNWIND_TABLES=OFF -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_Z3_SOLVER=OFF -DCLANG_PLUGIN_SUPPORT=OFF -DCLANG_ENABLE_STATIC_ANALYZER=OFF -DCLANG_ENABLE_ARCMT=OFF '-DBUG_REPORT_URL=https://crbug.com and run tools/clang/scripts/process_crashreports.py (only works inside Google) which will upload a report' -DLLVM_INCLUDE_GO_TESTS=OFF -DLLVM_ENABLE_DIA_SDK=OFF -DLLVM_ENABLE_LLD=ON -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DLLVM_ENABLE_CURL=OFF -DLIBCLANG_BUILD_STATIC=ON -DLLVM_STATIC_LINK_CXX_STDLIB=ON -DCMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot -DLLVM_ENABLE_LIBXML2=FORCE_ON -DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/include/libxml2 -DLIBXML2_LIBRARIES=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/lib/libxml2.a -DLLVM_TARGETS_TO_BUILD=X86 '-DLLVM_ENABLE_PROJECTS=clang;lld' -DLLVM_ENABLE_RUNTIMES=compiler-rt -DCMAKE_INSTALL_PREFIX=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' -DCMAKE_EXE_LINKER_FLAGS= -DCMAKE_SHARED_LINKER_FLAGS= -DCMAKE_MODULE_LINKER_FLAGS= -DLLVM_ENABLE_ASSERTIONS=ON -DCOMPILER_RT_BUILD_CRT=ON -DCOMPILER_RT_BUILD_LIBFUZZER=OFF -DCOMPILER_RT_BUILD_MEMPROF=OFF -DCOMPILER_RT_BUILD_ORC=OFF -DCOMPILER_RT_BUILD_PROFILE=ON -DCOMPILER_RT_BUILD_SANITIZERS=OFF -DCOMPILER_RT_BUILD_XRAY=OFF '-DCOMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang++ /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm/llvm
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap
+Running ninja
+......
+[3601/3614] Performing configure step for 'builtins'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap/runtimes/builtins-bins
+[3602/3614] Performing build step for 'builtins'
+......
+[3603/3614] No install step for 'builtins'
+[3605/3614] Completed 'builtins'
+......
+[3610/3614] Performing configure step for 'runtimes'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap/runtimes/runtimes-bins
+[3611/3614] Performing build step for 'runtimes'
+......
+[3612/3614] No install step for 'runtimes'
+[3614/3614] Completed 'runtimes'
+Running ninja check-all
+......
+Running ninja install
+......
+Bootstrap compiler installed.
+Building instrumented compiler
+Running cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=OFF '-DLLVM_ENABLE_PROJECTS=clang;lld;clang-tools-extra' -DLLVM_ENABLE_RUNTIMES=compiler-rt '-DLLVM_TARGETS_TO_BUILD=AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86' -DLLVM_ENABLE_PIC=ON -DLLVM_ENABLE_UNWIND_TABLES=OFF -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_Z3_SOLVER=OFF -DCLANG_PLUGIN_SUPPORT=OFF -DCLANG_ENABLE_STATIC_ANALYZER=OFF -DCLANG_ENABLE_ARCMT=OFF '-DBUG_REPORT_URL=https://crbug.com and run tools/clang/scripts/process_crashreports.py (only works inside Google) which will upload a report' -DLLVM_INCLUDE_GO_TESTS=OFF -DLLVM_ENABLE_DIA_SDK=OFF -DLLVM_ENABLE_LLD=ON -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DLLVM_ENABLE_CURL=OFF -DLIBCLANG_BUILD_STATIC=ON -DLLVM_STATIC_LINK_CXX_STDLIB=ON -DCMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot -DLLVM_ENABLE_LIBXML2=FORCE_ON -DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/include/libxml2 -DLIBXML2_LIBRARIES=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/lib/libxml2.a -DLLVM_ENABLE_PROJECTS=clang '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' -DCMAKE_EXE_LINKER_FLAGS= -DCMAKE_SHARED_LINKER_FLAGS= -DCMAKE_MODULE_LINKER_FLAGS= -DLLVM_BUILD_INSTRUMENTED=IR -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang++ /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm/llvm
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented
+Running ninja clang
+......
+Instrumented compiler built.
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/pgo_training-1.ii .......... Done.
+Running /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/bin/clang++ -target x86_64-unknown-unknown -O2 -g -std=c++14 -fno-exceptions -fno-rtti -w -c pgo_training-1.ii
+Running /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/llvm-profdata merge -output=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profdata.prof /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_15845172987977244619_0.profraw /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_7191452506276811320_0.profraw /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_17020395864641766123_0.profraw /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_8921931811589106686_0.profraw /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_15853303643431530627_0.profraw /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profiles/default_15853201381332895875_0.profraw
+Profile generated.
+Building final compiler.
+Embedding MLGO inliner model at https://commondatastorage.googleapis.com/chromium-browser-clang/tools/mlgo_model2.tgz using Tensorflow at /home/wangchen/.vpython-root/6c80d3/lib/python3.8/site-packages/tensorflow
+Running cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=OFF '-DLLVM_ENABLE_PROJECTS=clang;lld;clang-tools-extra' -DLLVM_ENABLE_RUNTIMES=compiler-rt '-DLLVM_TARGETS_TO_BUILD=AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86' -DLLVM_ENABLE_PIC=ON -DLLVM_ENABLE_UNWIND_TABLES=OFF -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_Z3_SOLVER=OFF -DCLANG_PLUGIN_SUPPORT=OFF -DCLANG_ENABLE_STATIC_ANALYZER=OFF -DCLANG_ENABLE_ARCMT=OFF '-DBUG_REPORT_URL=https://crbug.com and run tools/clang/scripts/process_crashreports.py (only works inside Google) which will upload a report' -DLLVM_INCLUDE_GO_TESTS=OFF -DLLVM_ENABLE_DIA_SDK=OFF -DLLVM_ENABLE_LLD=ON -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DLLVM_ENABLE_CURL=OFF -DLIBCLANG_BUILD_STATIC=ON -DLLVM_STATIC_LINK_CXX_STDLIB=ON -DCMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot -DLLVM_ENABLE_LIBXML2=FORCE_ON -DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/include/libxml2 -DLIBXML2_LIBRARIES=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/lib/libxml2.a -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang++ '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC' -DCMAKE_EXE_LINKER_FLAGS= -DCMAKE_SHARED_LINKER_FLAGS= -DCMAKE_MODULE_LINKER_FLAGS= -DCMAKE_INSTALL_PREFIX=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts -DLLVM_EXTERNAL_PROJECTS=chrometools -DLLVM_EXTERNAL_CHROMETOOLS_SOURCE_DIR=/aosp/wangchen/dev-chrome/chromium/src/tools/clang '-DCHROMIUM_TOOLS=blink_gc_plugin;plugins;translation_unit' -DLLVM_PROFDATA_FILE=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-instrumented/profdata.prof -DLLVM_ENABLE_LTO=Thin -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON -DLLVM_INLINER_MODEL_PATH=https://commondatastorage.googleapis.com/chromium-browser-clang/tools/mlgo_model2.tgz -DTENSORFLOW_AOT_PATH=/home/wangchen/.vpython-root/6c80d3/lib/python3.8/site-packages/tensorflow -DLLVM_RAEVICT_MODEL_PATH=none -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_i386-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_i386-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_i386-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_i386_sysroot -DRUNTIMES_i386-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_i386_sysroot -DBUILTINS_i386-unknown-linux-gnu_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_i386-unknown-linux-gnu_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_x86_64-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_x86_64-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_x86_64-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot -DRUNTIMES_x86_64-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_armv7-unknown-linux-gnueabihf_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_armv7-unknown-linux-gnueabihf_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_armv7-unknown-linux-gnueabihf_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_arm_sysroot -DRUNTIMES_armv7-unknown-linux-gnueabihf_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_arm_sysroot -DBUILTINS_armv7-unknown-linux-gnueabihf_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_armv7-unknown-linux-gnueabihf_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_aarch64-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_aarch64-unknown-linux-gnu_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_aarch64-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_arm64_sysroot -DRUNTIMES_aarch64-unknown-linux-gnu_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_arm64_sysroot -DBUILTINS_aarch64-unknown-linux-gnu_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_aarch64-unknown-linux-gnu_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_aarch64-linux-android21_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_aarch64-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_aarch64-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_aarch64-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_aarch64-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_aarch64-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_aarch64-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo -DRUNTIMES_aarch64-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo '-DBUILTINS_aarch64-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' '-DRUNTIMES_aarch64-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' '-DBUILTINS_aarch64-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' '-DRUNTIMES_aarch64-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' '-DBUILTINS_aarch64-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' '-DRUNTIMES_aarch64-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none -mbranch-protection=standard' -DBUILTINS_aarch64-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DRUNTIMES_aarch64-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DBUILTINS_aarch64-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DRUNTIMES_aarch64-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DBUILTINS_aarch64-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DRUNTIMES_aarch64-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DBUILTINS_aarch64-linux-android21_ANDROID=1 -DRUNTIMES_aarch64-linux-android21_ANDROID=1 -DBUILTINS_aarch64-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DRUNTIMES_aarch64-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DBUILTINS_aarch64-linux-android21_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_aarch64-linux-android21_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_aarch64-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DRUNTIMES_aarch64-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_armv7-linux-android21_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_armv7-linux-android21_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_armv7-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_armv7-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_armv7-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_armv7-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_armv7-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_armv7-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_armv7-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo -DRUNTIMES_armv7-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo '-DBUILTINS_armv7-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_armv7-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_armv7-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_armv7-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_armv7-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_armv7-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' -DBUILTINS_armv7-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DRUNTIMES_armv7-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DBUILTINS_armv7-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DRUNTIMES_armv7-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DBUILTINS_armv7-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DRUNTIMES_armv7-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DBUILTINS_armv7-linux-android21_ANDROID=1 -DRUNTIMES_armv7-linux-android21_ANDROID=1 -DBUILTINS_armv7-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DRUNTIMES_armv7-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DBUILTINS_armv7-linux-android21_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_armv7-linux-android21_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_armv7-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DRUNTIMES_armv7-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_i686-linux-android21_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_i686-linux-android21_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_i686-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_i686-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_i686-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_i686-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_i686-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_i686-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_i686-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo -DRUNTIMES_i686-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo '-DBUILTINS_i686-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_i686-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_i686-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_i686-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_i686-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_i686-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' -DBUILTINS_i686-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DRUNTIMES_i686-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DBUILTINS_i686-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DRUNTIMES_i686-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DBUILTINS_i686-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DRUNTIMES_i686-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DBUILTINS_i686-linux-android21_ANDROID=1 -DRUNTIMES_i686-linux-android21_ANDROID=1 -DBUILTINS_i686-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DRUNTIMES_i686-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DBUILTINS_i686-linux-android21_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_i686-linux-android21_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_i686-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DRUNTIMES_i686-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_x86_64-linux-android21_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_x86_64-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_x86_64-linux-android21_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_x86_64-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_x86_64-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_x86_64-linux-android21_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_x86_64-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo -DRUNTIMES_x86_64-linux-android21_CMAKE_BUILD_TYPE=RelWithDebInfo '-DBUILTINS_x86_64-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_x86_64-linux-android21_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_x86_64-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_x86_64-linux-android21_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_x86_64-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_x86_64-linux-android21_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' -DBUILTINS_x86_64-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DRUNTIMES_x86_64-linux-android21_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DBUILTINS_x86_64-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DRUNTIMES_x86_64-linux-android21_SANITIZER_CXX_ABI=libcxxabi -DBUILTINS_x86_64-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DRUNTIMES_x86_64-linux-android21_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DBUILTINS_x86_64-linux-android21_ANDROID=1 -DRUNTIMES_x86_64-linux-android21_ANDROID=1 -DBUILTINS_x86_64-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DRUNTIMES_x86_64-linux-android21_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DBUILTINS_x86_64-linux-android21_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_x86_64-linux-android21_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_x86_64-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DRUNTIMES_x86_64-linux-android21_ANDROID_NATIVE_API_LEVEL=21 -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_riscv64-linux-android10000_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_riscv64-linux-android10000_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_riscv64-linux-android10000_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_riscv64-linux-android10000_CMAKE_BUILD_TYPE=RelWithDebInfo -DRUNTIMES_riscv64-linux-android10000_CMAKE_BUILD_TYPE=RelWithDebInfo '-DBUILTINS_riscv64-linux-android10000_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_riscv64-linux-android10000_CMAKE_C_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_riscv64-linux-android10000_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_riscv64-linux-android10000_CMAKE_CXX_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DBUILTINS_riscv64-linux-android10000_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' '-DRUNTIMES_riscv64-linux-android10000_CMAKE_ASM_FLAGS=--sysroot=/aosp/wangchen/dev-chrome/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --unwindlib=none' -DBUILTINS_riscv64-linux-android10000_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DRUNTIMES_riscv64-linux-android10000_COMPILER_RT_USE_BUILTINS_LIBRARY=ON -DBUILTINS_riscv64-linux-android10000_SANITIZER_CXX_ABI=libcxxabi -DRUNTIMES_riscv64-linux-android10000_SANITIZER_CXX_ABI=libcxxabi -DBUILTINS_riscv64-linux-android10000_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DRUNTIMES_riscv64-linux-android10000_CMAKE_SHARED_LINKER_FLAGS=-Wl,-u__cxa_demangle -DBUILTINS_riscv64-linux-android10000_ANDROID=1 -DRUNTIMES_riscv64-linux-android10000_ANDROID=1 -DBUILTINS_riscv64-linux-android10000_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DRUNTIMES_riscv64-linux-android10000_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF -DBUILTINS_riscv64-linux-android10000_LLVM_INCLUDE_TESTS=OFF -DRUNTIMES_riscv64-linux-android10000_LLVM_INCLUDE_TESTS=OFF -DBUILTINS_riscv64-linux-android10000_ANDROID_NATIVE_API_LEVEL=10000 -DRUNTIMES_riscv64-linux-android10000_ANDROID_NATIVE_API_LEVEL=10000 -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_PROFILE=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_PROFILE=OFF -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_SANITIZERS=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_SANITIZERS=OFF -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_aarch64-unknown-fuchsia_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_aarch64-unknown-fuchsia_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_aarch64-unknown-fuchsia_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_aarch64-unknown-fuchsia_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_aarch64-unknown-fuchsia_CMAKE_SYSTEM_NAME=Fuchsia -DRUNTIMES_aarch64-unknown-fuchsia_CMAKE_SYSTEM_NAME=Fuchsia -DBUILTINS_aarch64-unknown-fuchsia_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/fuchsia-sdk/sdk/arch/arm64/sysroot -DRUNTIMES_aarch64-unknown-fuchsia_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/fuchsia-sdk/sdk/arch/arm64/sysroot -DBUILTINS_aarch64-unknown-fuchsia_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON -DRUNTIMES_aarch64-unknown-fuchsia_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_CRT=ON -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_CRT=ON -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_LIBFUZZER=OFF -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_LIBFUZZER=OFF -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_MEMPROF=OFF -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_MEMPROF=OFF -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_ORC=OFF -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_ORC=OFF -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_PROFILE=ON -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_PROFILE=ON -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_SANITIZERS=ON -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_SANITIZERS=ON -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_XRAY=OFF -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_BUILD_XRAY=OFF '-DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' '-DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi' -DBUILTINS_x86_64-unknown-fuchsia_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DRUNTIMES_x86_64-unknown-fuchsia_COMPILER_RT_DEFAULT_TARGET_ONLY=ON -DBUILTINS_x86_64-unknown-fuchsia_LLVM_ENABLE_RUNTIMES=compiler-rt -DRUNTIMES_x86_64-unknown-fuchsia_LLVM_ENABLE_RUNTIMES=compiler-rt -DBUILTINS_x86_64-unknown-fuchsia_CMAKE_SYSTEM_NAME=Fuchsia -DRUNTIMES_x86_64-unknown-fuchsia_CMAKE_SYSTEM_NAME=Fuchsia -DBUILTINS_x86_64-unknown-fuchsia_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/fuchsia-sdk/sdk/arch/x64/sysroot -DRUNTIMES_x86_64-unknown-fuchsia_CMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/fuchsia-sdk/sdk/arch/x64/sysroot -DBUILTINS_x86_64-unknown-fuchsia_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON -DRUNTIMES_x86_64-unknown-fuchsia_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON -DBUILTINS_x86_64-unknown-fuchsia_SANITIZER_NO_UNDEFINED_SYMBOLS=OFF -DRUNTIMES_x86_64-unknown-fuchsia_SANITIZER_NO_UNDEFINED_SYMBOLS=OFF '-DLLVM_BUILTIN_TARGETS=;i386-unknown-linux-gnu;x86_64-unknown-linux-gnu;armv7-unknown-linux-gnueabihf;aarch64-unknown-linux-gnu;aarch64-linux-android21;armv7-linux-android21;i686-linux-android21;x86_64-linux-android21;riscv64-linux-android10000;aarch64-unknown-fuchsia;x86_64-unknown-fuchsia' '-DLLVM_RUNTIME_TARGETS=;i386-unknown-linux-gnu;x86_64-unknown-linux-gnu;armv7-unknown-linux-gnueabihf;aarch64-unknown-linux-gnu;aarch64-linux-android21;armv7-linux-android21;i686-linux-android21;x86_64-linux-android21;riscv64-linux-android10000;aarch64-unknown-fuchsia;x86_64-unknown-fuchsia' /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm/llvm
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts
+Copying /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/gcc-10.2.0-bionic/bin/../lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../lib64/libstdc++.so.6 to /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/lib
+Running ninja
+......
+[4778/4997] Creating directories for 'builtins-armv7-unknown-linux-gnueabihf'
+[4779/4997] Creating directories for 'builtins-riscv64-linux-android10000'
+[4780/4997] Creating directories for 'builtins-i686-linux-android21'
+[4781/4997] Creating directories for 'builtins-i386-unknown-linux-gnu'
+[4782/4997] Creating directories for 'builtins-aarch64-unknown-fuchsia'
+[4783/4997] Creating directories for 'builtins-x86_64-unknown-linux-gnu'
+[4784/4997] Creating directories for 'builtins-aarch64-unknown-linux-gnu'
+[4785/4997] Creating directories for 'builtins-aarch64-linux-android21'
+[4786/4997] Creating directories for 'builtins-armv7-linux-android21'
+[4787/4997] Creating directories for 'builtins-x86_64-linux-android21'
+[4788/4997] Creating directories for 'builtins-x86_64-unknown-fuchsia'
+[4789/4997] No download step for 'builtins-armv7-unknown-linux-gnueabihf'
+[4790/4997] No download step for 'builtins-riscv64-linux-android10000'
+[4791/4997] No download step for 'builtins-i686-linux-android21'
+[4792/4997] No download step for 'builtins-i386-unknown-linux-gnu'
+[4793/4997] No download step for 'builtins-aarch64-unknown-fuchsia'
+[4794/4997] No download step for 'builtins-x86_64-unknown-linux-gnu'
+[4795/4997] No download step for 'builtins-aarch64-unknown-linux-gnu'
+[4796/4997] No download step for 'builtins-aarch64-linux-android21'
+[4797/4997] No download step for 'builtins-armv7-linux-android21'
+[4798/4997] No download step for 'builtins-x86_64-unknown-fuchsia'
+[4799/4997] No download step for 'builtins-x86_64-linux-android21'
+[4800/4997] No update step for 'builtins-armv7-unknown-linux-gnueabihf'
+[4801/4997] No update step for 'builtins-riscv64-linux-android10000'
+[4802/4997] No update step for 'builtins-i686-linux-android21'
+[4803/4997] No update step for 'builtins-i386-unknown-linux-gnu'
+[4804/4997] No update step for 'builtins-aarch64-unknown-fuchsia'
+[4805/4997] No update step for 'builtins-x86_64-unknown-linux-gnu'
+[4806/4997] No update step for 'builtins-aarch64-unknown-linux-gnu'
+[4807/4997] No update step for 'builtins-aarch64-linux-android21'
+[4808/4997] No update step for 'builtins-armv7-linux-android21'
+[4809/4997] No update step for 'builtins-x86_64-unknown-fuchsia'
+[4810/4997] No update step for 'builtins-x86_64-linux-android21'
+[4811/4997] No patch step for 'builtins-armv7-unknown-linux-gnueabihf'
+[4811/4997] Performing configure step for 'builtins-armv7-unknown-linux-gnueabihf'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-armv7-unknown-linux-gnueabihf-bins
+......
+[4823/4997] Performing configure step for 'builtins-armv7-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-armv7-linux-android21-bins
+......
+[4825/4997] Performing configure step for 'builtins-i686-linux-android21'
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-i686-linux-android21-bins
+[4826/4997] Performing configure step for 'builtins-x86_64-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-x86_64-linux-android21-bins
+......
+[4828/4997] Performing build step for 'builtins-armv7-linux-android21'
+......
+[4829/4997] Performing build step for 'builtins-x86_64-linux-android21'
+......
+[4830/4997] Performing configure step for 'builtins-i386-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-i386-unknown-linux-gnu-bins
+......
+[4832/4997] No install step for 'builtins-x86_64-linux-android21'
+[4833/4997] Performing build step for 'builtins-i386-unknown-linux-gnu'
+......
+[4834/4997] Completed 'builtins-x86_64-linux-android21'
+[4835/4997] Performing configure step for 'builtins-x86_64-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-x86_64-unknown-linux-gnu-bins
+[4836/4997] No install step for 'builtins-i386-unknown-linux-gnu'
+[4837/4997] Performing build step for 'builtins-x86_64-unknown-linux-gnu'
+......
+[4838/4997] Completed 'builtins-i386-unknown-linux-gnu'
+[4839/4997] Performing build step for 'builtins-armv7-unknown-linux-gnueabihf'
+......
+[4840/4997] No install step for 'builtins-x86_64-unknown-linux-gnu'
+[4841/4997] No install step for 'builtins-armv7-unknown-linux-gnueabihf'
+[4842/4997] Performing configure step for 'builtins-aarch64-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-aarch64-unknown-linux-gnu-bins
+......
+[4846/4997] Performing configure step for 'builtins-aarch64-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-aarch64-linux-android21-bins
+[4847/4997] Performing build step for 'builtins-aarch64-unknown-linux-gnu'
+......
+[4848/4997] Performing build step for 'builtins-aarch64-linux-android21'
+......
+[4849/4997] No install step for 'builtins-aarch64-unknown-linux-gnu'
+[4850/4997] No install step for 'builtins-aarch64-linux-android21'
+[4851/4997] No install step for 'builtins-armv7-linux-android21'
+[4852/4997] Completed 'builtins-aarch64-unknown-linux-gnu'
+[4853/4997] Performing build step for 'builtins-i686-linux-android21'
+......
+[4855/4997] Completed 'builtins-armv7-linux-android21'
+[4856/4997] Performing configure step for 'builtins-riscv64-linux-android10000'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-riscv64-linux-android10000-bins
+[4857/4997] No install step for 'builtins-i686-linux-android21'
+[4858/4997] Performing build step for 'builtins-riscv64-linux-android10000'
+......
+[4859/4997] Completed 'builtins-i686-linux-android21'
+[4860/4997] Performing configure step for 'builtins-aarch64-unknown-fuchsia'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-aarch64-unknown-fuchsia-bins
+......
+[4862/4997] No install step for 'builtins-riscv64-linux-android10000'
+[4863/4997] Performing build step for 'builtins-aarch64-unknown-fuchsia'
+......
+[4864/4997] Completed 'builtins-riscv64-linux-android10000'
+[4865/4997] Performing configure step for 'builtins-x86_64-unknown-fuchsia'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/builtins-x86_64-unknown-fuchsia-bins
+[4866/4997] No install step for 'builtins-aarch64-unknown-fuchsia'
+[4867/4997] Performing build step for 'builtins-x86_64-unknown-fuchsia'
+......
+[4871/4997] No install step for 'builtins-x86_64-unknown-fuchsia'
+[4873/4997] Completed 'builtins-x86_64-unknown-fuchsia'
+[4874/4997] Clobbering bootstrap build and stamp directories
+[4875/4997] Clobbering bootstrap build and stamp directories
+[4876/4997] Clobbering bootstrap build and stamp directories
+[4877/4997] Clobbering bootstrap build and stamp directories
+[4878/4997] Clobbering bootstrap build and stamp directories
+[4879/4997] Clobbering bootstrap build and stamp directories
+[4880/4997] Clobbering bootstrap build and stamp directories
+[4881/4997] Clobbering bootstrap build and stamp directories
+[4882/4997] Clobbering bootstrap build and stamp directories
+[4883/4997] Clobbering bootstrap build and stamp directories
+[4884/4997] Clobbering bootstrap build and stamp directories
+[4885/4997] Creating directories for 'runtimes-aarch64-unknown-fuchsia'
+[4886/4997] Creating directories for 'runtimes-armv7-linux-android21'
+[4887/4997] Creating directories for 'runtimes-i386-unknown-linux-gnu'
+[4888/4997] Creating directories for 'runtimes-x86_64-unknown-linux-gnu'
+[4889/4997] Creating directories for 'runtimes-armv7-unknown-linux-gnueabihf'
+[4890/4997] Creating directories for 'runtimes-i686-linux-android21'
+[4891/4997] Creating directories for 'runtimes-aarch64-linux-android21'
+[4892/4997] Creating directories for 'runtimes-aarch64-unknown-linux-gnu'
+[4893/4997] Creating directories for 'runtimes-x86_64-linux-android21'
+[4894/4997] Creating directories for 'runtimes-riscv64-linux-android10000'
+[4895/4997] Creating directories for 'runtimes-x86_64-unknown-fuchsia'
+[4896/4997] No download step for 'runtimes-aarch64-unknown-fuchsia'
+[4897/4997] No download step for 'runtimes-armv7-linux-android21'
+[4898/4997] No download step for 'runtimes-i386-unknown-linux-gnu'
+[4899/4997] No download step for 'runtimes-x86_64-unknown-linux-gnu'
+[4900/4997] No download step for 'runtimes-armv7-unknown-linux-gnueabihf'
+[4901/4997] No download step for 'runtimes-i686-linux-android21'
+[4902/4997] No download step for 'runtimes-aarch64-linux-android21'
+[4903/4997] No download step for 'runtimes-aarch64-unknown-linux-gnu'
+[4904/4997] No download step for 'runtimes-x86_64-linux-android21'
+[4905/4997] No download step for 'runtimes-riscv64-linux-android10000'
+[4906/4997] No download step for 'runtimes-x86_64-unknown-fuchsia'
+[4907/4997] No update step for 'runtimes-aarch64-unknown-fuchsia'
+[4908/4997] No update step for 'runtimes-armv7-linux-android21'
+[4909/4997] No update step for 'runtimes-i386-unknown-linux-gnu'
+[4910/4997] No update step for 'runtimes-x86_64-unknown-linux-gnu'
+[4911/4997] No update step for 'runtimes-i686-linux-android21'
+[4912/4997] No update step for 'runtimes-armv7-unknown-linux-gnueabihf'
+[4913/4997] No update step for 'runtimes-aarch64-linux-android21'
+[4914/4997] No update step for 'runtimes-aarch64-unknown-linux-gnu'
+[4915/4997] No update step for 'runtimes-x86_64-linux-android21'
+[4916/4997] No update step for 'runtimes-riscv64-linux-android10000'
+[4917/4997] No update step for 'runtimes-x86_64-unknown-fuchsia'
+[4918/4997] No patch step for 'runtimes-aarch64-unknown-fuchsia'
+[4918/4997] Performing configure step for 'runtimes-aarch64-unknown-fuchsia'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-aarch64-unknown-fuchsia-bins
+......
+[4935/4997] Performing configure step for 'runtimes-aarch64-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-aarch64-linux-android21-bins
+......
+[4941/4997] Performing configure step for 'runtimes-i386-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-i386-unknown-linux-gnu-bins
+......
+[4944/4997] Performing build step for 'runtimes-aarch64-linux-android21'
+......
+[4947/4997] Performing configure step for 'runtimes-aarch64-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-aarch64-unknown-linux-gnu-bins
+......
+[4957/4997] Performing configure step for 'runtimes-armv7-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-armv7-linux-android21-bins
+[4958/4997] Performing configure step for 'runtimes-i686-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-i686-linux-android21-bins
+......
+[4960/4997] Performing build step for 'runtimes-armv7-linux-android21'
+......
+[4961/4997] Performing build step for 'runtimes-i686-linux-android21'
+......
+[4962/4997] No install step for 'runtimes-armv7-linux-android21'
+[4963/4997] No install step for 'runtimes-i686-linux-android21'
+[4964/4997] Performing configure step for 'runtimes-armv7-unknown-linux-gnueabihf'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-armv7-unknown-linux-gnueabihf-bins
+[4966/4997] Completed 'runtimes-i686-linux-android21'
+[4967/4997] Performing build step for 'runtimes-i386-unknown-linux-gnu'
+......
+[4968/4997] Performing build step for 'runtimes-armv7-unknown-linux-gnueabihf'
+......
+[4969/4997] No install step for 'runtimes-i386-unknown-linux-gnu'
+[4970/4997] No install step for 'runtimes-armv7-unknown-linux-gnueabihf'
+[4971/4997] Performing configure step for 'runtimes-x86_64-unknown-linux-gnu'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-x86_64-unknown-linux-gnu-bins
+[4973/4997] Completed 'runtimes-armv7-unknown-linux-gnueabihf'
+[4974/4997] Performing build step for 'runtimes-aarch64-unknown-fuchsia'
+ninja: no work to do.
+[4975/4997] Performing build step for 'runtimes-x86_64-unknown-linux-gnu'
+......
+[4976/4997] Performing build step for 'runtimes-aarch64-unknown-linux-gnu'
+......
+[4977/4997] No install step for 'runtimes-x86_64-unknown-linux-gnu'
+[4978/4997] No install step for 'runtimes-aarch64-unknown-linux-gnu'
+[4979/4997] No install step for 'runtimes-aarch64-linux-android21'
+[4980/4997] Completed 'runtimes-x86_64-unknown-linux-gnu'
+[4981/4997] Performing configure step for 'runtimes-x86_64-linux-android21'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-x86_64-linux-android21-bins
+[4983/4997] Completed 'runtimes-aarch64-linux-android21'
+[4984/4997] Performing configure step for 'runtimes-riscv64-linux-android10000'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-riscv64-linux-android10000-bins
+[4985/4997] Performing build step for 'runtimes-x86_64-linux-android21'
+......
+[4986/4997] Performing build step for 'runtimes-riscv64-linux-android10000'
+......
+[4987/4997] No install step for 'runtimes-x86_64-linux-android21'
+[4988/4997] No install step for 'runtimes-riscv64-linux-android10000'
+[4989/4997] No install step for 'runtimes-aarch64-unknown-fuchsia'
+[4990/4997] Completed 'runtimes-x86_64-linux-android21'
+[4991/4997] Performing configure step for 'runtimes-x86_64-unknown-fuchsia'
+......
+-- Build files have been written to: /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts/runtimes/runtimes-x86_64-unknown-fuchsia-bins
+[4993/4997] Completed 'runtimes-aarch64-unknown-fuchsia'
+[4994/4997] Performing build step for 'runtimes-x86_64-unknown-fuchsia'
+......
+[4995/4997] No install step for 'runtimes-x86_64-unknown-fuchsia'
+[4997/4997] Completed 'runtimes-x86_64-unknown-fuchsia'
+Running ninja cr-install
+......
+Running ninja -C /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts cr-check-all
+......
+Running ninja -C /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build/Release+Asserts check-all
+......
+Clang build was successful.

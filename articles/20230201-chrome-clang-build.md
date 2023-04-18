@@ -208,7 +208,7 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 - **"FINAL CLANG"**: 这是我们最终生成的 clang。构建结果在 `third_party/llvm-build/Release+Asserts/` 中。`package.py` 脚本打包的也是针对这个 "FINAL CLANG"。
 
 
-重点分析其 `main()` 函数。对应的 logfile 可以见 [这里][9]。
+重点分析其 `main()` 函数。对应的完整 buildlog file 可以见 [这里][9]，但这个完整的 buildlog file 太长了，我 strip 了一个 [slim 版本][10]，保留了关键的步骤，可以看看。
 
 ```python
 def main():
@@ -591,3 +591,4 @@ expected_stamp = ','.join([PACKAGE_VERSION] + target_os)
 [7]:https://reviews.llvm.org/D32816
 [8]:https://llvm.org/devmtg/2017-10/slides/Hosek-Compiling%20cross-toolchains%20with%20CMake%20and%20runtimes%20build.pdf
 [9]:./code/20230201-chrome-clang-build/clang-llvmorg-16-init-8697-g60809cd2-1-buildlog.txt
+[10]:./code/20230201-chrome-clang-build/clang-llvmorg-16-init-8697-g60809cd2-1-buildlog-slim.txt
