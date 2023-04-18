@@ -203,12 +203,12 @@ Chromium 构建 Clang 的脚本是用 python 写的，主要有以下三个比�
 这里涉及几个概念先提一下，有个大概印象，下面还会详细描述：
 
 - **"PINNED CLANG"**: 一个 chrome team 预先做好的 clang，用来构建 "BOOTSTRAP" Clang。我们也可以通过 `--gcc-toolchain` 指定使用 gcc。总而言之，为隔绝不同用户 host 的影响，我们不会使用 host 上自带的 clang/gcc。
-- **"BOOTSTRAP CLANG"**: 最终生成的 clang 这里称之为 "FINAL CLANG"，整个构建的过程可以分为两大步，先用 "PINNED CLANG" 做一个基本的 "BOOTSTRAP CLANG"，这个 clang 比较简单，譬如不会涉及 runtime libraries 的制作等。然后再用 "BOOTSTRAP CLANG" 制作 "FINAL CLANG"。
+- **"BOOTSTRAP CLANG"**: 整个构建的过程可以分为两大步，先用 "PINNED CLANG" 做一个基本的 "BOOTSTRAP CLANG"，这个 clang 比较简单，譬如不会涉及 runtime libraries 的制作等。然后再用 "BOOTSTRAP CLANG" 制作最终的 clang，称之为 "FINAL CLANG"。
 - **"INSTRUMENTED CLANG"**: 如果命令行中指定了 `--pgo`，会在构建 "FINAL CLANG" 之前先用 "BOOTSTRAP CLANG" 构建一个所谓的 "INSTRUMENTED CLANG"，这个 "INSTRUMENTED CLANG" 完全是为了 PGO 的 training 所使用。
 - **"FINAL CLANG"**: 这是我们最终生成的 clang。构建结果在 `third_party/llvm-build/Release+Asserts/` 中。`package.py` 脚本打包的也是针对这个 "FINAL CLANG"。
 
 
-重点分析其 `main()` 函数。
+重点分析其 `main()` 函数。对应的 logfile 可以见 [这里][9]。
 
 ```python
 def main():
@@ -219,10 +219,14 @@ def main():
   ### 其中比较重要的动作包括:
   ### 如果没有指定 `--skip-checkout`，默认情况下会 clone llvm 的源码到 LLVM_DIR
   ### 并 checkout 到特定的版本，默认为 CLANG_REVISION，以上动作可以见 CheckoutLLVM 这个函数
+  ### 中间会打印 "Checking out LLVM monorepo ......"
+  ......
   ### 在这个阶段的最后会打印 "Locally building clang <PACKAGE_VERSION>"
   ### 并创建一个空的 STAMP_FILE，默认指向 src/third_party/llvm-build/Release+Asserts/cr_build_revision
   ### 并创建一个空的 FORCE_HEAD_REVISION_FILE，默认指向 src/third_party/llvm-build/force_head_revision
-  ......
+  print('Locally building clang %s...' % PACKAGE_VERSION)
+  WriteStampFile('', STAMP_FILE)
+  WriteStampFile('', FORCE_HEAD_REVISION_FILE)
 
   ### 下载一个 cmake, from
   ### https://commondatastorage.googleapis.com/chromium-browser-clang/tools/cmake-3.23.0-linux-x86_64.tar.gz
@@ -250,13 +254,20 @@ def main():
   ### - ldflags
   ### - targets = 'AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86'
   ###   这里是 chromium 支持的 tareget platform 的 ARCH。
-  ### - 如果采用 "Pinned Clang"，还会下载一个 prebuilt 的 gcc-10.2.0-bionic，主要是会用
-  ###   到其中的 gcc 的 libstdc++，具体谁会用到，TBD
+  base_cmake_args = [
+  ......
+
+  ### 根据命令行选项等配置继续对 base_cmake_args 进行定制
+  ### - 设置第一步构建 bootstrap clang 所用的工具链 cc/cxx
+  ###   - 可以是直接采用 host 自带的 gcc/clang。具体看调用 build.py 是否设置了
+  ###     --host-cc and --host-cxx 
+  ###   - 也可以使用 "Pinned Clang"，如果 build machine 是 linux，还会下载一个 
+  ###     prebuilt 的 gcc-10.2.0-bionic，主要是会用到其中的 gcc 的 libstdc++，具体谁会用到，TBD
   ### - 如果当前构建系统是 linux，则下载构建中需要的 sysroot，目前支持四个 amd64/i386/arm/arm64。
   ###   我理解目前能实际跑 clang 的 target 平台也就 amd64 和 arm64，i386 和 arm 的用处 TBD
   ###   所以下载 sysroot 后会设置 CMAKE_SYSROOT，默认采用 amd64
-  ### - 其他，譬如 LibXml2 ......
-  base_cmake_args = [
+  ### - 提前构建并安装 LibXml2 的静态库（BuildLibXml2()），具体原因见代码注释
+  ###   会安装到 <SRC>/third_party/llvm-build-tools/libxml2-v2.9.12/build/install
   ......
 
   ### bootstrap 构建
@@ -268,56 +279,9 @@ def main():
   ### BOOTSTRAP Clang 的 cmake configuration 会重新设置，在 base_cmake_args 上进行
   ### 修改，保存在 bootstrap_args 中，注意后加的配置选项如果和 base_cmake_args 重名的会
   ### 覆盖原有定义而不是追加
-  ### 直接运行 package.py 得到的 log 显示 bootstrap 的 cmake 配置如下：
-  ### cmake -GNinja
-  ### -DCMAKE_BUILD_TYPE=Release
-  ### -DLLVM_ENABLE_ASSERTIONS=OFF
-  ### '-DLLVM_ENABLE_PROJECTS=clang;lld;clang-tools-extra'
-  ### -DLLVM_ENABLE_RUNTIMES=compiler-rt
-  ### '-DLLVM_TARGETS_TO_BUILD=AArch64;ARM;Mips;PowerPC;RISCV;SystemZ;WebAssembly;X86'
-  ### -DLLVM_ENABLE_PIC=ON
-  ### -DLLVM_ENABLE_UNWIND_TABLES=OFF
-  ### -DLLVM_ENABLE_TERMINFO=OFF
-  ### -DLLVM_ENABLE_Z3_SOLVER=OFF
-  ### -DCLANG_PLUGIN_SUPPORT=OFF
-  ### -DCLANG_ENABLE_STATIC_ANALYZER=OFF
-  ### -DCLANG_ENABLE_ARCMT=OFF
-  ### '-DBUG_REPORT_URL=https://crbug.com and run tools/clang/scripts/process_crashreports.py (only works inside Google) which will upload a report'
-  ### -DLLVM_INCLUDE_GO_TESTS=OFF
-  ### -DLLVM_ENABLE_DIA_SDK=OFF
-  ### -DLLVM_ENABLE_LLD=ON
-  ### -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
-  ### -DLLVM_ENABLE_CURL=OFF
-  ### -DLIBCLANG_BUILD_STATIC=ON
-  ### -DLLVM_STATIC_LINK_CXX_STDLIB=ON
-  ### -DCMAKE_SYSROOT=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/debian_bullseye_amd64_sysroot
-  ### -DLLVM_ENABLE_LIBXML2=FORCE_ON
-  ### -DLIBXML2_INCLUDE_DIR=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/include/libxml2
-  ### -DLIBXML2_LIBRARIES=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/libxml2-v2.9.12/build/install/lib/libxml2.a
-  ### -DLLVM_TARGETS_TO_BUILD=X86
-  ### '-DLLVM_ENABLE_PROJECTS=clang;lld'
-  ### -DLLVM_ENABLE_RUNTIMES=compiler-rt
-  ### -DCMAKE_INSTALL_PREFIX=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install
-  ### '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
-  ### '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
-  ### -DCMAKE_EXE_LINKER_FLAGS=
-  ### -DCMAKE_SHARED_LINKER_FLAGS=
-  ### -DCMAKE_MODULE_LINKER_FLAGS=
-  ### -DLLVM_ENABLE_ASSERTIONS=ON
-  ### -DCOMPILER_RT_BUILD_CRT=ON
-  ### -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
-  ### -DCOMPILER_RT_BUILD_MEMPROF=OFF
-  ### -DCOMPILER_RT_BUILD_ORC=OFF
-  ### -DCOMPILER_RT_BUILD_PROFILE=ON
-  ### -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-  ### -DCOMPILER_RT_BUILD_XRAY=OFF
-  ### '-DCOMPILER_RT_SANITIZERS_TO_BUILD=asan;dfsan;msan;hwasan;tsan;cfi'
-  ### -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON
-  ### -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang
-  ### -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-build-tools/pinned-clang/bin/clang++
-  ### /aosp/wangchen/dev-chrome/chromium/src/third_party/llvm/llvm
-  ### 所以我们会发现譬如 BOOTSTRAP Clang 只会针对 x86 一个 tareget，enabled project 也
-  ### 只有 clang 和 lld；runtime 会构建，但只会生成 crt/builtin/profile 几个有限的。
+  ### 参考 log 可以获取 bootstrap 的 cmake 配置细节。
+  ### 我们会发现譬如 BOOTSTRAP Clang 只会针对 x86 一个 tareget，enabled project 也
+  ### 只有 "clang;lld;clang-tools-extra" 等等。
   ### 注意构建成功后会修改 cc 和 cxx 为 LLVM_BOOTSTRAP_INSTALL_DIR 下的 clang/clang++ 
   ### 这就是为第二阶段做准备了
   if args.bootstrap:
@@ -337,26 +301,24 @@ def main():
   ### 这个 INSTRUMENTED Clang 完全是为了 PGO 的 training 所使用，还不是最终的 FINAL Clang
   ### INSTRUMENTED Clang 的 build 目录在 LLVM_INSTRUMENTED_DIR
   ### INSTRUMENTED Clang 不涉及 install
-  ### 直接运行 package.py 得到的 log 显示针对 INSTRUMENTED Clang 的 cmake 配置如下：
-  ### 在 base_cmake_args 的基础上覆盖或者追加如下配置
-  ### -DLLVM_ENABLE_PROJECTS=clang
-  ### '-DCMAKE_C_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
-  ### '-DCMAKE_CXX_FLAGS=-DSANITIZER_OVERRIDE_INTERCEPTORS -I/aosp/wangchen/dev-chrome/chromium/src/tools/clang/scripts/sanitizers -DLIBXML_STATIC'
-  ### -DCMAKE_EXE_LINKER_FLAGS=
-  ### -DCMAKE_SHARED_LINKER_FLAGS=
-  ### -DCMAKE_MODULE_LINKER_FLAGS=
-  ### -DLLVM_BUILD_INSTRUMENTED=IR
-  ### -DCMAKE_C_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang
-  ### -DCMAKE_CXX_COMPILER=/aosp/wangchen/dev-chrome/chromium/src/third_party/llvm-bootstrap-install/bin/clang++
+  ### 参考 log 可以获取 INSTRUMENTED Clang 的 cmake 配置细节。
+  ### 在 base_cmake_args 的基础上覆盖或者追加了一些配置
   ### 这些配置选项中最关键的就是 DLLVM_BUILD_INSTRUMENTED，这个指定了本次编译的特殊处理，
   ### 编译过程和结果只会构建 X86 的 clang，不会有 builtin 和 runtime
   if args.pgo:
     print('Building instrumented compiler')
     ......
+    RunCommand(['cmake'] + instrument_args + [os.path.join(LLVM_DIR, 'llvm')],
+               msvc_arch='x64')
+    RunCommand(['ninja', 'clang'], msvc_arch='x64')
     print('Instrumented compiler built.')
 
     ### 执行 train，生成的结果就是 LLVM_PROFDATA_FILE，
     ### 该文件会在构建 FINAL clang 时作为 `-DLLVM_PROFDATA_FILE=` 的值
+    ......
+    RunCommand(train_cmd, msvc_arch='x64')
+    ......
+    RunCommand([profdata, 'merge', ......)
     print('Profile generated.')
 
   ### 一些和 deployment 有关的操作 TBD
@@ -628,3 +590,4 @@ expected_stamp = ','.join([PACKAGE_VERSION] + target_os)
 [6]:https://reviews.llvm.org/D26652
 [7]:https://reviews.llvm.org/D32816
 [8]:https://llvm.org/devmtg/2017-10/slides/Hosek-Compiling%20cross-toolchains%20with%20CMake%20and%20runtimes%20build.pdf
+[9]:./code/20230201-chrome-clang-build/clang-llvmorg-16-init-8697-g60809cd2-1-buildlog.txt
