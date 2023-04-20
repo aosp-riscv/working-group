@@ -51,9 +51,9 @@
   c4cdb0bc3b5a patch to enable riscv64 for android
   ```
 
-- chrome 109 的仓库也要做一些修改
+- 【3】chrome 109 的仓库也要做一些修改
   
-  基于【1】和【2】可以做出 clang 15，但在编译 chrome 109 时还要对 109 做些小修改。
+  基于【1】和【2】可以做出 clang 15，但在编译用这个 clang15 构建 chrome 109 时还要对 chrome 109 做些小修改。
   
   基于当时最新的 aosp-riscv/riscv64_109.0.5414.87_dev，修改分支在 https://github.com/unicornx/chromium/tree/test-clang-15
   
