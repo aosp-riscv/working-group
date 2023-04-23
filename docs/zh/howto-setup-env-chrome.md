@@ -80,43 +80,15 @@ git checkout riscv64_109.0.5414.87_dev
 
 此外，构建 Chrome 的过程中依赖于 Android NDK，因为目前 Google 还没有发布支持 riscv64 的 NDK，所以除了打以上补丁，我们还需要采用一个自己临时制作的 NDK 来替换它。
 
-当前阶段，我们提供了两套 **临时** 的 NDK：
+NDK 的仓库位置在: <https://github.com/aosp-riscv/toolchain-prebuilts-ndk-r23>: 基于 <https://github.com/riscv-android-src/toolchain-prebuilts-ndk-r23> 修改后的版本，如果希望在 aosp12 for riscv64 的开发板上运行可以选用这个 NDK。
 
-- **"版本 A"**: <https://github.com/aosp-riscv/toolchain-prebuilts-ndk-r23>: 基于 <https://github.com/riscv-android-src/toolchain-prebuilts-ndk-r23> 修改后的版本，如果希望在 aosp12 for riscv64 的开发板上运行可以选用这个 NDK。
-
-  切换方法如下：
-  ```shell
-  cd $WS/chromium/src/third_party
-  git clone git@github.com:aosp-riscv/toolchain-prebuilts-ndk-r23.git
-  mv android_ndk android_ndk.chrome
-  ln -s ./toolchain-prebuilts-ndk-r23/ ./android_ndk
-  ```
-
-- **"版本 B"**: <https://github.com/aosp-riscv/android-ndk-ci>: 基于 Google upstream 的 <https://ci.android.com/builds/branches/aosp-master-ndk/grid> (linux) 版本制作的 ndk，临时测试使用。
-
-  切换方法如下：
-
-  ```shell
-  cd $WS/chromium/src/third_party
-  git clone git@github.com:aosp-riscv/android-ndk-ci.git
-  mv android_ndk android_ndk.chrome
-  ln -s ./android-ndk-ci/ ./android_ndk
-  ```
-  **注意**：针对 "版本 B"，进一步操作之前还需要修改 ndk 中两个符号链接。
-
-  - `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin`
-  - `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib`
-
-  需要将以上两个符号链接指向实际的我们构建用的 llvm/clang 工具链的下的 bin/lib 目录。目前在 android-ndk-ci 仓库中我们没有存放 llvm/clang 工具链的内容，因为有些文件的 size 太大，超出了 github 的容量限制。所以 llvm/clang 工具链我们是单独提供的。当然也可以从源码开始自己制作一份（具体见本文的 “开发 Clang for Chrome” 章节介绍）。
-
-  假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。执行以下命令：
-
-  ```shell
-  rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-  ln -s $MY_CLANG/bin $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
-  rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
-  ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
-  ```
+切换方法如下：
+```shell
+cd $WS/chromium/src/third_party
+git clone git@github.com:aosp-riscv/toolchain-prebuilts-ndk-r23.git
+mv android_ndk android_ndk.chrome
+ln -s ./toolchain-prebuilts-ndk-r23/ ./android_ndk
+```
 
 # 构建 Chrome
 
@@ -165,8 +137,7 @@ make ninja T=trichrome_webview_apk
 
 # 开发 Clang for Chrome
 
-如果要开发 Clang for Chrome。我们目前的集成分支是 `riscv64_109.0.5414.87_dev_clang`。
-构建 Clang for Chrome 时需要注意还要下载一些 fuchia 相关的依赖，具体参考 [《笔记：Clang for Chromium 构建分析》][1] 的 "3. 构建 Clang for Chromium"。
+构建 Clang for Chrome 的开发环境具体参考 [《笔记：Clang for Chromium 构建分析》][1] 的 "3. 构建 Clang for Chromium"。注意这个文档只是描述了如何基于上游的代码构建。如果要构建针对 riscv64 的 android 上的 chrome 所用的 clang，同样需要将 chromium 的仓库切换到集成分支 `riscv64_109.0.5414.87_dev`。同时，如果只是构建 clang，则不需要对其他的仓库（譬如 ffmpeg、v8 等 Apply patches），但需要 Switch Android NDK，因为构建 clang 时，特别是 compiler_rt 时会依赖于 Android NDK。
 
 [1]:../../articles/20230201-chrome-clang-build.md
 [2]:https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/android_build_instructions.md
