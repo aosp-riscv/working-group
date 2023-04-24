@@ -65,6 +65,8 @@
 
 主要修改 T-head 已经提交并且合并完毕。我们可以参与的工作包括优化，以及执行 unit-test 并解决可能的 bug。
 
+- **CLOSED**[#84 [question] why bionic needs to save/restore gp for riscv][84]
+
 - **CLOSED**[#52 security: software shadow call stack support][52]
 
   软件实现 Shadow Call Stack。目前 bionic 中的实现是模仿 AARCH64 的，但后面有可能要切换为采用 gp。
@@ -122,7 +124,7 @@
 
 # Specification 相关
 
-- [#83 Define ptrdiff_t and size_t][83]
+- **CLOSED**[#83 Define ptrdiff_t and size_t][83]
 - [Fix default usage of reserved register][78]
 - [Investigate the status of SLP vectorizer][60]
 - [security: enable software CFI][45]
@@ -134,6 +136,8 @@
 
 # 其他(未分类)
 
+- [#85 Android Cuttlefish fails to boot when I use the --gpu_mode=drm_virgl flag.][85]
+
 - [#70 CTS test to ensure that core features are homogenous][70]
 - **CLOSED**[#65 build: vNDK not packaged for RISC-V builds][65] 已经解决，具体看 comments。
 
@@ -144,6 +148,8 @@
 - [#24 renderscript: go from deprecation to removal][24] 历史代码清理
 - [#10 bazel: microdroid will need bazel support for riscv64][10]
 
+[85]:https://github.com/google/android-riscv64/issues/85
+[84]:https://github.com/google/android-riscv64/issues/84
 [83]:https://github.com/google/android-riscv64/issues/83
 [82]:https://github.com/google/android-riscv64/issues/82
 [81]:https://github.com/google/android-riscv64/issues/81
