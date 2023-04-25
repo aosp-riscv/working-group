@@ -94,27 +94,46 @@
 
 优先级不高，但以前没有做过，而且如何测试是个问题。
 
-- [#66 external/libaom: optimization][66]
-- [#59 frameworks/av: optimization][59]
-- [#49 external/zlib optimization][49]
+- [#66 external/libaom: optimization][66]: 还未被指定，tracked with [gitee issue][I6YKFR]
+- [#59 frameworks/av: optimization][59]: 音频视频处理，aarch64 使用了 NEON，还未被指令
+- [#49 external/zlib optimization][49]: 对于这个库的工作感觉目前是各方面关注的重点，建议重点关注。仔细看 issue 上的讨论。TBD，虽然未被指令，但很多人在关注，压缩相关
 - **CLOSED**[#43 external/lzma: optimization (probably not?)][43]: 无需优化，cancelled
-- [#42 external/XNNPACK: optimization][42]
-- [#41 external/renderscript-intrinsics-replacement-toolkit/: optimization][41]
-- [#40 external/freetype: optimization (?)][40]
-- [#39 external/skia: optimization][39]
-- [#38 external/libyuv: optimization][38]
-- [#37 external/libpng: optimization][37]
-- [#36 external/boringssl: optimization][36]
-- [#35 external/libjpeg-turbo: optimization][35]
-- [#34 external/libmpeg2: optimization][34]
-- [#33 external/libhevc/: optimization][33]
-- [#32 external/libavc/: optimization][32]
-- [#31 external/libopus/: do we need optimization? (probably not?)][31]
+- [#42 external/XNNPACK: optimization][42] 
+  > XNNPACK is a highly optimized library of floating-point neural network inference operators for ARM, WebAssembly, and x86 platforms.
+  
+  有人已经开始跟踪这个工作，可能涉及 Zvediv 扩展的使用。
+- [#41 external/renderscript-intrinsics-replacement-toolkit/: optimization][41] 和 renderscript 有关
+- [#40 external/freetype: optimization (?)][40] 一个用于字体渲染（font render）的库，有一点点和 arm64 特定的配置，所以 riscv64 可能也要做一些相关的改动。有不少和 intel 相关的工作，但是考虑到 riscv64 倾向于参考 arm64，所以还需要看看 Intel 的这部分工作是否 riscv64 也需要？FIXME。又被 rbosetti 认领，但是是否已经解决还需要检查一下。
+- [#39 external/skia: optimization][39] 2D graphic library for drawing Text, Geometries, and Images。看上去已经被 google（from fuchsia） 的人 rbosetti 认领了，T-head 也表示了兴趣，使用 V 扩展优化。
+- [#38 external/libyuv: optimization][38] 
+
+  > The libyuv package provides implementation yuv image conversion and scaling. This library is used by Talk Video and WebRTC.
+
+  有被 google 的人 jaeheon 认领。
+
+- [#37 external/libpng: optimization][37] 有被 google 的人 rbosetti & dragostis 认领。
+- [#36 external/boringssl: optimization][36] 加密算法，riscv 有专门的扩展，并且非常需要在 android 的 abi 中有所体现，可以仔细看看 issue 上的描述 TBD，有被 google 的 rbosetti 认领
+- [#35 external/libjpeg-turbo: optimization][35] 图片相关，有被 google 的 rbosetti 认领
+- [#34 external/libmpeg2: optimization][34] 涉及 V 扩展，未被认领
+- [#33 external/libhevc/: optimization][33] 涉及 V 扩展，有被 google 的 rbosetti 认领
+- [#32 external/libavc/: optimization][32] 涉及 V 扩展，有被 google 的 rbosetti 认领
+- [#31 external/libopus/: do we need optimization? (probably not?)][31] arm64 没有优化，所以需要 check 是否需要为 riscv64 优化，涉及 V 扩展，有被 google 的 rbosetti 认领
 - [#30 external/libopus/][30]
-- [#29 external/flac/: need V optimization][29]
+
+  > Opus is a codec for interactive speech and audio transmission over the Internet.
+
+  还未被认领
+
+- [#29 external/flac/: need V optimization][29] 涉及 V 扩展，有被 google 的 rbosetti 认领
 - [#17 external/libvpx: missing optimized assembler][17]
-- [#13 external/aac: inline assembler (clz, saturating arithmetic)][13]
-- [#2 external/scudo/: optimize CRC32 when we have useful instructions][2]
+
+  https://www.webmproject.org/about/faq/
+  > VP8 and VP9 are highly-efficient video compression technologies (video "codecs") developed by the WebM Project.
+
+  是需要手写汇编优化，有被 google 的 rbosetti 认领
+
+- [#13 external/aac: inline assembler (clz, saturating arithmetic)][13] 是需要手写汇编优化，有被 google 的 rbosetti 认领
+- [#2 external/scudo/: optimize CRC32 when we have useful instructions][2] 可能涉及  Zbr/Zbc, 未指定。
 
 # 支持 Studio
 
@@ -232,3 +251,6 @@
 [3]:https://github.com/google/android-riscv64/issues/3
 [2]:https://github.com/google/android-riscv64/issues/2
 [1]:https://github.com/google/android-riscv64/issues/1
+
+
+[I6YKFR]:https://gitee.com/aosp-riscv/working-group/issues/I6YKFR
