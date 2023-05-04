@@ -9,6 +9,7 @@
 
 - **CLOSED**[#82 clang driver changes that must happen before even an initial NDK][82]: Duplicated with [81][81]
 - [#81 compiler must-haves for RISCV-android][81]
+- **CLOSED**[#78 Fix default usage of reserved register][78]
 - **CLOSED**[#77 [Investigation] Verify if binary is built with SCS reserved register.][77]
 - **CLOSED**[#76 Enable -msave-restore for binary size][76] 
   
@@ -18,7 +19,7 @@
 
 - **CLOSED**[#74 investigate if llvm requires any changes to make LR/SC sequence sequentially consistent][74]: Duplicated with [73][73].
 - [#73 clang compiler should emit atomic sequences that are compatible with hboehm's suggested new instructions][73]
-- [#72 reserve a register in the clang compiler driver's defaults for android [llvm]][72]
+- **CLOSED**[#72 reserve a register in the clang compiler driver's defaults for android [llvm]][72]
 - [#71 once V and Zb* are working in cuttlefish, add them to the clang driver's defaults for android [llvm]][71]
 - [#69 llvm function multi-versioning][69]
 - [#68 Binary analysis of aosp to compare Aarch64 vs RISC-V][68]
@@ -64,6 +65,8 @@
 # bionic
 
 主要修改 T-head 已经提交并且合并完毕。我们可以参与的工作包括优化，以及执行 unit-test 并解决可能的 bug。
+
+- **CLOSED**[#88 [Discussion] one question about "libbionic_tests_headers_posix"][88]
 
 - **CLOSED**[#84 [question] why bionic needs to save/restore gp for riscv][84]
 
@@ -155,18 +158,29 @@
 
 # 其他(未分类)
 
+## Cuttlefish
+- [#86 android cuttlefish infinite reboot when I use -kernel_path and -initramfs_path][86]
 - [#85 Android Cuttlefish fails to boot when I use the --gpu_mode=drm_virgl flag.][85]
+- **CLOSED**[#25 cuttlefish: get riscv64 cuttlefish up and running][25]:已经可以运行 cf slim。还缺 V 和 Zb* 扩展支持，但我觉得如果需要跟踪可以另外开一个 issue track。而且对这些扩展的支持是不是输入底层 QEMU 的事情？
 
+## CTS
+- [#87 add a cts test for RISCV_HWPROBE_MISALIGNED_FAST][87]
 - [#70 CTS test to ensure that core features are homogenous][70]
+
+
+
+## misc
 - **CLOSED**[#65 build: vNDK not packaged for RISC-V builds][65] 已经解决，具体看 comments。
 
   TBD：一些涉及 ld.config.txt 的处理还要看看，这个 topic 没有仔细总结过。
 
 - [#48 simpleperf][48]
-- **CLOSED**[#25 cuttlefish: get riscv64 cuttlefish up and running][25]:已经可以运行 cf slim。还缺 V 和 Zb* 扩展支持，但我觉得如果需要跟踪可以另外开一个 issue track。而且对这些扩展的支持是不是输入底层 QEMU 的事情？
 - [#24 renderscript: go from deprecation to removal][24] 历史代码清理
 - [#10 bazel: microdroid will need bazel support for riscv64][10]
 
+[88]:https://github.com/google/android-riscv64/issues/88
+[87]:https://github.com/google/android-riscv64/issues/87
+[86]:https://github.com/google/android-riscv64/issues/86
 [85]:https://github.com/google/android-riscv64/issues/85
 [84]:https://github.com/google/android-riscv64/issues/84
 [83]:https://github.com/google/android-riscv64/issues/83
