@@ -20,8 +20,6 @@
 
 # 1. 参考：
 
-个人体会：Android 官网上的资料一定要反复仔细看，由于 VNDK 这个概念对初次接触的人不是很好懂，一定要结合实际代码和案例再深入理解。
-
 - 【参考 1】《程序员的自我修养-链接、装载与库》8.2 符号版本
 - 【参考 2】[GNU ld 手册 3.9 VERSION Command](https://sourceware.org/binutils/docs/ld/VERSION.html)
 - 【参考 3】[Symbol Versioning](https://man7.org/conf/lca2006/shared_libraries/slide19a.html)
