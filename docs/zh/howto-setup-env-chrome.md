@@ -12,6 +12,7 @@
 	- [Get the code](#get-the-code)
 	- [Apply the patches](#apply-the-patches)
 	- [Switch Android NDK](#switch-android-ndk)
+		- [备注：另一个专门为 `build_ffmpeg.py` 制作的 NDK](#备注另一个专门为-build_ffmpegpy-制作的-ndk)
 - [构建 Chrome](#构建-chrome)
 - [构建 WebView](#构建-webview)
 - [开发 Clang for Chrome](#开发-clang-for-chrome)
@@ -89,6 +90,38 @@ git clone git@github.com:aosp-riscv/toolchain-prebuilts-ndk-r23.git
 mv android_ndk android_ndk.chrome
 ln -s ./toolchain-prebuilts-ndk-r23/ ./android_ndk
 ```
+
+### 备注：另一个专门为 `build_ffmpeg.py` 制作的 NDK
+
+在移植 chromium 过程中，我们还提供了一个 ndk：<https://github.com/aosp-riscv/android-ndk-ci>: 基于 Google upstream 的 <https://ci.android.com/builds/branches/aosp-master-ndk/grid> (linux) 版本制作的 ndk。目前该 NDK 只用于产生 ffmpeg 的 auto generated files。具体背景参考以下两个 commitments 的 comment：
+- <https://github.com/aosp-riscv/ffmpeg/commit/de7399e94ab2c148e6fd3a4f68b6cbc6354af697>
+- <https://github.com/aosp-riscv/ffmpeg/commit/15e5ff93d073fa7c9e11b1a7b1a46a786e591ad7>
+
+在运行 `build_ffmpeg.py` 脚本文件时记得切换 NDK 如下，同时 **注意在构建 chromium 时还要恢复原来的 NDK**：
+
+```shell
+cd $WS/chromium/src/third_party
+git clone git@github.com:aosp-riscv/android-ndk-ci.git
+mv android_ndk android_ndk.chrome
+ln -s ./android-ndk-ci/ ./android_ndk
+```
+**注意**：进一步操作之前还需要修改该 NDK 中两个符号链接。
+
+- `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin`
+- `$WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib`
+
+需要将以上两个符号链接指向实际的我们构建用的 llvm/clang 工具链的下的 bin/lib 目录。目前在 android-ndk-ci 仓库中我们没有存放 llvm/clang 工具链的内容，因为有些文件的 size 太大，超出了 github 的容量限制。所以 llvm/clang 工具链我们是单独提供的。当然也可以从源码开始自己制作一份（具体见本文的 “开发 Clang for Chrome” 章节介绍）。
+
+假设你使用的工具链(二进制可执行程序 `bin/clang` 所在的目录)是 `$MY_CLANG`。执行以下命令：
+
+```shell
+rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+ln -s $MY_CLANG/bin $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+rm $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+ln -s $MY_CLANG/lib $WS/chromium/src/third_party/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/lib
+```
+
+**注意**：目前为了方便，已经将 auto generated files 也一并提交到 <https://github.com/aosp-riscv/ffmpeg> 仓库中去了，所以本小节的描述仅供开发者在修改了 ffpeg 仓库的 `build_ffmpeg.py` 文件并且需要重新生成 auto generated files 时参考使用。
 
 # 构建 Chrome
 
