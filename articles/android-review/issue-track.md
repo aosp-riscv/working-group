@@ -159,6 +159,8 @@
 # 其他(未分类)
 
 ## Cuttlefish
+
+- **CLOSED**[#89 The executable formar of cvd host package of aosp_cf_riscv64_phone maybe wrong][89]
 - [#86 android cuttlefish infinite reboot when I use -kernel_path and -initramfs_path][86]
 - [#85 Android Cuttlefish fails to boot when I use the --gpu_mode=drm_virgl flag.][85]
 - **CLOSED**[#25 cuttlefish: get riscv64 cuttlefish up and running][25]:已经可以运行 cf slim。还缺 V 和 Zb* 扩展支持，但我觉得如果需要跟踪可以另外开一个 issue track。而且对这些扩展的支持是不是输入底层 QEMU 的事情？
@@ -178,6 +180,7 @@
 - [#24 renderscript: go from deprecation to removal][24] 历史代码清理
 - [#10 bazel: microdroid will need bazel support for riscv64][10]
 
+[89]:https://github.com/google/android-riscv64/issues/89
 [88]:https://github.com/google/android-riscv64/issues/88
 [87]:https://github.com/google/android-riscv64/issues/87
 [86]:https://github.com/google/android-riscv64/issues/86
