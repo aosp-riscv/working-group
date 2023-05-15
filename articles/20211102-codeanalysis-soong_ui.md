@@ -397,7 +397,9 @@ $(call get-product-makefiles,$(_find-android-products-files))
 endef
 ```
 
-`get-all-product-makefiles` 函数会遍历 AOSP 源码树下所有的 AndroidProducts.mk 文件并分析其中的 `PRODUCT_MAKEFILES` 变量和 `COMMON_LUNCH_CHOICES` 变量。AOSP 源码树下的 AndroidProducts.mk 主要分布在两处，一处是 `build/make/target/product/AndroidProducts.mk` 这个文件，还有一处是在 device 目录下，具体的文件路径被搜索后列在 `out/.module_paths/AndroidProducts.mk.list` 中。`build/make/target/product/AndroidProducts.mk` 中存放的是 GSI 的产品定义，device 目录下存放的是普通产品的定义。
+`get-all-product-makefiles` 函数会遍历 AOSP 源码树下所有的 `AndroidProducts.mk` 文件并分析其中的 `PRODUCT_MAKEFILES` 变量和 `COMMON_LUNCH_CHOICES` 变量。
+
+AOSP 源码树下的 `AndroidProducts.mk` 主要分布在两处，一处是 `build/make/target/product/AndroidProducts.mk` 这个文件，还有一处是在 `device` 目录下。`build/make/target/product/AndroidProducts.mk` 中存放的是 GSI 的产品定义，`device` 目录下存放的是普通产品的定义。当我们执行 lunch 命令时，所有的 `device` 目录下的 `AndroidProducts.mk` 会被提前扫描出来，列在 `out/.module_paths/AndroidProducts.mk.list` 中，但注意这里只有 `device` 目录下的， `build` 目录下的会在 mk 文件执行中自动添加，因为我们已经统一定义在 `build/make/target/product/AndroidProducts.mk`。同理 lunch 扫描 `AndroidProducts.mk` 时，会根据 `COMMON_LUNCH_CHOICES` 列出 lunch 菜单的 entry list。
 
 `get-all-product-makefiles` 这个函数在 `product_config.mk` 中被调用如下：
 ```makefile
