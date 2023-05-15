@@ -18,12 +18,12 @@
 <!-- /TOC -->
 
 # 1. 官方的 AOSP 构建环境参考
-- [1] [Requirements][5] 硬件和系统基本要求
-- [2] [Establishing a build environment][1] 软件依赖安装
-- [3] [Source control tools][2] repo/git 仓库管理软件介绍
-- [4] [Downloading the Source][3] 介绍如何下载代码仓库
-- [5] [Building Android][4] 介绍如何构建
-- [6] [Android 镜像使用帮助][6]
+- [Ref 1] [Requirements][5] 硬件和系统基本要求
+- [Ref 2] [Establishing a build environment][1] 软件依赖安装
+- [Ref 3] [Source control tools][2] repo/git 仓库管理软件介绍
+- [Ref 4] [Downloading the Source][3] 介绍如何下载代码仓库
+- [Ref 5] [Building Android][4] 介绍如何构建
+- [Ref 6] [清华大学 Android 镜像使用帮助][6]
 
 注意，Google 官方的 android 网站 URL 前缀凡是 <https://source.android.com/> 的国内大陆无法直接访问，可以替换为 <https://source.android.google.cn/>。
 
@@ -45,7 +45,7 @@ Google 官方推荐 Ubuntu。
 
 # 4. 安装软件依赖
 
-参考 [2]
+参考 [Ref 2]
 
 ```bash
 sudo apt-get install git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig
@@ -59,7 +59,7 @@ sudo apt install python
 
 # 5. 安装 repo
 
-参考 [6]，这里我们采用清华大学开源软件镜像站提供的软件包。
+参考 [Ref 6]，这里我们采用清华大学开源软件镜像站提供的软件包。
 
 下载 repo 工具:
 
@@ -102,9 +102,9 @@ repo 版本需要 2.15 以上， 显示 `(from /home/u/bin/repo)` 说明是手�
 
 # 6. 下载源码
 
-参考 [6]，这里我们采用清华大学开源软件镜像站提供的软件包。
+参考 [Ref 6]，这里我们采用清华大学开源软件镜像站提供的软件包。
 
-由于采用 `repo init` 加 `repo sync` 的方法首次同步需要下载约 190GB 数据，过程中任何网络故障都可能造成同步失败，所以我按照 [6] 上建议的采用初始化包进行初始化。
+由于采用 `repo init` 加 `repo sync` 的方法首次同步需要下载约 190GB 数据，过程中任何网络故障都可能造成同步失败，所以我按照 [Ref 6] 上建议的采用初始化包进行初始化。
 
 使用方法如下:
 
@@ -122,7 +122,7 @@ repo sync
 
 # 7. 构建
 
-参考 [5]。
+参考 [Ref 5]。
 
 
 [1]:https://source.android.com/docs/setup/start/initializing
