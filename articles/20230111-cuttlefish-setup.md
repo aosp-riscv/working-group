@@ -92,6 +92,29 @@ sudo dpkg -i ./cuttlefish-user_*_*64.deb || sudo apt-get install -f
 sudo usermod -aG kvm,cvdnetwork,render $USER
 sudo reboot
 ```
+ **注意：设置 go 代理的问题，升级到较新的 android-cuttlefish 仓库后，在执行debuild 之前设置的 go 代理可能无效，可以参考如下方法解决！** 
+
+上述 debuild 命令用于生成 Debian 发行版及其衍生版的软件包（后缀名 .deb），在 frontend 文件夹中，debuild 会根据`debian/rules`里面的规则（调用 `go build` 指令)，生成最终的 cuttlefish-user*.deb，按照上文提到的方法设置 go 代理，可能遇到如下报错：
+```bash
+github.com/google/uuid@v1.3.0/go.mod: verifying module: github.com/google/uuid@v1.3.0/go.mod: Get "https://sum.golang.org/lookup/github.com/google/uuid@v1.3.0": dial tcp 142.251.42.241:443: i/o timeout
+```
+请把设置代理的命令放到 `frontend/src/goutil`，并且把原来的代理注释掉，goutil 是一个 bash 脚本，作用是为 `go build` 配置一些环境变量，`debian/rules` 会调用它。
+
+```bash
+diff --git a/frontend/src/goutil b/frontend/src/goutil
+index 449ccab..03e7cd8 100755
+--- a/frontend/src/goutil
++++ b/frontend/src/goutil
+@@ -24,7 +24,9 @@ if [[ "$version" > "1.15" ]]; then
+   # Temporary solution until https://github.com/golang/go/issues/28194 is fixed
+   # in order to retry failed fetch requests.
+   # GOPROXY fallback was added in Go 1.15
+-  export GOPROXY="proxy.golang.org|proxy.golang.org|direct"
++  #export GOPROXY="proxy.golang.org|proxy.golang.org|direct"
++  go env -w GO111MODULE=on
++  go env -w GOPROXY=https://goproxy.cn,direct
+ fi
+```
 
 # 6. 下载 CuttleFish 镜像
 
