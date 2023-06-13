@@ -3,6 +3,22 @@
 
 我根据我的理解按照功能模块分了一下类，看看我们可以参与哪些：
 
+<!-- TOC -->
+
+- [LLVM/Clang/Rust：](#llvmclangrust)
+- [内核部分：](#内核部分)
+- [ART](#art)
+- [bionic](#bionic)
+- [库 Optimization](#库-optimization)
+- [支持 Studio](#支持-studio)
+- [Specification 相关](#specification-相关)
+- [其他(未分类)](#其他未分类)
+	- [Cuttlefish](#cuttlefish)
+	- [CTS](#cts)
+	- [misc](#misc)
+
+<!-- /TOC -->
+
 # LLVM/Clang/Rust：
 
 可以用 llvm/toolchain 标签进行过滤。如果要介入需要在 llvm/clang 上有深厚的积累。
@@ -25,7 +41,7 @@
 - [#68 Binary analysis of aosp to compare Aarch64 vs RISC-V][68]
 - [#67 Comparative analysis of compiler statistics between Aarch64 and RISC-V][67]
 - [#64 crash with RISC-V scalable vectorization and kernel address sanitizer #61096][64]
-- [#63 need support '.option arch' directive (https://reviews.llvm.org/D123515) to enable linux 6.3 Zbb optimizations?][63]
+- **CLOSED**[#63 need support '.option arch' directive (https://reviews.llvm.org/D123515) to enable linux 6.3 Zbb optimizations?][63] FIXME 值得再仔细看看，貌似和 zbb 扩展有关。
 - [#62 Enable -msave-restore at -Oz][62]
 - [#61 Fix ABI and mcpu/march for LTO][61]
 - [#58 Fix platform:Android bugs in llvm-project][58]
@@ -45,7 +61,7 @@
 - **CLOSED**[#19 llvm: make sure "[RISCV] Allow mismatched SmallDataLimit and use Min for conflicting values" gets merged][19]:已解决
 - [#18 llvm: missing libunwind support][18]
 - [#16 llvm: prebuilts for hwasan support][16]
-- [#9 clang: check that the global clang drivers riscv64 default flags make sense for Android][9]
+- **CLOSED**[#9 clang: check that the global clang drivers riscv64 default flags make sense for Android][9] FIXME：值得再仔细看看，涉及 android 上的编译选项问题。
 
 # 内核部分：
 - **CLOSED**[#79 kernel: CONFIG_SMP][79]
@@ -120,8 +136,8 @@
 - [#34 external/libmpeg2: optimization][34] 涉及 V 扩展，未被认领
 - [#33 external/libhevc/: optimization][33] 涉及 V 扩展，有被 google 的 rbosetti 认领
 - [#32 external/libavc/: optimization][32] 涉及 V 扩展，有被 google 的 rbosetti 认领
-- [#31 external/libopus/: do we need optimization? (probably not?)][31] arm64 没有优化，所以需要 check 是否需要为 riscv64 优化，涉及 V 扩展，有被 google 的 rbosetti 认领
-- [#30 external/libopus/][30]
+- **CLOSED**[#31 external/libopus/: do we need optimization? (probably not?)][31] arm64 没有优化，所以需要 check 是否需要为 riscv64 优化，涉及 V 扩展，有被 google 的 rbosetti 认领
+- **CLOSED**[#30 external/libopus/][30] duplicated with #31
 
   > Opus is a codec for interactive speech and audio transmission over the Internet.
 
@@ -146,6 +162,8 @@
 
 # Specification 相关
 
+- [#92 Enable v extension][92]
+- [#91 Enable zbb on aosp builds][91]
 - **CLOSED**[#83 Define ptrdiff_t and size_t][83]
 - [Fix default usage of reserved register][78]
 - [Investigate the status of SLP vectorizer][60]
@@ -161,7 +179,10 @@
 ## Cuttlefish
 
 - **CLOSED**[#89 The executable formar of cvd host package of aosp_cf_riscv64_phone maybe wrong][89]
-- [#86 android cuttlefish infinite reboot when I use -kernel_path and -initramfs_path][86]
+- **CLOSED**[#86 android cuttlefish infinite reboot when I use -kernel_path and -initramfs_path][86]
+  
+  通过 https://android-review.googlesource.com/c/kernel/common/+/2618134 解决。
+
 - [#85 Android Cuttlefish fails to boot when I use the --gpu_mode=drm_virgl flag.][85]
 - **CLOSED**[#25 cuttlefish: get riscv64 cuttlefish up and running][25]:已经可以运行 cf slim。还缺 V 和 Zb* 扩展支持，但我觉得如果需要跟踪可以另外开一个 issue track。而且对这些扩展的支持是不是输入底层 QEMU 的事情？
 
@@ -172,14 +193,28 @@
 
 
 ## misc
+
+- [#97 What PMUs would be useful to support in simpleperf][97]
+- [#96 Question about video play][96]
+- [#95 Build simpleperf failed][95]
 - **CLOSED**[#65 build: vNDK not packaged for RISC-V builds][65] 已经解决，具体看 comments。
 
   TBD：一些涉及 ld.config.txt 的处理还要看看，这个 topic 没有仔细总结过。
 
-- [#48 simpleperf][48]
+- [#93 really slow boot time on cuttlefish][93]
+- **CLOSED**[#90 [Question] how to use vncviewer to connect to cuttlefish from Window][90]
+- **CLOSED**[#48 simpleperf][48] 转移到 [95][95]。
 - [#24 renderscript: go from deprecation to removal][24] 历史代码清理
 - [#10 bazel: microdroid will need bazel support for riscv64][10]
 
+ 
+[97]:https://github.com/google/android-riscv64/issues/97
+[96]:https://github.com/google/android-riscv64/issues/96
+[95]:https://github.com/google/android-riscv64/issues/95
+[93]:https://github.com/google/android-riscv64/issues/93
+[92]:https://github.com/google/android-riscv64/issues/92
+[91]:https://github.com/google/android-riscv64/issues/91
+[90]:https://github.com/google/android-riscv64/issues/90
 [89]:https://github.com/google/android-riscv64/issues/89
 [88]:https://github.com/google/android-riscv64/issues/88
 [87]:https://github.com/google/android-riscv64/issues/87
@@ -268,6 +303,5 @@
 [3]:https://github.com/google/android-riscv64/issues/3
 [2]:https://github.com/google/android-riscv64/issues/2
 [1]:https://github.com/google/android-riscv64/issues/1
-
 
 [I6YKFR]:https://gitee.com/aosp-riscv/working-group/issues/I6YKFR
