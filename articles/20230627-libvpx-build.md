@@ -1,4 +1,4 @@
-![](./diagrams/multimedia.png)
+![](./diagrams/lena.jpeg)
 
 文章标题：**工作笔记：libvpx 构建分析**
 
