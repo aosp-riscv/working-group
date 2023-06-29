@@ -56,7 +56,7 @@ $ sudo apt install yasm doxygen
 
 ## 2.1. 下载仓库：
 
-libvpx 的官方仓库地址在 <https://chromium.googlesource.com/webm/libvpx/>。我在 github 上也创建了该仓库的 mirror：<https://github.com/aosp-riscv/libvpx>。
+libvpx 的官方仓库地址在 <https://chromium.googlesource.com/webm/libvpx/>。
 
 假设我们的工作路径是 `$WS`
 
