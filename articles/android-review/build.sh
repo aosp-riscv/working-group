@@ -2,9 +2,9 @@
 # Currently only support running this under the same dir as this script
 
 # Update these vars as per tracking period
-ISSUE_NO="20"
+ISSUE_NO="21"
 # this Thursday ~ next next Friday
-ISSUE_STRING="2023-06-22 ~ 2023-07-07"
+ISSUE_STRING="2023-07-06 ~ 2023-07-21"
 ARGS=($ISSUE_STRING)
 #echo ${ARGS[0]} ${ARGS[1]} ${ARGS[2]}
 
