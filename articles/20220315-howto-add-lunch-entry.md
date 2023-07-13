@@ -9,48 +9,90 @@
 
 <!-- TOC -->
 
-- [1. 如何定义一个普通的产品](#1-如何定义一个普通的产品)
-- [2. lunch 过程中 Android Build System 是如何识别产品的](#2-lunch-过程中-android-build-system-是如何识别产品的)
+- [1. AOSP 中涉及产品定义的基本概念](#1-aosp-中涉及产品定义的基本概念)
+	- [1.1. Build 的 layers](#11-build-的-layers)
+	- [1.2. Build 的 variants](#12-build-的-variants)
+- [2. 定义产品](#2-定义产品)
+	- [2.1. 如何定义一个普通的产品](#21-如何定义一个普通的产品)
+	- [2.2. lunch 过程中 Android Build System 是如何识别产品的](#22-lunch-过程中-android-build-system-是如何识别产品的)
+	- [2.3. 总结](#23-总结)
 - [3. 如何定义一个 GSI 产品](#3-如何定义一个-gsi-产品)
-- [4. 总结：](#4-总结)
-- [5. 附录：产品定义的继承关系](#5-附录产品定义的继承关系)
+	- [3.1. 总结：](#31-总结)
+- [4. 附录：产品定义的继承关系](#4-附录产品定义的继承关系)
 
 <!-- /TOC -->
 
 注：本文内容基于 AOSP 12 (tag: `android-12.0.0_r3`)
 
-AOSP 的 Product 分为两种：
+# 1. AOSP 中涉及产品定义的基本概念
 
-- 普通 Product
-- GSI Product
+## 1.1. Build 的 layers
 
-# 1. 如何定义一个普通的产品
+按照 Google 的定义，整个构建系统中产品定义从上到下分如下三层：
 
-本章节是对以下参考文章的内容整理。
-- [Adding a New Device](https://source.android.google.cn/setup/develop/new-device)
-- [Understanding 64-bit Builds](https://source.android.google.cn/setup/develop/64-bit-builds)
-
-
-所谓普通的 Product，指的是在 AOSP 源码树中 `device` 目录下定义的一些产品，涉及如下概念：
-
-- 首先，我们看一下 `device` 目录下的 **目录分层安排** 如下：`device/<company-name>/<device-name>` , 譬如 `device/google/sunfish/`。但注意这个 "device-name" 级别的目录一般不会只对应一个我们所谓的 Product，而是一个 Product family。在这个目录下我们会看到有一个 `AndroidProducts.mk` 文件，全路径是 `device/google/sunfish/AndroidProducts.mk`。  我们可以看看这个 `device/google/sunfish/AndroidProducts.mk` 文件：
-  ```makefile
-  PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/aosp_sunfish.mk \
-    $(LOCAL_DIR)/aosp_sunfish_hwasan.mk \
-
-  COMMON_LUNCH_CHOICES := \
-    aosp_sunfish-userdebug \
-  ```
-  `PRODUCT_MAKEFILES` 定义了 `device/google/sunfish/` 这个目录下定义的 Proudct 的列表，一个 Product 是 `aosp_sunfish`, 另一个是 `aosp_sunfish_hwasan`。这也是上面我理解 "device-name" 级别的目录对应的是一个 Product family 的概念。
-  
-  这个 `AndroidProducts.mk` 文件是个入口文件，定义了我们在 lunch 的菜单列表中显示的 product list 名称以及每个 product 对应的自己的 **product 配置文件** 的位置。
-
-- **product 配置文件**。PRODUCT 的概念可以理解成是在 DEVICE 更上一层的概念，譬如基于一款 board/device 定义的一款产品，譬如针对不同的国家。地区和运营商的定义。官方文档中的解释是:
+- Product: PRODUCT 的概念可以理解成是在 DEVICE 更上一层的概念，譬如基于一款 board/device 定义的一款产品，譬如针对不同的国家。地区和运营商的定义。官方文档中的解释是:
   
   > Create a product definition makefile to create a specific product based on the device. 
-  
-  例如：`device/google/sunfish/aosp_sunfish.mk`。 
+
+- Device
+- Arch
+
+实际的派生关系实际上是从下往上，譬如 Arch 是 arm64，那么我们基于 arm64 的处理器会定义很多的板子，就是 device（aosp 中也叫 board） 的概念，针对每个 device，配置上的不同形成不同的 product，这里的配置包括很多，譬如卖给不同的国家，卖给不同的运营商等等。
+
+
+## 1.2. Build 的 variants
+
+这是在 product 确定后，从发布角度出发的分类：
+
+- eng：可以认为就是对应的工程机。debug 版本 + adb enabled
+- user：发货版本，release 版本 + adb disabled
+- userdebug：发货版本，但是 debug 版本 + adb enabled
+
+# 2. 定义产品
+
+按照我的理解，AOSP 中的 Product 分为两种：
+
+- 普通 Product 或者叫 vendor defined proudct，这里的 vendor 也包括 google。在 AOSP 源码树中指的是一级目录 `device` 目录下定义的一些产品。大部分的做产品的厂家或者开发板都是在这里定义自己的产品。
+- GSI Product: 对应 Generic System Images 的 product。这里的产品是由 Google 统一维护的，并不对应特定的硬件。
+
+对以上两种方式，本文分别总结。
+
+## 2.1. 如何定义一个普通的产品
+
+本章节是对以下参考文章的内容整理。
+- [Ref 1] [Adding a New Device](https://source.android.com/docs/setup/create/new-device)
+- [Ref 2] [Understanding 64-bit Builds](https://source.android.com/docs/setup/create/64-bit-builds)
+
+注意 [Ref 1] 上举的例子过时了，marlin 相关目录已经被移除，我们现在用 sunfish 为例。
+
+> 注，有关 marlin 和 sunfish，这些都是 google 发布的产品的代号。这里简单记录一下：
+>
+> |发布时间 | 产品 | 代号 | 对应 Android 版本 |
+> |--------|-----|-----|------------------|
+> |2016    | Pixel / Pixel XL         | Sailfish 和 Marlin | Android 7.0 Nougat |
+> |2017/10 | Pixel 2 和 Pixel XL 2    | Walleye 和 Muskie | Android 8.0 Oreo|
+> |2018/10 | Pixel 3 和 Pixel 3 XL    |                   | Android 9 Pie|
+> |2019/5  | Pixel 3a 和 Pixel 3a XL  |                   |              |
+> |2019/10 | Pixel 4 和 Pixel 4 XL    |                   | Android 10   |
+> |2020    | Pixel 4A 和 Pixel 4A XL  | Sunfish           |              |
+> |2021/10 | Pixel 6 / Pixel 6 Pro    |                   | Android 12  |
+> |2022    | Pixel tablet             |tangorpro          | Android 13  |
+
+- 每个 product 都衍生自一款硬件平台，即我们前面所谓的 device（或者 board）。对应一款 device，我们看一下 `device` 目录下的 **目录分层安排** 如下：`device/<company-name>/<device-name>` , 譬如 `device/google/sunfish/`。注意这里的 “sunfish” 不是我们所谓的 Product，而是一个 device，基于这个 device 原型我们会定义一个或者多个 product。这个 device 和基于其定义的 product 一般都会放在 `device/<company-name>/<device-name>` 这个目录下面。
+
+- device 级别的定义文件，即 `device/google/sunfish/device-sunfish.mk`, 这个文件会被 product 级别的文件包含，体现 product 派生于 device 的概念。具体参考 product 级别文件 `device/google/sunfish/aosp_sunfish.mk`:
+
+  ```make
+  $(call inherit-product, device/google/sunfish/device-sunfish.mk)
+  ```
+
+  device 级别的文件除了 `device-sunfish.mk`, 还有 `device/google/sunfish/device.mk` 和 `device/google/sunfish/device-common.mk`, 这些文件是为了考虑复用的结果，大致关系如下：
+  - `device-common.mk` 中 `include device/google/sunfish/device.mk`
+  - `device-sunfish.mk` 中 `include device/google/sunfish/device-common.mk`
+
+  这些 mk 文件中大部分代码都是在定义的 `PRODUCT_*` 的变量。参考 [官方文档定义][5]，AOSP 源码中所有支持的 `PRODUCT_*` 可以参考 `build/make/core/product.mk`。
+
+- device 级别的文件定义好后，我们就可以定义 product 的文件了。譬如 `aosp_sunfish.mk` 和 `aosp_sunfish_hwasan.mk`。 
 
   我们查看这个文件发现其内容定义更侧重软件模块，主要是在描述该产品对应的文件系统 image 中会包含哪些模块和软件包等。
 
@@ -61,12 +103,7 @@ AOSP 的 Product 分为两种：
   > For example, two products that differ only by their radios (CDMA versus GSM) 
   > can inherit from the same base product that doesn't define a radio.`
 
-  产品的 mk 文件中可以定义的 `PRODUCT_*` 的变量。参考 [官方文档定义][5]，AOSP 源码中所有的 `PRODUCT_*` 可以参考 `build/make/core/product.mk`。 特别注意一个系统预定义的变量 `PRODUCT_DEVICE`。
-  
-  > PRODUCT_DEVICE：Name of the industrial design. This is also the board name, 
-  > and the build system uses it to locate BoardConfig.mk.`。
-
-  我们来简单看看 `device/google/sunfish/aosp_sunfish.mk`，注意其中定义的 `PRODUCT_DEVICE := sunfish`
+  我们来简单看看 `device/google/sunfish/aosp_sunfish.mk`
   
   ```makefile
   #
@@ -83,6 +120,11 @@ AOSP 的 Product 分为两种：
   PRODUCT_DEVICE := sunfish
   PRODUCT_MODEL := AOSP on sunfish
   ```
+
+  特别注意一个系统预定义的变量 `PRODUCT_DEVICE`。
+  
+  > PRODUCT_DEVICE：Name of the industrial design. This is also the board name, 
+  > and the build system uses it to locate BoardConfig.mk.`。
 
   因为每个 product 的定义内容比较多，不是一个 `aosp_sunfish.mk` 能说清楚，所以 `PRODUCT_DEVICE` 这个变量告诉我们需要到一个叫做 `sunfish` 的目录中去找所有和 `aosp_sunfish` 相关的配置文件。而完整的路径则是通过将 `device/google/sunfish/AndroidProducts.mk` 出现的 `$(LOCAL_DIR)` 和 `PRODUCT_DEVICE` 的值进行拼接而成，即 `$(LOCAL_DIR)/sunfish`。我们可以称该目录为 **"product 配置目录"**。
 
@@ -104,16 +146,20 @@ AOSP 的 Product 分为两种：
 
   感兴趣的可以去看看 `BoardConfig-common.mk` 这个文件。
 
-
-- 除了 **"product 目录"** 下的 `BoardConfig.mk` 外，还有一些 DEVICE 级别的配置文件（`device.mk`），用来声明设备级别的信息。譬如 `device/google/sunfish/device-sunfish.mk`。这些文件并不是放在各个 **"product 目录"** 下，我理解是整个 product family 公用的配置信息而已，我这里先不展开，以后如果发现比较重要，或者的确是我理解上有偏差再补充。这种文件的排放似乎也很随意，只要能找到即可，在 `aosp_sunfish` 这个 product 例子中，就是直接在 `device/google/sunfish/aosp_sunfish.mk` 中继承引用了。
-  
+- 所有的 product 文件都定义在一个叫做 `AndroidProducts.mk` 文件中，每个 `device/<company-name>/<device-name>` 下都有一个 `AndroidProducts.mk`，譬如 `device/google/sunfish/AndroidProducts.mk`。我们可以看看这个 `device/google/sunfish/AndroidProducts.mk` 文件：
   ```makefile
-  ......
-  $(call inherit-product, device/google/sunfish/device-sunfish.mk)
-  ......
-  ```
+  PRODUCT_MAKEFILES := \
+    $(LOCAL_DIR)/aosp_sunfish.mk \
+    $(LOCAL_DIR)/aosp_sunfish_hwasan.mk \
 
-# 2. lunch 过程中 Android Build System 是如何识别产品的
+  COMMON_LUNCH_CHOICES := \
+    aosp_sunfish-userdebug \
+  ```
+  `PRODUCT_MAKEFILES` 定义了 `device/google/sunfish/` 这个目录下定义的 Proudct 的列表，一个 Product 是 `aosp_sunfish`, 另一个是 `aosp_sunfish_hwasan`。这也是上面我理解 "device-name" 级别的目录对应的是一个 Product family 的概念。
+  
+  `AndroidProducts.mk` 文件中的 `COMMON_LUNCH_CHOICES` 定义了我们在 lunch 的菜单列表中可以看到的项目名称。至于 AOSP 是如何根据这个 `aosp_sunfish-userdebug` 找到对应的 product，我们后面会专门介绍。
+
+## 2.2. lunch 过程中 Android Build System 是如何识别产品的
 
 要进一步深刻理解如何为 AOSP 增加一个产品定义，除了上面介绍的概念外，还可以了解一下当我们输入 lunch 命令后，AOSP 是如何根据我们指定的 product-variant 找到 product 的相关配置文件的流程入手。理解了这个流程，再结合上面对此过程中涉及的文件的内容以及关键的变量定义，基本上就可以明白如何为 AOSP 增加一个产品定义了。
 
@@ -152,6 +198,18 @@ AOSP 根据我们指定的 product-variant 找到 product 的相关配置文件�
 形象如下图所示，帮助理解整个过程。
 
 ![](./diagrams/20220315-howto-add-lunch-entry/normal-product.png)
+
+## 2.3. 总结
+
+基于上面的分析，我们可以总结一下，如何在 AOSP 中定义自己的产品。
+
+- 创建一个 `device/<company-name>/<device-name>` 目录，所有的文件都放在下面。
+- 分析并规划一下自己产品或者产品族的 Arch -> Device -> Prodcut 层次关系，如果要在 Device 下继续划分 Prodcut, 则每个 Product 会有一个自己的目录。当比较简单时，Device 和 Product 可以合并为一级，那么就不会再往下划分子目录。
+  每个 Product 子目录下都会有一个 `BoardConfig.mk` 文件。如果只有 Device 没有 Product，则 `BoardConfig.mk` 文件就直接放在 `device/<company-name>/<device-name>` 目录下。
+  FIXME 在有些（不是所有）Product 目录下还会有一个 `AndroidBoard.mk` 文件，貌似这个文件在历史上是用于和内核有关的构建的，参考 [Android device configuration for AOSP](https://stackoverflow.com/questions/11352709/android-device-configuration-for-aosp)
+
+- 在 `device/<company-name>/<device-name>` 目录下创建一个 `AndroidProducts.mk` 文件，文件中定义 `PRODUCT_MAKEFILES`` 和 `COMMON_LUNCH_CHOICES`
+- 在 `device/<company-name>/<device-name>` 目录下创建 prodcut 配置文件和 device 配置文件（可选）。
 
 # 3. 如何定义一个 GSI 产品
 
@@ -228,23 +286,13 @@ OUT_DIR=out
 
 ![](./diagrams/20220315-howto-add-lunch-entry/gsi-product.png)
 
-# 4. 总结：
+## 3.1. 总结：
 
-AOSP 中的产品定义文件是一些名为 `AndroidProducts.mk` 的文件，这些文件分两大类，存放在两个地方：
-- 一类是 GSI 产品，由 Google 统一维护，统一存放在 `build/target/product/AndroidProducts.mk` 中。
-- 一类是普通产品，由各个 vendor 维护，存放在 `device` 目录下，一般会按照 vendor 分目录分别存放。
+- GSI 产品，由 Google 统一维护，统一存放在 `build/target/product/AndroidProducts.mk` 中。
+- 每个 Product 的一个配置文件，放在 `build/target/product` 下。
+- 每个 Product 对应自己的 PRODUCT_DEVICE 的 product 目录，放在在 `build/target/board` 目录下。
 
-`AndroidProducts.mk` 文件中关键是定义两个变量:
-
-- `PRODUCT_MAKEFILES`: 定义真正的 **product 配置文件** 的路径，每个文件的命名必须符合 `$TARGET_PRODUCT.mk`
-- `COMMON_LUNCH_CHOICES`: 定义可以出现在 lunch 菜单项中的条目，每个条目的命名格式是 `$TARGET_PRODUCT-$TARGET_BUILD_VARIANTS`
-
-**product 配置文件**，其内容定义更侧重软件模块，主要是在描述该产品对应的文件系统 image 中会包含哪些模块和软件包等。**product 配置文件** 中我们比较关心的是其定义的 `PRODUCT_DEVICE` 这个变量，这个变量定义了 **"product 配置目录"**。
-
-**"product 配置目录"** 中我们比较关心的典型文件包括 **板级配置文件** `BoardConfig.mk`。这个文件中定义了更多 board 级别的编译构建变量定义。
-
-
-# 5. 附录：产品定义的继承关系
+# 4. 附录：产品定义的继承关系
 
 具体一个产品中要包含哪些 module，这个是需要用户自己定义的。有关 module 的定义方法，我总结了一篇笔记在 [《为 AOSP 添加一个 module》][3]。
 
