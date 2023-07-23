@@ -137,7 +137,7 @@ set tftp_boot 'echo Booting from tftp ...; set autoload no; setenv ipaddr 192.16
 run tftp_boot
 ```
 
-该命令会将 zImage 下载到 DDR 的 ${loadaddr} 处，将 am335x-boneblack.dtb 下载到 ${fdtaddr}，loadaddr 和 fdtaddr 是 U-boot 预先定义好的两个环境变量，分别是内核的加载地址（0x82000000）和 FDT 的加载地址（0x88000000）。下载完成功能后，继续设置内核启动参数 bootargs，最后调用 bootz 解压缩 zImage 即可启动内核。
+该命令会将 zImage 下载到 DDR 的 `${loadaddr}` 处，将 `am335x-boneblack.dtb` 下载到 `${fdtaddr}`，`loadaddr`` 和 `fdtaddr`` 是 U-boot 预先定义好的两个环境变量，分别是内核的加载地址（0x82000000）和 FDT 的加载地址（0x88000000）。下载完成功能后，继续设置内核启动参数 bootargs，最后调用 bootz 解压缩 zImage 即可启动内核。
 
 
 [1]:https://bootlin.com/doc/training/buildroot/buildroot-labs.pdf
