@@ -14,6 +14,7 @@
 	- [2.2. 给内核打上 PREEMPT_RT 补丁。](#22-给内核打上-preempt_rt-补丁)
 	- [2.3. 将 BBB-wireless 替换为 BBB](#23-将-bbb-wireless-替换为-bbb)
 - [3. TFTP 方式动态加载内核启动](#3-tftp-方式动态加载内核启动)
+- [4. 通过 NFS 挂载主机目录](#4-通过-nfs-挂载主机目录)
 
 <!-- /TOC -->
 
@@ -139,6 +140,51 @@ run tftp_boot
 
 该命令会将 zImage 下载到 DDR 的 `${loadaddr}` 处，将 `am335x-boneblack.dtb` 下载到 `${fdtaddr}`，`loadaddr` 和 `fdtaddr` 是 U-boot 预先定义好的两个环境变量，分别是内核的加载地址（0x82000000）和 FDT 的加载地址（0x88000000）。下载完成功能后，继续设置内核启动参数 bootargs，最后调用 bootz 解压缩 zImage 即可启动内核。
 
+
+# 4. 通过 NFS 挂载主机目录
+
+NFS 即网络文件系统，使用 NFS 的方法主要目的在于方便调试文件系统和应用程序。相应步骤如下：
+
+Host 侧安装并配置 NFS 服务器:
+
+```bash
+$ sudo apt-get install nfs-kernel-server
+```
+
+设置 Host 侧共享的 nfs 目录
+
+假设 NFS 的目录为 `/home/u/ws/nfs`，该目录将会被挂载到客户端，用户也可以使用自己定义的目录。将以下内容添加到“/etc/exports”文件尾，如果有多个共享目录则相应添加多行， 更详细的配置选项请参考“man exports”：
+
+```
+/home/u/ws/nfs *(rw,sync,no_root_squash)
+```
+
+设置完后需要重启 portmap 和 nfs-kernel-server 服务，使其生效。
+
+```bash
+$ sudo service portmap restart
+$ sudo service nfs-kernel-server restart
+```
+
+我们可以通过手动挂载方式在 Target 目标机（开发板）的根文件系统已经启动前提下，登录 Target 的 shell 之后，手动输入命令行将网络上 Host 共享的一个 NFS 文件夹挂载到开发板的根文件系统上。这种方式比较简单，常用于调试应用和驱动模块。下面是一个例子：假设主机 IP 地址是 192.168.2.14，主机共享的文件目录路径是 `/home/u/ws/nfs`，目标机上的挂载点路径是 `/mnt`。
+
+```bash
+# mount -t nfs -o nolock 192.168.2.14:/home/u/ws/nfs /mnt
+```
+
+这样我们在目标机上查看 `/mnt` 下的内容和主机上 `/home/u/ws/nfs` 上的内容是完全一样的，而且是双向同步的，两边任意一边做了修改都会在另一边体现出来。
+
+如果希望每次开机时都执行该操作，也可以将此命令写入启动批处理命令列表。
+
+如果要取消挂载可以输入以下命令（基于上面挂载的例子）
+
+```bash
+# umount /mnt
+```
+
+注意 mount 和 umount 都需要 root 权限。
+
+更进一步我们还可以在启动系统时将 Host 主机上的一个完整的根文件系统直接挂载到目标机的开发板上，这样可以避免更改 rootfs 后反复烧写开发板的存储设备，完全通过网络加载 rootfs。该方式主要用于根文件系统的调试。这里暂不描述。
 
 [1]:https://bootlin.com/doc/training/buildroot/buildroot-labs.pdf
 [2]:https://cdn.kernel.org/pub/linux/kernel/projects/rt/
