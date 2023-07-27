@@ -1,4 +1,4 @@
-![](./diagrams/logo-linux.png)
+![](./diagrams/RTLinux.png)
 
 文章标题：**工作笔记：基于 BBB 实验 RT-Linux**
 
