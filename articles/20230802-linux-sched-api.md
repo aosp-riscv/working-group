@@ -100,7 +100,7 @@ SYNOPSIS
   > calling sched_get_priority_min(2) and sched_get_priority_max(2) with the 
   > specified policy.  On Linux, these system calls return, respectively, 1 
   > and 99.
-  这个值越小优先级越高。
+  这个值越大优先级越高。
 
 ## 2.4. sched_setattr/sched_getattr
 
