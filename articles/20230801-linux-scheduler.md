@@ -64,12 +64,12 @@ Linux 2.6 种引入新的调度算法 CFS，同时引入一些针对调度子系
 ## 4.2. Scheduling Core
 
 两个主要入口：
-- The main body: `__schedule()``
+- The main body: `__schedule()`
 - Periodic accounting: `scheduler_tick()`
 
 ## 4.3. Scheduling Classes
 
-Linux Scheduler 子系统通过 Scheduling Classes 来扩展不同的调度器算法。内核定义了一个 [sched_class][sched_class] 作为接口类，这个类定义了一堆回调函数，不同的调度器类实现这个接口。譬如 `rt_sched_class` 就是 RT sched class 的实现。我们也
+Linux Scheduler 子系统通过 Scheduling Classes 来扩展不同的调度器算法。内核定义了一个 [`sched_class`][sched_class] 作为接口类，这个类定义了一堆回调函数，不同的调度器类实现这个接口。譬如 `rt_sched_class` 就是 RT sched class 的实现。我们也可以自己定义新的 scheduling class，实现 `sched_class` 定义的接口回调函数即可。
 
 ```cpp
 struct sched_class {
