@@ -108,7 +108,19 @@ struct sched_class {
 
 ![](./diagrams/20230801-linux-scheduler/sched-class-dl.png)
 
+有关 `SCHED_DEADLINE`，我们需要了解的是：
+
+This policy implements the Global Earliest Deadline First (GEDF) algorithm. Tasks scheduled under this policy can preempt any task scheduled with SCHED_FIFO or SCHED_RR.
+
+
 ![](./diagrams/20230801-linux-scheduler/sched-class-rt.png)
+
+- `SCHED_FIFO`: Tasks have a priority between 1 (low) and 99 (high). A task running under this policy is scheduled until it finishes or a higher prioritized task preempts it.
+- `SCHED_RR`: This policy is derived from `SCHED_FIFO`. The difference to `SCHED_FIFO` is that a task runs for the duration of a defined time slice (if it is not preempted by a higher prioritized task). It can be interrupted by a task with the same priority once the time slice is used up. The time slice definition is exported in procfs (`/proc/sys/kernel/sched_rr_timeslice_ms`).
+
+`SCHED_FIFO` 相比 `SCHED_RR` 更加强势，采用该 policy 的任务，除非自己执行完，或者被比更高优先级（譬如 STOP/DL 类，或者 RT 类中 priority 更高的）的任务抢占，否则不会主动让出 cpu。而 `SCHED_RR` 则相对温柔并且有底线，被更高优先级的任务抢占当然不用说了，如果运行期间不存在更高优先级的任务，那么它也不会一直霸占 cpu，而是最多执行一个时间片(time
+ slice)，时间片到了会尝试让渡 cpu。这个时间片默认定义值为 100ms，我们可以通过 `/proc/sys/kernel/sched_rr_timeslice_ms` 对该时间片进行设置。
+
 
 ![](./diagrams/20230801-linux-scheduler/sched-class-normal.png)
 
