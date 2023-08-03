@@ -235,7 +235,7 @@ nonvoluntary_ctxt_switches:	0
 
   `CONFIG_PREEMPT_COUNT` 这个配置开关和 `CONFIG_PREEMPTION`` 是捆绑的，当我们选择了 `PREEMPT`` 或者 `PREEMPT_RT`` 时会自动 `select PREEMPTION`，而 `PREEMPTION`` 会进一步自动 `select PREEMPT_COUNT`。这意味着 `PREEMPT`` 模式下 `CONFIG_PREEMPT_COUNT`` 也会被打开，所以以上代码可以认为在没有打开 PREEMPT 开关时 `preempt_xxxx()`` 这些函数都是空函数，一旦启用 `PREEMPT`` 模式后就会影响内核逻辑。
 
-  `PREEMPT`` 模式开启情况下 `preempt_disable()` 函数的逻辑非常简单，核心逻辑就是调用 `preempt_count_inc()` 增加抢占计数器的值，`preempt_enable()` 函数的逻辑稍微复杂一点，除了执行反操作调用 `preempt_count_dec_and_test()` 外还会调用`__preempt_schedule()`，该函数有可能会执行实际的任务调度完成抢占。 
+  `PREEMPT` 模式开启情况下 `preempt_disable()` 函数的逻辑非常简单，核心逻辑就是调用 `preempt_count_inc()` 增加抢占计数器的值，`preempt_enable()` 函数的逻辑稍微复杂一点，除了执行反操作调用 `preempt_count_dec_and_test()` 外还会调用`__preempt_schedule()`，该函数有可能会执行实际的任务调度完成抢占。 
 
 - 以上机制完备后，对于临界区的保护可以采用以下简单的方式：
 
