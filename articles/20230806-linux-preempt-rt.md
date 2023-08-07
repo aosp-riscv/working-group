@@ -97,7 +97,7 @@ int request_threaded_irq(unsigned int irq, irq_handler_t handler,
 			 const char *devname, void *dev_id)
 ```
 
-如果 `thread_fn`` 这个回调函数指针不为 NULL，kernel就会创建一个名字为 “irq/%d-%s” 的线程，优先级为50（`MAX_RT_PRIO / 2`），`%d` 对应着中断号 irq，`%s` 对应着设备名name。中断的上半部（硬中断）执行 handler（一般直接赋值为 NULL，除非要处理共享中断设备问题），在做完必要的处理工作之后，返回 `IRQ_WAKE_THREAD`` 之后 kernel 会唤醒 “ irq/%d-%s” 线程执行 `thread_fn` 函数以下半部的形式运行。如果不希望线程化，可以在 flags 中指定 `IRQF_NO_THREAD` 或者 `IRQF_TIMER`，譬如定时器（timer）中断在`PREEMPT_RT` 补丁中就没有线程化。
+如果 `thread_fn` 这个回调函数指针不为 NULL，kernel就会创建一个名字为 “irq/%d-%s” 的线程，优先级为50（`MAX_RT_PRIO / 2`），`%d` 对应着中断号 irq，`%s` 对应着设备名name。中断的上半部（硬中断）执行 handler（一般直接赋值为 NULL，除非要处理共享中断设备问题），在做完必要的处理工作之后，返回 `IRQ_WAKE_THREAD` 之后 kernel 会唤醒 “ irq/%d-%s” 线程执行 `thread_fn` 函数以下半部的形式运行。如果不希望线程化，可以在 flags 中指定 `IRQF_NO_THREAD` 或者 `IRQF_TIMER`，譬如定时器（timer）中断在`PREEMPT_RT` 补丁中就没有线程化。
 
 在主线内核版本中，为了保持和以往版本的兼容性，用于申请中断号的函数 `request_irq()` 虽然内部被替换为直接调用 `request_threaded_irq()`，但缺省情况下并没有启动线程化，第三个参数传入的是 NULL。参考如下代码：
 
@@ -199,7 +199,7 @@ static int irq_thread(void *data)
 }
 ```
 
-早期主线内核中缺省情况下 `IRQ_FORCED_THREADING` 这个配置并没有使能，所以在当时版本中大量的中断实际上并没有被线程化。中断上半部引入的延迟一定是存在的。从 3.12 开始，ARM 开始 “Allow forced irq threading”，`IRQ_FORCED_THREADING` 被加入 `arch/arm/Kconfig`；4.2 中 arm64 也默认使能了 `IRQ_FORCED_THREADING`。从 5.4 开始，也就是在 5.3 开启 PREEMPT_RT 的主线化工作后，内核 “Force interrupt threading on RT”（commitid：b6a32bbd8735def2d0d696ba59205d1874b7800f），具体代码参考上面 `force_irqthreads()` 的定义部分，所以现在对于主线内核（无需额外打上 `PREEMPT_RT`` 补丁）只要我们在配置中选择了 `PREEMPT_RT` 抢占模式，则对于 ARM/ARM64, 中断强制线程化将默认被使能，我们也无需通过启动内核时通过命令行参数进行额外的指定了。
+早期主线内核中缺省情况下 `IRQ_FORCED_THREADING` 这个配置并没有使能，所以在当时版本中大量的中断实际上并没有被线程化。中断上半部引入的延迟一定是存在的。从 3.12 开始，ARM 开始 “Allow forced irq threading”，`IRQ_FORCED_THREADING` 被加入 `arch/arm/Kconfig`；4.2 中 arm64 也默认使能了 `IRQ_FORCED_THREADING`。从 5.4 开始，也就是在 5.3 开启 PREEMPT_RT 的主线化工作后，内核 “Force interrupt threading on RT”（commitid：b6a32bbd8735def2d0d696ba59205d1874b7800f），具体代码参考上面 `force_irqthreads()` 的定义部分，所以现在对于主线内核（无需额外打上 `PREEMPT_RT` 补丁）只要我们在配置中选择了 `PREEMPT_RT` 抢占模式，则对于 ARM/ARM64, 中断强制线程化将默认被使能，我们也无需通过启动内核时通过命令行参数进行额外的指定了。
 
 # 3. 针对软中断的实时化改造
 
@@ -209,9 +209,9 @@ static int irq_thread(void *data)
 
 软中断最终的执行由 `__do_softirq()` 函数完成。没有引入 `PREEMPT_RT` 情况下主线内核的具体的执行点情况总结如下：
 
-- 在硬中断执行完毕刚刚开中断的时候，以 ARM 架构为例，缺省没有强制线程化（`force_irqthreads` 默认为 0）的执行流程如下：`handle_IRQ()` -> `irq_exit()` -> `__irq_exit_rcu()` -> `invoke_softirq()`` –> `__do_softirq()`。
+- 在硬中断执行完毕刚刚开中断的时候，以 ARM 架构为例，缺省没有强制线程化（`force_irqthreads` 默认为 0）的执行流程如下：`handle_IRQ()` -> `irq_exit()` -> `__irq_exit_rcu()` -> `invoke_softirq()` –> `__do_softirq()`。
 - 在 ksoftirqd 内核态线程被调度中被执行：`run_ksoftirqd()` -> `__do_softirq()`。
-- 在所有内核执行路径中可能会使能软中断处理的地方，具体来说就是调用诸如 `local_bh_enable()` 这些函数中。函数调用序列为`local_bh_enable()`` -> `_local_bh_enable_ip()` -> `do_softirq()`` -> `do_softirq_own_stack` -> `__do_softirq()`。
+- 在所有内核执行路径中可能会使能软中断处理的地方，具体来说就是调用诸如 `local_bh_enable()` 这些函数中。函数调用序列为 `local_bh_enable()` -> `_local_bh_enable_ip()` -> `do_softirq()` -> `do_softirq_own_stack` -> `__do_softirq()`。
 
 在 `__do_softirq()` 函数中会根据当前系统 softirq 的 pending 情况决定是直接运行还是推后到 ksoftirqd 内核线程中执行，这里的直接运行应该还是在中断上下文中，只不过是在下半部所以是开中断的。另外一种推迟到 ksoftirqd 内核线程中执行则是在任务上下文中执行。
 
@@ -219,9 +219,9 @@ static int irq_thread(void *data)
 
 ## 3.2. 改进方法
 
-`PREEMPT_RT`` 补丁解决这个问题的想法很简单，和处理硬中断类似，只要我们把所有的软中断都放到 ksoftirqd 内核线程中运行，这样就可以按优先级参与内核的统一调度了。但由此可见，这么做会对那些原本通过在中断上下文中执行用来加速处理的块设备、网络设备来说会降低吞吐量上的处理效率，但这对于实时系统来说是无法避免的，因为保证实时性和处理效率本身是一对矛盾的综合体。
+`PREEMPT_RT` 补丁解决这个问题的想法很简单，和处理硬中断类似，只要我们把所有的软中断都放到 ksoftirqd 内核线程中运行，这样就可以按优先级参与内核的统一调度了。但由此可见，这么做会对那些原本通过在中断上下文中执行用来加速处理的块设备、网络设备来说会降低吞吐量上的处理效率，但这对于实时系统来说是无法避免的，因为保证实时性和处理效率本身是一对矛盾的综合体。
 
-具体代码上，和硬中断实时性改造一样，在 5.3 开启 PREEMPT_RT 的主线化工作后，内核 “softirq: Make softirq control and processing RT aware”（commitid：8b1c04acad082dec76f3f8f7e1fa13493d6cbb79）针对 softirq 为 `PREEMPT_RT`` 抢占模式重写了一些关键函数，包括 `invoke_softirq()`、`__local_bh_enable_ip()` 等。以 `invoke_softirq()` 为例，在 `PREEMPT_RT` 下，`invoke_softirq()` 变得很简单，只会唤醒 ksoftirqd 内核线程进行处理，不再有可能在中断上下文中执行 `__do_softirq()` 函数，摘录如下：
+具体代码上，和硬中断实时性改造一样，在 5.3 开启 PREEMPT_RT 的主线化工作后，内核 “softirq: Make softirq control and processing RT aware”（commitid：8b1c04acad082dec76f3f8f7e1fa13493d6cbb79）针对 softirq 为 `PREEMPT_RT` 抢占模式重写了一些关键函数，包括 `invoke_softirq()`、`__local_bh_enable_ip()` 等。以 `invoke_softirq()` 为例，在 `PREEMPT_RT` 下，`invoke_softirq()` 变得很简单，只会唤醒 ksoftirqd 内核线程进行处理，不再有可能在中断上下文中执行 `__do_softirq()` 函数，摘录如下：
 
 ```cpp
 static inline void invoke_softirq(void)
@@ -290,7 +290,7 @@ PREEMPT_RT 解决锁同步问题的基本措施是引入 rtmutex。首先简单�
 
   Spinlock 的实时化改造，可以有效解决前面介绍的 spinlock 在 SMP 上的问题，，首先 CPU1 和 CPU2 都不会被禁止抢占，所以高优先级的任务 C 必定有机会抢占处理器，其次任务 B 此时也不会进入自旋，而是在没有获得互斥量的情况下会进入休眠，这对 CPU2 来说未尝不是一件好事。总而言之，spinlock 的改造对减少高优先级实时任务的抢占延迟会有改进。
 
-- `PREEMPT_RT` 对 spinlock 的改造思路其主要的修改可以关注 `include/linux/mutex.h`。如果没有使能 `PREEMPT_RT`，那么保持原来的 `struct mutex`` 的定义，如果使能了 `PREEMPT_RT`，则用 `rt_mutex_base`` 代替了原来的 spinlock 实现机制。
+- `PREEMPT_RT` 对 mutex 的改造思路其主要的修改可以关注 `include/linux/mutex.h`。如果没有使能 `PREEMPT_RT`，那么保持原来的 `struct mutex` 的定义，如果使能了 `PREEMPT_RT`，则用 `rt_mutex_base` 代替了原来的 spinlock 实现机制。
 
   ```cpp
   #ifndef CONFIG_PREEMPT_RT
