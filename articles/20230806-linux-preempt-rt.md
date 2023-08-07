@@ -1,11 +1,11 @@
 ![](./diagrams/RTLinux.png)
 
-文章标题：**笔记：Linux PREEMPT_RT 补丁分析报告**
+文章标题：**笔记：Linux "PREEMPT_RT" 抢占模式分析报告**
 
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
-本笔记总结了 Linux 内核的 `PREEMPT_RT` 抢占模型，分析了该抢占类型中抢占动作的实现机制。
+本笔记总结了 Linux 内核的 `PREEMPT_RT` 抢占模式，分析了该抢占类型中抢占动作的实现机制。
 
 代码部分基于 Linux 5.15.36；涉及架构时以 ARM 为例子。
 
