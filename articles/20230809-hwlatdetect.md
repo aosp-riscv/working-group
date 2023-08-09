@@ -50,6 +50,25 @@ Linux 内核部分代码基于版本 v6.1.38
 
   > The hardware latency detector works by hogging one of the cpus for configurable amounts of time (with interrupts disabled), polling the CPU Time Stamp Counter for some period, then looking for gaps in the TSC data. Any gap indicates a time when the polling was interrupted and since the interrupts are disabled, the only thing that could do that would be an SMI or other hardware hiccup (or an NMI, but those can be tracked).
 
+- [内核文档 OSNOISE Tracer][5] 中也有一段对 hwlatdetect 的描述，写得不错，摘录如下：
+
+  > hwlat_detector is one of the tools used to identify the most complex
+  > source of noise: *hardware noise*.
+  > 
+  > In a nutshell, the hwlat_detector creates a thread that runs
+  > periodically for a given period. At the beginning of a period, the thread
+  > disables interrupt and starts sampling. While running, the hwlatd
+  > thread reads the time in a loop. As interrupts are disabled, threads,
+  > IRQs, and SoftIRQs cannot interfere with the hwlatd thread. Hence, the
+  > cause of any gap between two different reads of the time roots either on
+  > NMI or in the hardware itself. At the end of the period, hwlatd enables
+  > interrupts and reports the max observed gap between the reads. It also
+  > prints a NMI occurrence counter. If the output does not report NMI
+  > executions, the user can conclude that the hardware is the culprit for
+  > the latency. The hwlat detects the NMI execution by observing
+  > the entry and exit of a NMI.
+
+
 - Linux 中 `kernel/trace/trace_hwlat.c` 这个文件最早提交的 commitid e7c15cd8a113335cf7154f027c9c8da1a92238ee 对应的 commitment 的注释, 摘录一下：
 
   >    The logic is pretty simple. It simply creates a thread that spins on a
@@ -109,7 +128,7 @@ Linux 内核部分代码基于版本 v6.1.38
   >	 file. Every time a latency is greater than tracing_thresh, it will
   >	 be recorded into the ring buffer.
 
-差不多就是这个意思，执行 detection 时，CPU 上会关闭所有中断，然后执行一个内核线程，通过 looping 方式查询 Time Stamp Counter, 判断两次读取之间的时间差是否出现大的延迟，如果出现并且大于你的期望值则说明系统上有影响实时性的问题。
+差不多就是这个意思，执行 detection 时，CPU 上会关闭所有中断(不包括 NMI)，然后执行一个内核线程，通过 looping 方式周期性查询 Time Stamp Counter, 判断两次读取之间的时间差是否出现大的延迟，因为关中断，所以任务调度、其他硬中断和软中断都不会干扰（抢占） hwlatd 线程，如果出现并且大于你的期望值的延迟则说明存在 NMI 或者硬件系统上有影响实时性的问题。
 
 # 4. 使用 hwlatdetect
 
@@ -141,3 +160,4 @@ Samples exceeding threshold: 0
 [2]:https://elixir.bootlin.com/linux/v6.1.38/source/Documentation/trace/hwlat_detector.rst
 [3]:./20230808-cyclictest.md
 [4]:https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_for_real_time/8/html/optimizing_rhel_8_for_real_time_for_low_latency_operation/assembly_running-and-interpreting-hardware-and-firmware-latency-tests_optimizing-rhel8-for-real-time-for-low-latency-operation
+[5]:https://elixir.bootlin.com/linux/v6.1.38/source/Documentation/trace/osnoise-tracer.rst
