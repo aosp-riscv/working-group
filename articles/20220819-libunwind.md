@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 在研究 Stack unwinding 的过程中接触到了不少用于该目的的库，总结在这里方便以后查看。
 
 在这些库中，我目前主要研究的是 [nongnu 的 libunwind][1] 和 [LLVM 的 libunwind][2]，所以在这篇笔记中我也会把我对这两个项目的代码理解简单总结一下（先只列了 nongnu 的 libunwind，LLVM 的 libunwind 的实现后来看了一下实际类似，只是 llvm 的代码全部是 c++ 写的，比较抽象，可读性我觉得反而没有 nongun 的 libunwind 的 c 读起来舒服）。
@@ -22,9 +24,9 @@
 - [3. GCC/Clang Built-in Function](#3-gccclang-built-in-function)
 - [4. glibc 提供的 `backtrace`/`backtrace_symbols` 函数](#4-glibc-提供的-backtracebacktrace_symbols-函数)
 - [5. libunwind (nongnu)](#5-libunwind-nongnu)
-	- [5.1. 构建 libunwind (nongnu)](#51-构建-libunwind-nongnu)
-	- [5.2. 使用 libunwind (nongnu)](#52-使用-libunwind-nongnu)
-	- [5.3. libunwind (nongnu) 代码分析](#53-libunwind-nongnu-代码分析)
+  - [5.1. 构建 libunwind (nongnu)](#51-构建-libunwind-nongnu)
+  - [5.2. 使用 libunwind (nongnu)](#52-使用-libunwind-nongnu)
+  - [5.3. libunwind (nongnu) 代码分析](#53-libunwind-nongnu-代码分析)
 
 <!-- /TOC -->
 

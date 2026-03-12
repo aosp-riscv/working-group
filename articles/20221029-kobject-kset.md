@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本文主要记录了一些学习 Linux 设备模型（Device Model）过程中对 kobject 和 kset 数据结构的理解，这部分的内容网上其实已经很丰富了，这里更多的是对网上资料的摘抄以及根据自己的理解的重新整理。有什么雷同或者不足之处欢迎批评指正。
 
 文章大纲

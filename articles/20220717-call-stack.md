@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 文章大纲
 
 <!-- TOC -->
@@ -13,11 +15,11 @@
 - [2. 什么是 Call Stack](#2-什么是-call-stack)
 - [3. Call Stack 的组成](#3-call-stack-的组成)
 - [4. Stack frame 中的具体内容](#4-stack-frame-中的具体内容)
-    - [4.1. 返回地址（Return Address）](#41-返回地址return-address)
-    - [4.2. 帧指针（Frame Pointer）](#42-帧指针frame-pointer)
-    - [4.3. 局部变量（Local data storage）](#43-局部变量local-data-storage)
-    - [4.4. 函数参数（Parameter passing）或返回值](#44-函数参数parameter-passing或返回值)
-    - [4.5. Others](#45-others)
+  - [4.1. 返回地址（Return Address）](#41-返回地址return-address)
+  - [4.2. 帧指针（Frame Pointer）](#42-帧指针frame-pointer)
+  - [4.3. 局部变量（Local data storage）](#43-局部变量local-data-storage)
+  - [4.4. 函数参数（Parameter passing）或返回值](#44-函数参数parameter-passing或返回值)
+  - [4.5. Others](#45-others)
 - [5. 例子](#5-例子)
 
 <!-- /TOC -->

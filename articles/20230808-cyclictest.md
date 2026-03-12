@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本笔记简单总结了 RTLinux 测试中常用的 cyclictest 的安装方法，并简单分析了 cyclictest 的工作原理。
 
 cyclictest 代码部分基于 rt-tests v2.3。
@@ -14,8 +16,8 @@ cyclictest 代码部分基于 rt-tests v2.3。
 - [1. 什么是 cyclictest](#1-什么是-cyclictest)
 - [2. 编译 cyclictest](#2-编译-cyclictest)
 - [3. cyclictest 代码分析](#3-cyclictest-代码分析)
-	- [3.1. "抢占延迟" 的概念](#31-抢占延迟-的概念)
-	- [3.2. cyclictest 计算延迟算法分析](#32-cyclictest-计算延迟算法分析)
+  - [3.1. "抢占延迟" 的概念](#31-抢占延迟-的概念)
+  - [3.2. cyclictest 计算延迟算法分析](#32-cyclictest-计算延迟算法分析)
 
 <!-- /TOC -->
 

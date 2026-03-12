@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本笔记主要是摘录了一些我在整理有关 Linux 调度器子系统中有关 scheduling class 和 Scheduling policy 方面的内容。通过这篇笔记希望对理解 Linux 内核中调度器的框架设计有一个初步的认识。
 
 因为是摘录，所以本文主要是提纲挈领，没有过多的深入。

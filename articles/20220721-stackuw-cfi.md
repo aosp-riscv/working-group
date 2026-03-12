@@ -5,16 +5,18 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 文章大纲
 
 <!-- TOC -->
 
 - [1. 参考](#1-参考)
 - [2. 基本概念](#2-基本概念)
-	- [2.1. DWARF 定义的 section `.debug_frame`](#21-dwarf-定义的-section-debug_frame)
-	- [2.2. LSB 定义的 section `.eh_frame`](#22-lsb-定义的-section-eh_frame)
-	- [2.3. `.eh_frame` vs `.debug_frame`](#23-eh_frame-vs-debug_frame)
-	- [2.4. 编译选项对 section `.debug_frame` 和 `.eh_frame` 的影响](#24-编译选项对-section-debug_frame-和-eh_frame-的影响)
+  - [2.1. DWARF 定义的 section `.debug_frame`](#21-dwarf-定义的-section-debug_frame)
+  - [2.2. LSB 定义的 section `.eh_frame`](#22-lsb-定义的-section-eh_frame)
+  - [2.3. `.eh_frame` vs `.debug_frame`](#23-eh_frame-vs-debug_frame)
+  - [2.4. 编译选项对 section `.debug_frame` 和 `.eh_frame` 的影响](#24-编译选项对-section-debug_frame-和-eh_frame-的影响)
 - [3. 基于 CFI 的栈回溯工作原理分析](#3-基于-cfi-的栈回溯工作原理分析)
 - [4. section `.eh_frame` 中的数据结构](#4-section-eh_frame-中的数据结构)
 - [5. CFI directives](#5-cfi-directives)

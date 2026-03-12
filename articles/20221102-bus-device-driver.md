@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 说得好听叫三剑客，其实就是 Bus、Device 和 Driver。简单做个笔记，方便回顾时快速复习。
 
 本文暂时不涉及内核中 Bus/Device/Driver 的详细实现，需要再补充吧，感觉这部分内容比较成熟，网上资料也不少了。

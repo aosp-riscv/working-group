@@ -5,6 +5,7 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
 
 目前先整理总结一下 优先级反转（Priority Inversion）和 优先级继承（Priority Inheritance）的基本概念。有关 Linux 内核中如何实现的相关内容，后面有机会再补充。
 

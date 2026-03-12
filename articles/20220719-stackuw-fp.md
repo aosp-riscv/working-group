@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 文章大纲
 
 <!-- TOC -->
@@ -12,8 +14,8 @@
 - [1. 参考](#1-参考)
 - [2. 基于 Frame Pointer 实现栈回溯的工作原理](#2-基于-frame-pointer-实现栈回溯的工作原理)
 - [3. fp 的优化相关总结](#3-fp-的优化相关总结)
-    - [3.1. `-O1`](#31--o1)
-    - [3.2. `-O2`](#32--o2)
+  - [3.1. `-O1`](#31--o1)
+  - [3.2. `-O2`](#32--o2)
 - [4. 基于 FP 实现 Stack Unwinding 的优势和不足](#4-基于-fp-实现-stack-unwinding-的优势和不足)
 
 <!-- /TOC -->

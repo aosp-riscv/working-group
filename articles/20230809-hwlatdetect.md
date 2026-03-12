@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本笔记简单总结了 RTLinux 测试中常用的 hwlatdetect 的安装方法，并简单介绍了 hwlatdetect 的使用。
 
 hwlatdetect 代码部分基于 rt-tests v2.3。

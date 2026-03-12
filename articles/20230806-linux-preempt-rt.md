@@ -5,6 +5,8 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本笔记总结了 Linux 内核的 `PREEMPT_RT` 抢占模式，分析了该抢占类型中抢占动作的实现机制。
 
 代码部分基于 Linux 5.15.36；涉及架构时以 ARM 为例子。

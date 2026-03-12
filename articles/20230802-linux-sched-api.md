@@ -5,16 +5,19 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
+
 本笔记主要是总结了 Linux 上提供的用于设置任务调度的 API。
+
 <!-- TOC -->
 
 - [1. 参考文档](#1-参考文档)
 - [2. 设置调度策略（policy）和优先级（priority）](#2-设置调度策略policy和优先级priority)
-	- [2.1. nice](#21-nice)
-	- [2.2. setpriority/getpriority](#22-setprioritygetpriority)
-	- [2.3. sched_setscheduler/sched_getscheduler](#23-sched_setschedulersched_getscheduler)
-	- [2.4. sched_setattr/sched_getattr](#24-sched_setattrsched_getattr)
-	- [2.5. sched_get_priority_max/sched_get_priority_min](#25-sched_get_priority_maxsched_get_priority_min)
+  - [2.1. nice](#21-nice)
+  - [2.2. setpriority/getpriority](#22-setprioritygetpriority)
+  - [2.3. sched\_setscheduler/sched\_getscheduler](#23-sched_setschedulersched_getscheduler)
+  - [2.4. sched\_setattr/sched\_getattr](#24-sched_setattrsched_getattr)
+  - [2.5. sched\_get\_priority\_max/sched\_get\_priority\_min](#25-sched_get_priority_maxsched_get_priority_min)
 - [3. 其他（未总结）](#3-其他未总结)
 
 <!-- /TOC -->

@@ -5,13 +5,14 @@
 - 作者：汪辰
 - 联系方式：<unicorn_wang@outlook.com> / <wangchen20@iscas.ac.cn>
 
+**注：本文章已经迁移到 <https://gitee.com/unicornx/tblog/> 继续维护，下文仅保留作为原归档备份。**
 
 <!-- TOC -->
 
 - [1. 参考文档](#1-参考文档)
 - [2. 搭建过程描述](#2-搭建过程描述)
 	- [2.1. 修改内核](#21-修改内核)
-	- [2.2. 给内核打上 PREEMPT_RT 补丁。](#22-给内核打上-preempt_rt-补丁)
+	- [2.2. 给内核打上 PREEMPT\_RT 补丁。](#22-给内核打上-preempt_rt-补丁)
 	- [2.3. 将 BBB-wireless 替换为 BBB](#23-将-bbb-wireless-替换为-bbb)
 - [3. TFTP 方式动态加载内核启动](#3-tftp-方式动态加载内核启动)
 - [4. 通过 NFS 挂载主机目录](#4-通过-nfs-挂载主机目录)
